@@ -1,0 +1,38 @@
+\documentclass[a4paper]{article}
+
+\title{Specification for PaperTrader}
+\author{altffour}
+
+\begin{document}
+\maketitle
+\newpage
+
+\section{Sepecification}
+
+\subsection{Master Servers}
+Per instance of the papertrader there should be exactly one master server.
+
+\begin{itemize}
+	\item The master server contains all accounts.
+	\item Calculates stock changes.
+	\item Issues sell and buy of assets
+	\item Keeps track of due sell and buy of assets.
+	\item Has an external API to get values of assets.
+	\item Receive commands from worker servers and choose whether to authorize them or not.
+	\item A secure logging system.
+	\item Only accept commands from worker systems.
+	\item Has an event logging system.
+	\item Manages online worker systems.
+\end{itemize}
+
+\subsection{Worker Servers}
+
+\begin{itemize}
+	\item It Can be deployed as many times as needed.
+	\item MUST be deployed at least once.
+	\item Ability to organize sent commands to the master server with timestamps.
+	\item Routes login information to the master server.
+\end{itemize}
+
+\end{document}
+
