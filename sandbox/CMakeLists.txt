@@ -2,11 +2,12 @@ project("sandbox" LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 
+set(sandbox_hdrs)
 set(sandbox_srcs 
-	"main.c"
+	main.c
 )
 
-add_executable(${PROJECT_NAME} ${sandbox_srcs})
+add_executable(${PROJECT_NAME} ${sandbox_hdrs} ${sandbox_srcs})
 
 # Set compiler arguments.
 if(MSVC)
