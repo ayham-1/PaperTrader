@@ -32,3 +32,15 @@ jobs:
         run: |
           cmake --config=Release .
           msbuild PaperTrader.sln
+    docker-build:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        - name: Checkout submodules
+          uses: textbook/git-checkout-submodule-action@master
+        - name: Build Debug
+          run: |
+            ./buildDocker.sh
+        - name: Build Release
+          run: |
+            ./buildDockerRelease.sh
