@@ -94,31 +94,35 @@ speed and reliabilty. An overview diagram of the infrastructure: \newline
 
 \newpage
 \subsubsection{Master Server Infrastructure Model}
-The master server is contains critical data. It can be defined into modules as
-demonstrated in the following diagram: \newline
+The master can be defined into modules as demonstrated in the following diagram:
+\newline
 
 \begin{center}
 \begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,rounded
 	corners}]
 	% create the nodes.
 	\node (master) {Master Server};
-	\node (db) [above right=2cm and 2cm of master]{Database};
-	\node (acc) [below=of db]{Account \& Authorization};
-	\node (log) [below=of acc]{Event Logging system};
-	\node (worker) [below=of log]{Worker Server Management};
-	\node (asset) [below=of worker]{Assets data retrieval};
-	\node (assettrans) [below=of asset]{Assets Buy \& Sell};
-	\node (outsideworkers) [left=of master] {Outside Workers};
+	\node (db) [above=of master]{Database};
+	\node (acc) [left=of db]{Account \& Authorization};
+	\node (log) [right=of db]{Event Logging system};
+	\node (worker) [below left=of master]{Worker Server Management};
+	\node (asset) [below right=of master]{Assets data retrieval};
+	\node (assettrans) [below=of master]{Assets Buy \& Sell};
+	\node (outsideworkers) [left=4cm of master] {Outside Workers};
 
     % connect the nodes
-    \draw[<->] (outsideworkers) -- (master);
-    \draw[<->] (master) -- (db);
+	\draw[<->] (outsideworkers) -- (master);
+	\draw[<->] (master) -- (db);
     \draw[<->] (master) -- (acc);
+	\draw[<->] (acc) -- (outsideworkers);
     \draw[<->, dashed] (acc) -- (db);
     \draw[<->] (master) -- (log);
     \draw[<->] (master) -- (worker);
+	\draw[<->] (worker) -- (outsideworkers);
+    \draw[<->, dashed] (acc) -- (db);
     \draw[<->] (master) -- (asset);
     \draw[<->] (master) -- (assettrans);
+	\draw[<->] (assettrans) -- (outsideworkers);
 \end{tikzpicture}
 \end{center}
 
