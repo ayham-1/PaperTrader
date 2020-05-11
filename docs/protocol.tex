@@ -217,13 +217,32 @@ crash the server and dump the logs from the memory of the event log system.
 Refer to \ref{Memory size of Log system} for insight on why this is recommended.
 
 \subsubsection{Database Management}
-The database management sould be able to do the following things:
+The database management module sould be able to do the following things:
 \begin{itemize}
 	\item Be able to manipulate files (create, delete, write, read).
 	\item Be able to convert data representations (structs) into SQL Databases.
 \end{itemize}
 
-The mainpulations of files should be quite straightforward, a couple of
-functions. The ability to manipulate to an SQL database is also necassery.
+The manipulations of files should be quite straightforward, a couple of
+functions. The ability to access an SQL database is also necassery.
+
+\subsubsection{Account Management}
+The account management module  should be able to do the following things:
+\begin{itemize}
+	\item Be able to register new users.
+	\item Be able to login \emph{AND} authorize users.
+	\item Be able to return a session token for the user.
+	\item Be able to manage those session tokens.
+\end{itemize}
+
+The module should be able to take the set of information given and put them
+into the database (using the database management \ref{Database Management}).
+All passwords should be hashed and salted, this is up to the implementation on
+the exact details. The accounts registered may contain third-party logins ex. 
+Google Logins. In that case the account \emph{MUST} be recognized as an account
+with a password, and the user should be asked to sign in with the third-party
+credentials. It should also be possible to add a password to the account marked
+to be 'logginable' with third-party logins, making it possible to login with
+the password and using third-party logins.
 
 \end{document}
