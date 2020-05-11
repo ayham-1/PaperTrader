@@ -98,32 +98,103 @@ The master can be defined into modules as demonstrated in the following diagram:
 \newline
 
 \begin{center}
-\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,rounded
-	corners}]
-	% create the nodes.
-	\node (master) {Master Server};
-	\node (db) [above=of master]{Database};
-	\node (acc) [left=of db]{Account \& Authorization};
-	\node (log) [right=of db]{Event Logging system};
-	\node (worker) [below left=of master]{Worker Server Management};
-	\node (asset) [below right=of master]{Assets data retrieval};
-	\node (assettrans) [below=of master]{Assets Buy \& Sell};
-	\node (outsideworkers) [left=4cm of master] {Outside Workers};
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,rounded
+		corners}]
+		% create the nodes.
+		\node (master) {Master Server};
+		\node (db) [above=of master]{Database};
+		\node (acc) [left=of db]{Account \& Authorization};
+		\node (log) [right=of db]{Event Logging system};
+		\node (worker) [below left=of master]{Worker Server Management};
+		\node (asset) [below right=of master]{Assets data retrieval};
+		\node (assettrans) [below=of master]{Assets Buy \& Sell};
+		\node (outsideworkers) [left=4cm of master] {Outside Workers};
+		\node (client) [left=of outsideworkers]{Clients};
 
-    % connect the nodes
-	\draw[<->] (outsideworkers) -- (master);
-	\draw[<->] (master) -- (db);
-    \draw[<->] (master) -- (acc);
-	\draw[<->] (acc) -- (outsideworkers);
-    \draw[<->, dashed] (acc) -- (db);
-    \draw[<->] (master) -- (log);
-    \draw[<->] (master) -- (worker);
-	\draw[<->] (worker) -- (outsideworkers);
-    \draw[<->, dashed] (acc) -- (db);
-    \draw[<->] (master) -- (asset);
-    \draw[<->] (master) -- (assettrans);
-	\draw[<->] (assettrans) -- (outsideworkers);
-\end{tikzpicture}
+		% connect the nodes
+		\draw[<->] (outsideworkers) -- (master);
+		\draw[<->] (master) -- (db);
+		\draw[<->] (master) -- (acc);
+		\draw[<->] (acc) -- (outsideworkers);
+		\draw[<->, dashed] (acc) -- (db);
+		\draw[<->] (master) -- (log);
+		\draw[<->] (master) -- (worker);
+		\draw[<->] (worker) -- (outsideworkers);
+		\draw[<->, dashed] (acc) -- (db);
+		\draw[<->] (master) -- (asset);
+		\draw[<->] (master) -- (assettrans);
+		\draw[<->] (assettrans) -- (outsideworkers);
+		\draw[<->] (client) -- (worker);
+		\draw[<->] (client) -- (outsideworkers);
+	\end{tikzpicture}
 \end{center}
+
+\subsubsection{Worker Servers Infrastructure Model}
+The worker servers can be defined into modules as demonstrated in the following
+diagram:\newline
+
+\begin{center}
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,rounded
+		corners}]
+		% create the nodes
+		\node (workerserver) {Worker Server};
+		\node (masterserver) [right=4cm of workerserver] {Master Server};
+		\node (clients) [left=2cm of workerserver] {Clients};
+		\node (mastercom) [above right=of workerserver] {Master Server Communication};
+		\node (cachemanage) [above=of workerserver] {Cache Management};
+		\node (clientmanage) [above left=of workerserver] {Client Management};
+		\node (accauth) [below left=of workerserver] {Account Authorization};
+		\node (event) [below right=of workerserver] {Event Logging};
+
+		% connect the nodes
+		\draw[<->] (masterserver) -- (workerserver);
+		\draw[<->] (mastercom) -- (masterserver);
+		\draw[<->] (workerserver) -- (clients);
+		\draw[<->, dashed] (masterserver.west) to [bend right=15] (clients.west);
+		\draw[<->] (workerserver) -- (mastercom);
+		\draw[<->] (workerserver) -- (cachemanage);
+		\draw[<->] (workerserver) -- (clientmanage);
+		\draw[<->] (clientmanage) -- (clients);
+		\draw[<->] (workerserver) -- (accauth);
+		\draw[<->] (accauth) -- (clients);
+		\draw[<->] (workerserver) -- (event);
+
+	\end{tikzpicture}
+\end{center}
+
+\subsection{Global Deployment Variables}
+This section contains an overview of the global deployment variables.
+
+\subsubsection{Number of Workers}
+This is the number of workers deployed with the master server. It must be 
+atleast one. The worker server preferably should be deployed regionally.
+\subsubsection{Memory Size of Log system}
+This is a technical variable, this is the size of the log in memory before it 
+being flushed to harddisk. Generally the smaller this is the more disk speed is
+required. And the larger it is the more RAM the instance needs and the faster 
+it is.
+\subsubsection{Stock Data Update Interval}
+This is the interaval of the stock data retrieval. The more this is the faster
+the transactions that can occur in a minute. This should be planned perfectly
+so that it can maintain the userbase with the API calls.
+
+\section{A more Technical Overview}
+This is the section that describes the functioning parts of the project in
+detail. We will start with modules, including master server modules, and worker
+server modules.
+
+\subsection{Modules}
+\subsubsection{Master Server}
+The master server has multiple modules:
+\begin{itemize}
+	\item Main Module, i.e the driver.
+	\item Database Management.
+	\item Account Management.
+	\item Event Logging System.
+	\item Authorization.
+	\item Worker Management.
+	\item Assets Data Retrieval.
+	\item Assets Transaction Management.
+\end{itemize}
 
 \end{document}
