@@ -183,8 +183,7 @@ This is the section that describes the functioning parts of the project in
 detail. We will start with modules, including master server modules, and worker
 server modules.
 
-\subsection{Modules}
-\subsubsection{Master Server}
+\subsection{Master Server}
 The master server has multiple modules:
 \begin{itemize}
 	\item Main Module, i.e the driver.
@@ -196,5 +195,35 @@ The master server has multiple modules:
 	\item Assets Data Retrieval.
 	\item Assets Transaction Management.
 \end{itemize}
+
+\subsubsection{Main Module}
+The main module should be able to do the following things:
+\begin{itemize}
+	\item Start the authorization thread.
+	\item Start the Worker Management thread.
+	\item Start the assets data retrieval thread.
+	\item Start the assets transaction thread.
+	\item Be able to parse commands from the worker threads.
+	\item Be able to route the commands to the correct thread.
+\end{itemize}
+
+The main module's functionality in relation of the deployment and running stage
+is as follows, The binary containing the master server is run -> initializes 
+states required to operate the server -> start the threads -> start listening 
+to workers -> parse it -> pass it to the appropriate thread. This is usually 
+the set of functions that the main function would call. Putting the workings 
+of the main module on a seperate is advised, since it gives the ability to
+crash the server and dump the logs from the memory of the event log system.
+Refer to \ref{Memory size of Log system} for insight on why this is recommended.
+
+\subsubsection{Database Management}
+The database management sould be able to do the following things:
+\begin{itemize}
+	\item Be able to manipulate files (create, delete, write, read).
+	\item Be able to convert data representations (structs) into SQL Databases.
+\end{itemize}
+
+The mainpulations of files should be quite straightforward, a couple of
+functions. The ability to manipulate to an SQL database is also necassery.
 
 \end{document}
