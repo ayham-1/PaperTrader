@@ -324,4 +324,38 @@ them on the account transaction history of the issuer of the transaction. The
 history should be able to show the time of the transaction going through. All 
 transaction go through a queue. The queue is cleared every update interval.
 
+\newpage
+\subsection{Worker Server}
+The worker server has multiple modules:
+\begin{itemize}
+	\item Main module. i.e The driver.
+	\item Master Server Communication.
+	\item Cache Management.
+	\item Account Authorization Tunnel.
+	\item Event Logging System.
+	\item Client Management.
+\end{itemize}
+
+\subsubsection{Main Module}
+The main module should be able to do the following things:
+\begin{itemize}
+	\item Start the master server communication thread.
+	\item Start the client management thread.
+\end{itemize}
+
+The main module's functionality in relation of deployment and running stage is 
+as follows, the binary containing the worker server is run -> initializes
+states required to operate the worker server -> start the threads -> connect to
+master server and authorize with the mater server -> start listening to clients
+-> parse it -> pass it to the appropriate thread.
+
+\subsubsection{Master Server Communication}
+The master server communication should be able to do the following:
+\begin{itemize}
+	\item Parse commands.
+	\item Send them to the master server.
+\end{itemize}
+
+The parsing is quite important and it is explained further in the document.
+
 \end{document}
