@@ -168,6 +168,10 @@ diagram:\newline
 \subsection{Global Deployment Variables}
 This section contains an overview of the global deployment variables.
 
+\subsubsection{List of assets to retrieve}
+\label{var_list_assets}
+This is the list of assets to retrieve using the assets/stocks API. The list
+can be available in a file or hard-coded into the implementation.
 \subsubsection{Number of Workers}
 \label{var_num_worker}
 This is the number of workers deployed with the master server. It must be 
@@ -287,5 +291,20 @@ registered/allowed worker servers to connect to master server AND show in the
 list of available worker servers. Registration should be done using GPG keys.
 A list of IPs should be given to the client when a session is connected. The 
 list of IPs are the workers' IPs.
+
+\subsubsection{Assets Data Retrieval}
+The assets data retrieval model should be able to do the following things:
+\begin{itemize}
+	\item Retrieve data in intervals of the global variable: data update 
+		retrieval interval (\ref{var_data_update_interval}).
+	\item Store them in memory and be able to read them (Parsed, into a 
+		struct).
+	\item Be able to communicate with the assets API.
+	\item Retrieve list of assets using API (\ref{var_list_assets})
+\end{itemize}
+
+The assets API is upto the implementation. Assets Data should be stored in the
+memory and retrieved in a thread-safe manner. This module is preferably to be 
+run on a thread.
 
 \end{document}
