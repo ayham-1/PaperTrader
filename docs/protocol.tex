@@ -134,23 +134,26 @@ The worker servers can be defined into modules as demonstrated in the following
 diagram:\newline
 
 \begin{center}
-	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,rounded
-		corners}]
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
+		,rounded corners}]
 		% create the nodes
 		\node (workerserver) {Worker Server};
 		\node (masterserver) [right=4cm of workerserver] {Master Server};
 		\node (clients) [left=2cm of workerserver] {Clients};
-		\node (mastercom) [above right=of workerserver] {Master Server Communication};
+		\node (mastercom) [above right=of workerserver] {Master Server 
+			Communication};
 		\node (cachemanage) [above=of workerserver] {Cache Management};
 		\node (clientmanage) [above left=of workerserver] {Client Management};
-		\node (accauth) [below left=of workerserver] {Account Authorization};
+		\node (accauth) [below left=of workerserver] {Account \& 
+			Authorization};
 		\node (event) [below right=of workerserver] {Event Logging};
 
 		% connect the nodes
 		\draw[<->] (masterserver) -- (workerserver);
 		\draw[<->] (mastercom) -- (masterserver);
 		\draw[<->] (workerserver) -- (clients);
-		\draw[<->, dashed] (masterserver.west) to [bend right=15] (clients.west);
+		\draw[<->, dashed] (masterserver.west) to [bend right=15] 
+		(clients.east);
 		\draw[<->] (workerserver) -- (mastercom);
 		\draw[<->] (workerserver) -- (cachemanage);
 		\draw[<->] (workerserver) -- (clientmanage);
@@ -166,14 +169,17 @@ diagram:\newline
 This section contains an overview of the global deployment variables.
 
 \subsubsection{Number of Workers}
+\label{var_num_worker}
 This is the number of workers deployed with the master server. It must be 
 atleast one. The worker server preferably should be deployed regionally.
 \subsubsection{Memory Size of Log system}
+\label{var_log_size}
 This is a technical variable, this is the size of the log in memory before it 
 being flushed to harddisk. Generally the smaller this is the more disk speed is
 required. And the larger it is the more RAM the instance needs and the faster 
 it is.
 \subsubsection{Stock Data Update Interval}
+\label{var_data_update_interval}
 This is the interaval of the stock data retrieval. The more this is the faster
 the transactions that can occur in a minute. This should be planned perfectly
 so that it can maintain the userbase with the API calls.
@@ -190,13 +196,13 @@ The master server has multiple modules:
 	\item Database Management.
 	\item Account Management.
 	\item Event Logging System.
-	\item Authorization.
 	\item Worker Management.
 	\item Assets Data Retrieval.
 	\item Assets Transaction Management.
 \end{itemize}
 
 \subsubsection{Main Module}
+\label{master_mods_main}
 The main module should be able to do the following things:
 \begin{itemize}
 	\item Start the authorization thread.
@@ -214,9 +220,10 @@ to workers -> parse it -> pass it to the appropriate thread. This is usually
 the set of functions that the main function would call. Putting the workings 
 of the main module on a seperate is advised, since it gives the ability to
 crash the server and dump the logs from the memory of the event log system.
-Refer to \ref{Memory size of Log system} for insight on why this is recommended.
+Refer to \ref{var_log_size} for insight on why this is recommended.
 
 \subsubsection{Database Management}
+\label{master_mods_db}
 The database management module sould be able to do the following things:
 \begin{itemize}
 	\item Be able to manipulate files (create, delete, write, read).
@@ -226,8 +233,10 @@ The database management module sould be able to do the following things:
 The manipulations of files should be quite straightforward, a couple of
 functions. The ability to access an SQL database is also necassery.
 
-\subsubsection{Account Management}
-The account management module  should be able to do the following things:
+\subsubsection{Account Management \& Authorization}
+\label{master_mods_acc}
+The account management \& authorization module  should be able to do the 
+following things:
 \begin{itemize}
 	\item Be able to register new users.
 	\item Be able to login \emph{AND} authorize users.
@@ -236,7 +245,7 @@ The account management module  should be able to do the following things:
 \end{itemize}
 
 The module should be able to take the set of information given and put them
-into the database (using the database management \ref{Database Management}).
+into the database (using the database management \ref{master_mods_db}).
 All passwords should be hashed and salted, this is up to the implementation on
 the exact details. The accounts registered may contain third-party logins ex. 
 Google Logins. In that case the account \emph{MUST} be recognized as an account
