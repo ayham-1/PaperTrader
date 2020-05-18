@@ -267,4 +267,25 @@ One thing should be noted, the log system should not store in memory more
 entries than specified in the global variable: memory size of log system
 (\ref{var_log_size}).
 
+\subsubsection{Worker Management}
+The worker management module should be able to do the following things:
+\begin{itemize}
+	\item Keep track of worker servers.
+	\item Print information about worker servers.
+	\item Retrieve information aobut worker servers.
+	\item \emph{ONLY} allow worker servers that are registered.
+	\item Verify worker servers with gpg keys.
+	\item Able Boot off worker servers while running.
+	\item Able to give client list of servers.
+\end{itemize}
+
+Most of the functionalities' details can be implementation depended. Keeping
+track of worker servers can be done in multiple ways. Printing information can
+print stored information about the connected worker server, or retrive 
+information about the worker server from the worker server. Should only allow
+registered/allowed worker servers to connect to master server AND show in the 
+list of available worker servers. Registration should be done using GPG keys.
+A list of IPs should be given to the client when a session is connected. The 
+list of IPs are the workers' IPs.
+
 \end{document}
