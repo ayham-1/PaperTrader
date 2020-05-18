@@ -249,9 +249,22 @@ into the database (using the database management \ref{master_mods_db}).
 All passwords should be hashed and salted, this is up to the implementation on
 the exact details. The accounts registered may contain third-party logins ex. 
 Google Logins. In that case the account \emph{MUST} be recognized as an account
-with a password, and the user should be asked to sign in with the third-party
-credentials. It should also be possible to add a password to the account marked
-to be 'logginable' with third-party logins, making it possible to login with
-the password and using third-party logins.
+without a password, and the user should be asked to sign in with the 
+third-party credentials. It should also be possible to add a password to the 
+account marked to be 'logginable' with third-party logins, making it possible 
+to login with the password and using third-party logins.
+
+\subsubsection{Log System}
+The log system should be able to do the following things:
+\begin{itemize}
+	\item To capture the date and time.
+	\item To capture the caller's file, function, and line number.
+	\item To capture a message and be able to format it.
+	\item To be able to store it in a file.
+\end{itemize}
+
+One thing should be noted, the log system should not store in memory more 
+entries than specified in the global variable: memory size of log system
+(\ref{var_log_size}).
 
 \end{document}
