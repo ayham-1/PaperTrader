@@ -388,4 +388,17 @@ The account authorization tunnel is simple. Get hte credentials, parse them,
 send them to the master server. Wait for reply, if successfully logged in, make
 a new session token and send it to the client.
 
+\subsubsection{Logging System}
+The log system should be able to do the following things:
+\begin{itemize}
+	\item To capture the date and time.
+	\item To capture the caller's file, function, and line number.
+	\item To capture a message and be able to format it.
+	\item To be able to store it in a file.
+\end{itemize}
+
+One thing should be noted, the log system should not store in memory more 
+entries than specified in the global variable: memory size of log system
+(\ref{var_log_size}).
+
 \end{document}
