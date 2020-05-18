@@ -307,4 +307,21 @@ The assets API is upto the implementation. Assets Data should be stored in the
 memory and retrieved in a thread-safe manner. This module is preferably to be 
 run on a thread.
 
+\subsubsection{Assets Buy \& Sell}
+Thie assets buy \& sell module should be able to do the following things:
+\begin{itemize}
+	\item Buy assets and store them into users' portfolios.
+	\item Sell assets and store them into users' portfolios.
+	\item Validate transactions of buying and selling.
+	\item Log transactions to users profiles.
+	\item Process queued transactions per update interval 
+		(\ref{var_data_update_interval}).
+\end{itemize}
+
+The module should provide functions to apply the above functionality. The
+logging is \emph{NOT} to be done with the Log sytem, but rather with storing
+them on the account transaction history of the issuer of the transaction. The 
+history should be able to show the time of the transaction going through. All 
+transaction go through a queue. The queue is cleared every update interval.
+
 \end{document}
