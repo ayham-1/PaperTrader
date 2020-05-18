@@ -324,7 +324,6 @@ them on the account transaction history of the issuer of the transaction. The
 history should be able to show the time of the transaction going through. All 
 transaction go through a queue. The queue is cleared every update interval.
 
-\newpage
 \subsection{Worker Server}
 The worker server has multiple modules:
 \begin{itemize}
@@ -371,5 +370,22 @@ The client management module should be able to do the following:
 
 Keeping track of the clients data structure is explained in the data structure
 section of the document TODO.
+
+\subsubsection{Account Authorization Tunnel}
+The account authorization tunnel module should be able to do the following
+things:
+\begin{itemize}
+	\item Recieve the credentials from the client.
+	\item Parse the credentails into commands.
+	\item Send them to the master server using the master server communication
+		module.
+	\item Return the login status.
+	\item Notify the client management with the new client. Make new token and
+		send to client.
+\end{itemize}
+
+The account authorization tunnel is simple. Get hte credentials, parse them,
+send them to the master server. Wait for reply, if successfully logged in, make
+a new session token and send it to the client.
 
 \end{document}
