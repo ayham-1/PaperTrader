@@ -350,12 +350,26 @@ master server and authorize with the mater server -> start listening to clients
 -> parse it -> pass it to the appropriate thread.
 
 \subsubsection{Master Server Communication}
-The master server communication should be able to do the following:
+\label{worker_master_comms}
+The master server communication module should be able to do the following:
 \begin{itemize}
 	\item Parse commands.
 	\item Send them to the master server.
 \end{itemize}
 
 The parsing is quite important and it is explained further in the document.
+
+\subsubsection{Client Management}
+The client management module should be able to do the following:
+\begin{itemize}
+	\item Keep track of connected clients.
+	\item Keep track of sessions.
+	\item Be able to give out session tokens to clients.
+	\item Be able to verify those session tokens.
+	\item Be able to expire those session tokens.
+\end{itemize}
+
+Keeping track of the clients data structure is explained in the data structure
+section of the document TODO.
 
 \end{document}
