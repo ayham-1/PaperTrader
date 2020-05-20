@@ -75,7 +75,6 @@ information about hte user and their account.
 A fully deployed infrastructure cotains \emph{ONE} master server, 
 \emph{ATLEAST} one worker server, theoretically across the world to maintain 
 speed and reliabilty. An overview diagram of the infrastructure: \newline
-
 \begin{center}
 \begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,rounded 
 	corners}]
@@ -98,12 +97,11 @@ speed and reliabilty. An overview diagram of the infrastructure: \newline
 \end{center}
 
 \subsubsection{Master Server Infrastructure Model}
-The master can be defined into modules as demonstrated in the following diagram:
-\newline
-
+The master can be defined into modules as demonstrated in the following 
+diagram: \newline
 \begin{center}
-	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,rounded
-		corners}]
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw,
+		rounded	corners}]
 		% create the nodes.
 		\node (master) {Master Server};
 		\node (db) [above=of master]{Database};
