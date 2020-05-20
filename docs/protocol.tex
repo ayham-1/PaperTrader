@@ -46,11 +46,16 @@ mobile client, or the website client.
 
 \subsubsection{User/Client Data}
 This is the data of the user. The meaning depends on the specific conext. It
-could mean the personal information, credentials, etc. Most of the time it means
-data that is attached to a data transfer to identify client (IP?).
+could mean the personal information, credentials, etc. Most of the time it
+means data that is attached to a data transfer to identify client (IP?).
+
+\subsubsection{Module}
+The module is a set of functions. Usually there would be a main header file
+containing the declarations of the functions, a folder with the name of the
+header file containing the individual functions definitions of the header file.
 
 \subsubsection{Master Server}
-This is the main server that MUST be run when deploying the application.
+This is the main server that \emph{MUST} be run when deploying the application.
 Contains critical data, it would only interact to the outside world by the
 worker servers.
 
@@ -92,7 +97,6 @@ speed and reliabilty. An overview diagram of the infrastructure: \newline
 \end{tikzpicture} 
 \end{center}
 
-\newpage
 \subsubsection{Master Server Infrastructure Model}
 The master can be defined into modules as demonstrated in the following diagram:
 \newline
@@ -187,6 +191,95 @@ it is.
 This is the interaval of the stock data retrieval. The more this is the faster
 the transactions that can occur in a minute. This should be planned perfectly
 so that it can maintain the userbase with the API calls.
+
+\subsection{Data/State Structures}
+\label{ds_list}
+This section will contain an overview of the data structure. The general data
+structures discussed here are:
+\begin{itemize}
+	\item Account Structure
+	\item Session Structure
+	\item Assets Structure
+	\item Transaction Structure
+	\item LogEntry Structure
+	\item WorkerServer Structure
+	\item MasterState Structure
+	\item WorkerState Structure
+\end{itemize}
+
+\subsubsection{Account Structure}
+\label{ds_account}
+The account structure is:
+\begin{itemize}
+	\item UserName - string - 24 MAX CHARS
+	\item Email - string - 321 MAX CHARS
+	\item isPassword - bool - true
+	\item passHash - string
+	\item portfolio - Portfolio Structure
+	\item transactions - Transaction Structure List
+\end{itemize}
+
+\subsubsection{Session Structure}
+\label{ds_session}
+The session structure is:
+\begin{itemize}
+	\item sessionID - string
+	\item expiryDate - Date
+	\item clientIP - IP
+	\item isActive - bool
+\end{itemize}
+
+\subsubsection{Asset Structure}
+\label{ds_asset}
+The assets strucure is:
+\begin{itemize}
+	\item assetSymbol - string
+	\item openVal - num
+	\item highVal - num
+	\item lowVal - num
+	\item closeVal - num
+	\item volumeVal - num
+\end{itemize}
+
+\subsubsection{LogEntry Structure}
+\label{ds_logentry}
+The LogEntry structure is:
+\begin{itemize}
+	\item message - string
+	\item date - Date
+	\item time - Time
+	\item filename - string
+	\item funcname - string
+	\item linenum - num
+\end{itemize}
+
+\subsubsection{WorkerServer Structure}
+\label{ds_workerserver}
+The worker server structure is:
+\begin{itemize}
+	\item name - string
+	\item gpgkey - string
+	\item ipaddr - IP
+\end{itemize}
+
+\subsubsection{MasterState Structure}
+\label{ds_masterstate}
+The master state structure is:
+\begin{itemize}
+	\item workerServers - WorkerServer Structure List
+	\item activeSessions - Session Structure List
+	\item assetsData - Assets Structure HashMap
+	\item logentries - Log Entry Structure List
+\end{itemize}
+
+\subsubsection{WorkerState Structure}
+\label{ds_workerstate}
+The worker state structure is:
+\begin{itemize}
+	\item masterServersock - Socket
+	\item sessions - Session Structure List
+	\item logentries - Log Entry Structure List
+\end{itemize}
 
 \section{A more Technical Overview}
 This is the section that describes the functioning parts of the project in
