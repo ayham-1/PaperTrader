@@ -504,4 +504,44 @@ This is very closely related to the implementation. It is not a must to have a
 cache system, it is recommended though due to the limited number of API calls
 to assets/stock values.
 
+\section{The Protocol}
+This section will describe the protcol used in PaperTrader.
+
+\subsection{Design Goals}
+\begin{itemize}
+	\item Based on the UDP protocol.
+	\item Connectionless model.
+	\item Authorization based communication.
+	\item Authentication of commands based on expirable session ID
+	\item Optmization to prevent high usage of the stock API (e.x. storing
+		asset values, caching data between update intervals).
+	\item Parties involved: MasterServer (1), WorkerServers (multiple), clients
+		(multiple). 
+	\item Parties connections: MasterServer <-> WorkerServers <-> Clients
+	\item Basic Error Handling (ex: failed login attempt)
+	\item Binary communications, little-endian format.
+	\item Message Categories are: Commands, Data Transfer, Control.
+	\item Connection States are: commanding, data transfering.
+\end{itemize}
+
+Real world examples are given later in the document. This is a brief 
+explaination of the design goals. The protocol is based on connectionless model
+meaning that each message should be given with a session ID, except for few.
+Messages with functionalites like, give stock values, do transactions, etc are
+required to have a session ID attached to the message header. Messages with
+functionalities like, login new user, register user, do \emph{NOT} require
+session IDs. Communication from the worker servers and the master server are
+conectionless models. All commands between master server and worker servers
+strictly require UUID to be attached to the message. A list of UUIDs are kept 
+on the master server. To verify a worker server, the message transmitted should 
+be encrypted using GPG keys, the IP is whitelisted, and UUID is verified in the 
+previously mentioned UUIDs list. Verification of the clients are simpler since 
+it only requires keeping track of the active session IDs. The 
+MasterServer-Client communications are very limited, sending the list of
+worker servers is the only functionality available to the client from the
+master server. States of the communication are handled localy on the reciever 
+and transmitter, i.e states switching are indicated by commands and \emph{NOT} 
+values in the message itself. Basic error handling is also facilitated, 
+examples are forgotten passwords. 
+
 \end{document}
