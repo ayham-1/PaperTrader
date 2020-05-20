@@ -494,4 +494,16 @@ One thing should be noted, the log system should not store in memory more
 entries than specified in the global variable: memory size of log system
 (\ref{var_log_size}).
 
+\subsubsection{Cache Management}
+The cache management module shoudl be able to do the following things:
+\begin{itemize}
+	\item Keep track of memory pointers, and destroy them correctly.
+	\item Efficiently keep track of memory (ex. hash maps).
+	\item Store past assets values.
+\end{itemize}
+
+This is very closely related to the implementation. It is not a must to have a
+cache system, it is recommended though due to the limited number of API calls
+to assets/stock values.
+
 \end{document}
