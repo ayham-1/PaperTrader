@@ -509,7 +509,7 @@ This section will describe the protcol used in PaperTrader.
 
 \subsection{Design Goals}
 \begin{itemize}
-	\item Based on the UDP protocol.
+	\item Based on the UDP \& TCP protocol.
 	\item Connectionless model.
 	\item Authorization based communication.
 	\item Authentication of commands based on expirable session ID
@@ -564,5 +564,17 @@ The data transfer state is switchable from the command state. Switching back to
 command state is done at the end of the data transfer. The data transfer
 commands include but are not limited to: get asset value, get past asset value,
 get predicted future asset value.
+\subsection{The Connection}
+There are multiple types of connections that are running in the program. The
+rules for communication are discussed later in this document.
+\begin{itemize}
+	\item Master-Worker Server Connection
+	\item Client-Worker Server Connection
+\end{itemize}
+
+\subsubsection{Master-Worker Server Connection}
+The connection is a TCP socket listening on port 2048 on the Master server. The
+worker server can connect to this port, and after the authentication process
+the master-worker server connection is established.
 
 \end{document}
