@@ -542,6 +542,21 @@ worker servers is the only functionality available to the client from the
 master server. States of the communication are handled localy on the reciever 
 and transmitter, i.e states switching are indicated by commands and \emph{NOT} 
 values in the message itself. Basic error handling is also facilitated, 
-examples are forgotten passwords. 
+examples are forgotten passwords. The communication is an active session ID
+between the clients and the worker servers, and is permanent for the worker and
+master servers communication connection.
+
+\subsection{States}
+There will be two states in any given communication phase:
+\begin{itemize}
+	\item Command State
+	\item Data Transfer State
+\end{itemize}
+
+\subsubsection{Command State}
+The command state will be the begining of all communication phases. In the
+command state commands that don't require transfer of Assets/Profile data are
+available to command to the worker/master server. These commands include but
+not limited to: login, register, purchase asset, sell asset.
 
 \end{document}
