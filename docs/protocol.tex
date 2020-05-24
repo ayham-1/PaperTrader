@@ -614,6 +614,15 @@ connection:
 	\item login(email, hashedPass, isExpirable)
 	\item login(sessionID)
 	\item register(name, email, hashedPass)
+	\item purchaseAsset(name, quantity)
+	\item sellAsset(name, quantity)
+	\item switchState(state)
+\end{itemize}
+
+\subsubsection{Data Transfer State Instructions}
+This is a list of isntructions that can be executed in the command state of a
+connection:
+\begin{itemize}
 	\item getAssetInfo(asset)
 	\item getAssetValueCurrent(asset)
 	\item getAssetValueDay(asset, date)
@@ -624,8 +633,10 @@ connection:
 	\item getUserInfo(username)
 	\item getUserPortfolio(username)
 	\item getUserTransactionHistory(username)
-	\item purchaseAsset(name, quantity)
-	\item sellAsset(name, quantity)
+	\item switchState(state)
 \end{itemize}
+
+This is ofcourse not a comprehensive list, and will be updated with further
+releases of the application.
 
 \end{document}
