@@ -519,7 +519,7 @@ This section will describe the protcol used in PaperTrader.
 		(multiple). 
 	\item Parties connections: MasterServer <-> WorkerServers <-> Clients
 	\item Basic Error Handling (ex: failed login attempt)
-	\item Binary communications, little-endian format.
+	\item Binary communications, big-endian format.
 	\item Message Categories are: Commands, Data Transfer, Control.
 	\item Connection States are: commanding, data transfering.
 \end{itemize}
@@ -586,13 +586,46 @@ clients can connect to this port using any port from their end, and after the
 authentication process the client-worker server connection is said to be 
 established.
 
+\subsection{Message Structure}
+As mentioned before, all messages are in binary, big-endian format. All
+messages follow a certain data structure:
+\begin{itemize}
+	\item messageType - is it a command or data transfer command?
+	\item instruction - the integer representation of the instruction/command.
+	\item dataSize - the size of the data with the packet.
+	\item argumentCount - the amount of arguments passed to the instruction.
+	\item data - the data sent with the packet.
+\end{itemize}
+
 \subsection{Instructions}
 The instructions listed in this section are organized into the two states 
 explained in \ref{states}. Instructions and commands are interchangable in this
-context, not to be confused with the command state (\ref{state_command}).
+context, not to be confused with the command state (\ref{state_command}). The
+instruction integer representation is a detail that is left for the
+implementation, nevertheless an important one. The data field of a message
+structure can be string arguments seperated by a space, these kind of datas are
+sent on the command state with command type instructions. Data can also be
+binary data.
 
 \subsubsection{Command State Instructions}
 This a list of instructions that can be executed in the command state of a
 connection:
+\begin{itemize}
+	\item login(email, hashedPass, isExpirable)
+	\item login(sessionID)
+	\item register(name, email, hashedPass)
+	\item getAssetInfo(asset)
+	\item getAssetValueCurrent(asset)
+	\item getAssetValueDay(asset, date)
+	\item getAssetValueWeek(asset, date)
+	\item getAssetValueMonth(asset, date)
+	\item getAssetValueYear(asset, date)
+	\item getAssetValueAllTime(asset)
+	\item getUserInfo(username)
+	\item getUserPortfolio(username)
+	\item getUserTransactionHistory(username)
+	\item purchaseAsset(name, quantity)
+	\item sellAsset(name, quantity)
+\end{itemize}
 
 \end{document}
