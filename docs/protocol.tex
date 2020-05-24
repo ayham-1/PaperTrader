@@ -509,7 +509,7 @@ This section will describe the protcol used in PaperTrader.
 
 \subsection{Design Goals}
 \begin{itemize}
-	\item Based on the UDP \& TCP protocol.
+	\item Based on the TCP protocol.
 	\item Connectionless model.
 	\item Authorization based communication.
 	\item Authentication of commands based on expirable session ID
@@ -576,5 +576,10 @@ rules for communication are discussed later in this document.
 The connection is a TCP socket listening on port 2048 on the Master server. The
 worker server can connect to this port, and after the authentication process
 the master-worker server connection is established.
+
+\subsubsection{Client-Worker Server Connection}
+The connection is a TCP socket listening on port 2049 on the Worker server. The
+clients can connect to this port using any port from their end, and after the
+authentication process the client-worker server connection is established.
 
 \end{document}
