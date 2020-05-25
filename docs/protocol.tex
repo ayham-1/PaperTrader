@@ -590,7 +590,7 @@ established.
 As mentioned before, all messages are in binary, big-endian format. All
 messages follow a certain data structure:
 \begin{itemize}
-	\item messageType - is it a command or data transfer command?
+	\item messageType - is it a command, data transfer, server return command?
 	\item instruction - the integer representation of the instruction/command.
 	\item dataSize - the size of the data with the packet.
 	\item argumentCount - the amount of arguments passed to the instruction.
@@ -598,29 +598,33 @@ messages follow a certain data structure:
 \end{itemize}
 
 \subsection{Instructions}
+\label{instructions}
 The instructions listed in this section are organized into the two states 
-explained in \ref{states}. Instructions and commands are interchangable in this
-context, not to be confused with the command state (\ref{state_command}). The
-instruction integer representation is a detail that is left for the
-implementation, nevertheless an important one. The data field of a message
-structure can be string arguments seperated by a space, these kind of datas are
-sent on the command state with command type instructions. Data can also be
-binary data.
+explained in \ref{states}, with the addition of the server return instructions.
+Instructions and commands are interchangable in this context, not to be 
+confused with the command state (\ref{state_command}). The instruction integer 
+representation is a detail that is left for the implementation, nevertheless an
+important one. The data field of a message structure can be string arguments 
+seperated by a space, these kind of datas are sent on the command state with 
+command type instructions. Data can also be binary data. \emph{NOTE:} The 
+following representation of the instructions are just for the ease of 
+understanding and not meant to be used as literal strings passed on the 
+network.
 
 \subsubsection{Command State Instructions}
 This a list of instructions that can be executed in the command state of a
 connection:
 \begin{itemize}
-	\item login(email, hashedPass, isExpirable)
+	\item login(username, hashedPass, isExpirable)
 	\item login(sessionID)
-	\item register(name, email, hashedPass)
-	\item purchaseAsset(name, quantity)
-	\item sellAsset(name, quantity)
-	\item switchState(state)
+	\item register(username, email, hashedPass)
+	\item purchaseAsset(sessionID, username, quantity)
+	\item sellAsset(sessionID, username, quantity)
+	\item switchState(sessionID, state)
 \end{itemize}
 
 \subsubsection{Data Transfer State Instructions}
-This is a list of isntructions that can be executed in the command state of a
+This is a list of instructions that can be executed in the command state of a
 connection:
 \begin{itemize}
 	\item getAssetInfo(asset)
@@ -630,13 +634,37 @@ connection:
 	\item getAssetValueMonth(asset, date)
 	\item getAssetValueYear(asset, date)
 	\item getAssetValueAllTime(asset)
-	\item getUserInfo(username)
-	\item getUserPortfolio(username)
-	\item getUserTransactionHistory(username)
-	\item switchState(state)
+	\item getUserInfo(sessionID, username)
+	\item getUserPortfolio(sessionID, username)
+	\item getUserTransactionHistory(sessionID, username)
+	\item switchState(sessionID, state)
+\end{itemize}
+
+\subsubsection{Server Return Instructions}
+These instructions are more of return formats. This is a list of instructions 
+that can be returned by a server due to a previous instruction:
+\begin{itemize}
+	\item loginFail
+	\item sessionID
+	\item purchaseSuccess
+	\item sellSuccess
+	\item data
 \end{itemize}
 
 This is ofcourse not a comprehensive list, and will be updated with further
 releases of the application.
+
+\subsection{Overivew of The Instructions}
+This would be a comprehensive overview of the instructions mentioned at
+\ref{instructions} 
+
+\subsubsection{login(name, hashedPass, isExpirable)}
+The `login' instruction is from the set of command state instructions, and does
+not require an active session ID to be provided from the worker server. The
+first argument is the username of the account, notice that this is not the
+email. This username is what will be used to login. The second argument is a
+hashed password. This password hashing is up to the implementation to handle.
+And the third and last argument is a boolean indicating whether to remember the
+sessionID or dispose it after disconnection of the user.
 
 \end{document}
