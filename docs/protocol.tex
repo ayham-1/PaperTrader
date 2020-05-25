@@ -665,6 +665,9 @@ first argument is the username of the account, notice that this is not the
 email. This username is what will be used to login. The second argument is a
 hashed password. This password hashing is up to the implementation to handle.
 And the third and last argument is a boolean indicating whether to remember the
-sessionID or dispose it after disconnection of the user.
+sessionID or dispose it after disconnection of the user. The length of the
+storing of the session is upto the impelmentation. On success, the server would
+return the `sessionID' instruction with the sessionID attached to it. On 
+failure, the server would return `loginFail'.
 
 \end{document}
