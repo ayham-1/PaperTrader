@@ -697,8 +697,16 @@ and requires an active session ID to be provided from and to the worker server.
 The sessionID argument will identify the caller of the function. The second
 argument is the name of the asset to buy. The third argument is the quantity to
 buy. On success, the server would return `purchaseSuccess' instruction. On
-failure, the server would return `purchaseFailure' instruction with the reason
-in the arguments.
+failure, the server would return `purchaseFail' instruction with the reason
+in the command's arguments.
 
+\subsubsection{sellAsset(sessionID, name, quantity)}
+The `sellAsset' instruction is from the set of command state instructionis, and
+requires an active sesion ID to be provided from and to the worker server. The
+sessoinID argument will identify the caller of the functioni. The second
+argument is the name of the asset to sell. The third argument is the quantity
+to buy. On success,the server would return `sellSuccess' instruction. On
+failure, the server would return `sellFail' instruction with the reason in
+the command's arguments.
 
 \end{document}
