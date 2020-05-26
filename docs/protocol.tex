@@ -618,8 +618,8 @@ connection:
 	\item login(username, hashedPass, isExpirable)
 	\item login(sessionID)
 	\item register(username, email, hashedPass)
-	\item purchaseAsset(sessionID, username, quantity)
-	\item sellAsset(sessionID, username, quantity)
+	\item purchaseAsset(sessionID, name, quantity)
+	\item sellAsset(sessionID, name, quantity)
 	\item switchState(sessionID, state)
 \end{itemize}
 
@@ -649,7 +649,9 @@ that can be returned by a server due to a previous instruction:
 	\item registerFail
 	\item registerSuccess
 	\item purchaseSuccess
+	\item purchaseFail
 	\item sellSuccess
+	\item sellFail
 	\item data
 \end{itemize}
 
@@ -681,12 +683,22 @@ stored locally on the client's machine. On success, the server would return the
 server would return `loginFail'.
 
 \subsubsection{register(username, email, hashedPass)}
-THe `register' instruction is from the set of command state instructions, and
+The `register' instruction is from the set of command state instructions, and
 does not requrie an active session ID to be provided from the worker server.
 The first argument is the username of the account, that would be used to login
 with. The second argument is the email of the account. The third argument is
 the hashed password. The hashing mechanism is up to the implementation. On
 success, the server would reurn the `registerSuccess' instruction. On failure,
 the server would return the `registerFail' instruction.
+
+\subsubsection{purchaseAsset(sessionID, name, quantity)}
+The `purchaseAsset' instruction is from the set of command state instructions,
+and requires an active session ID to be provided from and to the worker server.
+The sessionID argument will identify the caller of the function. The second
+argument is the name of the asset to buy. The third argument is the quantity to
+buy. On success, the server would return `purchaseSuccess' instruction. On
+failure, the server would return `purchaseFailure' instruction with the reason
+in the arguments.
+
 
 \end{document}
