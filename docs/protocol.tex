@@ -594,6 +594,8 @@ messages follow a certain data structure:
 	\item instruction - the integer representation of the instruction/command.
 	\item dataSize - the size of the data with the packet.
 	\item argumentCount - the amount of arguments passed to the instruction.
+	\item dataMessageNumber - the number of this packet in the set of packets.
+	\item dataMessageMax - the max number of data packets to expect.
 	\item data - the data sent with the packet.
 \end{itemize}
 
@@ -655,6 +657,7 @@ that can be returned by a server due to a previous instruction:
 	\item stateSwitchSuccess
 	\item stateSwitchFail
 	\item data
+	\item dataFail
 \end{itemize}
 
 This is ofcourse not a comprehensive list, and will be updated with further
@@ -719,5 +722,11 @@ argument is the state to switch to. The values of the states do not matter and
 should be agreed on per implementation. On success, the server would return 
 `switchStateSuccess'. On failure, the server would return `switchstateFail'
 with the reason in the command's arguments.
+
+\subsubsection{getAssetInfo(asset)}
+The `getAssetInfo' instruction is from the set of data state instructions. It
+gets the assets information refer to \ref{ds_asset} for the structure of the
+data sent back. On success, the server would return using the data transaction
+mechanism. On failure, the server would return the `dataFail' instruction.
 
 \end{document}
