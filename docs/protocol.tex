@@ -670,4 +670,12 @@ storing of the session is upto the impelmentation. On success, the server would
 return the `sessionID' instruction with the sessionID attached to it. On 
 failure, the server would return `loginFail'.
 
+\subsubsection{login(sessionID)}
+The `login' instructions is from the set of command state instructions. This
+version of the login instruction requires a sessionID. It is used when the
+client has already logged and and got a sessionID. The sessionID should be
+stored locally on the client's machine. On success, the server would return the
+`sessionID' instruction with the same sessionID attached to it. On failure, the
+server would return `loginFail'.
+
 \end{document}
