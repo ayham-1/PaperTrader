@@ -646,6 +646,8 @@ that can be returned by a server due to a previous instruction:
 \begin{itemize}
 	\item loginFail
 	\item sessionID
+	\item registerFail
+	\item registerSuccess
 	\item purchaseSuccess
 	\item sellSuccess
 	\item data
@@ -677,5 +679,14 @@ client has already logged and and got a sessionID. The sessionID should be
 stored locally on the client's machine. On success, the server would return the
 `sessionID' instruction with the same sessionID attached to it. On failure, the
 server would return `loginFail'.
+
+\subsubsection{register(username, email, hashedPass)}
+THe `register' instruction is from the set of command state instructions, and
+does not requrie an active session ID to be provided from the worker server.
+The first argument is the username of the account, that would be used to login
+with. The second argument is the email of the account. The third argument is
+the hashed password. The hashing mechanism is up to the implementation. On
+success, the server would reurn the `registerSuccess' instruction. On failure,
+the server would return the `registerFail' instruction.
 
 \end{document}
