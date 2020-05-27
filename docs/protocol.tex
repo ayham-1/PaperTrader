@@ -781,7 +781,14 @@ return the `dataFail' instruction.
 The `getUserPortfolio' instruction is from the set of data instructions. It
 gets the portfolio of a user. Public/Private data returning is based on the
 sessionID, i.e if the sessionID is for username all data is returned. On
-success, ther server would return the data transfer mechanism. On failure, the
+success, the server would return the data transfer mechanism. On failure, the
 server would return the `dataFail' instruction.
+
+\subsubsection{getUserTransactionHistroy(sessionID, username)}
+The `getUserTransactionHistory' instruction is from the data instructions. It
+gets the transaction history of a user. Public/Private data returning is based
+on the sessionID, i.e if the sessionID is for username all data is returned. On
+success, the server would return teh data transfer mechanism. On failure, the
+server would return the `dataFill' instruction.
 
 \end{document}
