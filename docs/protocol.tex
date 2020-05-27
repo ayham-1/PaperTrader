@@ -771,10 +771,17 @@ server would return using the data transfer mechanism. On failure, the server
 would retunr the `dataFail' instruction.
 
 \subsubsection{getUserInfo(sessionID, username)}
-The 'getUserInfo' instruction is from the set of data instructions. It gets the
+The `getUserInfo' instruction is from the set of data instructions. It gets the
 data of a user. Public/Private data returning is based on the sessionID, i.e if
 the sessionID is for username all data is returned. On success, the server
 would return using the data transfer mechanism. On failure, the server would
 return the `dataFail' instruction.
+
+\subsubsection{getUserPortfolio(sessionID, username)}
+The `getUserPortfolio' instruction is from the set of data instructions. It
+gets the portfolio of a user. Public/Private data returning is based on the
+sessionID, i.e if the sessionID is for username all data is returned. On
+success, ther server would return the data transfer mechanism. On failure, the
+server would return the `dataFail' instruction.
 
 \end{document}
