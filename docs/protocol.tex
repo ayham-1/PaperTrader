@@ -758,10 +758,23 @@ transaction mechanism. On failure, the server would return the `dataFail'
 instructionn.
 
 \subsubsection{getAssetValueYear(asset, date)}
-The `getAssetValueyear' instruction is from the set of data instructions. It
+The `getAssetValueYear' instruction is from the set of data instructions. It
 gets the past years month's time frame of the data starting from the date
 passed in with the arguments. On succuess, the server would return using the
 data transaction mechanism. On ailure, teh server would return the `dataFail'
 instruction.
+
+\subsubsection{getAssetValueAllTime(asset)}
+The `getAssetValueAllTime' instruction is from the set of data instructions. It
+gets all of the value data stored for the asset per month. On success, the
+server would return using the data transfer mechanism. On failure, the server
+would retunr the `dataFail' instruction.
+
+\subsubsection{getUserInfo(sessionID, username)}
+The 'getUserInfo' instruction is from the set of data instructions. It gets the
+data of a user. Public/Private data returning is based on the sessionID, i.e if
+the sessionID is for username all data is returned. On success, the server
+would return using the data transfer mechanism. On failure, the server would
+return the `dataFail' instruction.
 
 \end{document}
