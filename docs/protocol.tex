@@ -730,9 +730,17 @@ data sent back. On success, the server would return using the data transaction
 mechanism. On failure, the server would return the `dataFail' instruction.
 
 \subsubsection{getAssetValueCurrent(asset)}
-The `getAssetValueCurrent' instruction is from teh set of data instructions. It
+The `getAssetValueCurrent' instruction is from the set of data instructions. It
 gets the latest asset value available in the master server. On success, the
 server would return using the data transaction mechanism. On failure, the
 server would return the `dataFail' instruction.
+
+\subsubsection{getAssetValueDay(asset, date)}
+The `getAssetValueDay' instruction is from the set of data instructions. It
+gets the 24Hours time frame of data of the date and time specified in the
+second argument. The frequency of these updates depends on the global variable
+data update interval (\ref{var_data_update_interval}). On success, the server
+would return using the data transaction mechanism. On failure, the server would
+return the `dataFail' instruction.
 
 \end{document}
