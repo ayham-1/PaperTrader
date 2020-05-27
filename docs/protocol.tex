@@ -744,10 +744,17 @@ would return using the data transaction mechanism. On failure, the server would
 return the `dataFail' instruction.
 
 \subsubsection{getAssetValueWeek(asset, date)}
-This `getAssetValueWeek' instruction is from the set of data instruction. It
-gets the past week day's time frame of the data starting from the date value
-passed in with the arguments. On success, the server would return using the
-data transaction mechanism. On failure, the server would return the `dataFail'
+This `getAssetValueWeek' instruction is from the set of data instructions. It
+gets the past week day's time frame of the data starting from the date passed 
+in with the arguments. On success, the server would return using the data 
+transaction mechanism. On failure, the server would return the `dataFail' 
 instruction.
+
+\subsubsection{getAssetValueMonth(asset, date)}
+This `getAssetValueMonth' instruction is from the set of data instruction. It
+gets the past months day's time frame of the data starting from the date passed
+in with the the arguments. On success, the server would return using the data
+transaction mechanism. On failure, the server would return the `dataFail'
+instructionn.
 
 \end{document}
