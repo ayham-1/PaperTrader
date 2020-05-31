@@ -58,3 +58,6 @@ bin/
 lib/
 *.log
 *.aux
+*.fdb_latexmk
+*.fls
+*.toc
