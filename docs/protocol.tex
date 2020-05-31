@@ -18,8 +18,8 @@ application for 'fake' trading assets, to practice investing. The document
 contains explainations on how to implement the papertrader application. It 
 should be noted that the document isn't `production-ready' until this sentence 
 is removed. The document will go over the roles of the master server, and the
-worker servers, how they interact with eachother and the communication protocol,
-and finally, suggestions on server side implementations.
+worker servers, how they interact with eachother and the communication 
+protocol, and finally, suggestions on server side implementations.
 
 \section{Overview}
 This section contains the required terminology and modelling of the PaperTrader
@@ -33,7 +33,8 @@ lockdown. Meaning, critical data should be kept secure.
 
 \subsubsection{Outer World}
 This is the frontend, including the desktop cleint, mobile client, or the
-website client. The data here is controlled by the authorization of the account.
+website client. The data here is controlled by the authorization of the 
+account.
 
 \subsubsection{Critical Data}
 Cirtical Data are all data types that shouldn't be tampered with without
@@ -790,5 +791,9 @@ gets the transaction history of a user. Public/Private data returning is based
 on the sessionID, i.e if the sessionID is for username all data is returned. On
 success, the server would return teh data transfer mechanism. On failure, the
 server would return the `dataFill' instruction.
+
+\subsubsection{loginFail}
+This is a server return instruction. It means that a login has failed. The
+reason is in the arguments attached with the instruction.
 
 \end{document}
