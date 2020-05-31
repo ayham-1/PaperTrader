@@ -840,4 +840,42 @@ details later in the document.
 This is a server return instruction. It means that the data transfer action
 failed. The reason/message is in the arguments attached with the instruction.
 
+\subsection{Communication}
+The following section describe the communication rules.
+
+\subsubsection{Data Transfer Mechanism}
+The data transfer mechanism is also refered to as the `data' instruction is
+used to transfer bunch of data. The data is transfered in within the a message
+in it's data field. The data instruction is passed a number of times until the 
+whole data is transfered. Data instructions can be refered to packets. All 
+packets contains the total amount of packets required to transfer the requested 
+the data. Each individual packet contains it's own number relative to the
+already sent packets. For example if `n' packets have \emph{ALREADY} been sent,
+then the following packet will be `n+1'. This mechanism allows precise progress
+calculation, and ensuring of data order. This mechanism is used in all
+instances where data needs to be transfered, ex: from master to worker, from
+worker to client, \emph{NEVER} from master to client. The following diagram
+shows how a data transfer can happen from master to worker server.
+
+\begin{center}
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
+		,rounded corners}]
+		% create the nodes
+		\node (masterserver) {Master Server};
+		\node (packet1) [right=of masterserver] {Packet 1/5...};
+		\node (packet2) [right=of packet1] {Packet 2/5...};
+		\node (packet3) [right=of packet2] {Packet 3/5...};
+		\node (packet4) [below=of packet3] {Packet 4/5...};
+		\node (packet5) [left=of packet4] {Packet 5/5...};
+		\node (workerserver) [left=of packet5] {Worker Server};
+		% link the nodes
+		\draw[->] (masterserver) -- (packet1);
+		\draw[->] (packet1) -- (packet2);
+		\draw[->] (packet2) -- (packet3);
+		\draw[->] (packet3) -- (packet4);
+		\draw[->] (packet4) -- (packet5);
+		\draw[->] (packet5) -- (workerserver);
+	\end{tikzpicture}
+\end{center}
+
 \end{document}
