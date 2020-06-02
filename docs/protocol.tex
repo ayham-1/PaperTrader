@@ -881,9 +881,9 @@ shows how a data transfer can happen from master to worker server.
 \subsubsection{Login - First Method}
 The first method of login is done by the `login(name, hashedPass, 
 isExpirable)'. This message is sent to the worker server from a client. Then it
-is routed back to the master server. The master server approves/disapprove the
-login attempt and returns back the return codes (ref ...). The return code is
-routed back to the client. The following is a diagram of an example login
+is routed to the master server. The master server approves/disapproves the 
+login attempt and returns back the return codes (ref ...). The return code is 
+routed back to the client. The following is a diagram of an example login 
 request.
 
 \begin{center}
@@ -893,9 +893,45 @@ request.
 		\node (masterserver) {Master Server};
 		\node (workerserver) [left=2cm of masterserver] {Worker Server};
 		\node (client) [left=2cm of workerserver] {Client};
-		\node (masterlogin) [below=of masterserver] {login()};
-		\node (workerlogin) [below=of workerserver] {login()};
-		\node (clientlogin) [below=of client] {login()};
+		\node (masterlogin) [below=of masterserver] {login(name, ...)};
+		\node (workerlogin) [below=of workerserver] {login(name, ...)};
+		\node (clientlogin) [below=of client] {login(name, ...)};
+		\node(masterret) [below=1cm of masterlogin] {sessionID()/loginFail()};
+		\node(workerret) [below=1.7cm of workerlogin]{sessionID()/loginFail()};
+		\node(clientret) [below=2.4cm of clientlogin]{sessionID()/loginFail()};
+		% link the nodes
+		\draw[->] (masterserver) -- (masterlogin);
+		\draw[->] (workerserver) -- (workerlogin);
+		\draw[->] (client) -- (clientlogin);
+		\draw[->] (masterlogin) -- (masterret);
+		\draw[->] (workerlogin) -- (workerret);
+		\draw[->] (clientlogin) -- (clientret);
+		\draw[->] (clientlogin) -- (workerlogin);
+		\draw[->] (workerlogin) -- (masterlogin);
+		\draw[<-] (clientret) -- (workerret);
+		\draw[<-] (workerret) -- (masterret);
+	\end{tikzpicture}
+\end{center}
+
+\subsubsection{Login - Second Method}
+The second method of login is done by the `login(sessionID)'. This method is
+very close the previous one, the only difference is that it uses the sesssionID
+for authorization. This message is senet to the worker server from an already 
+registered and past logged in. Then it is routed to the master server. The 
+master server approves/disapproves the login attempt and returns back the 
+return codes (ref ...). The return code is routed back to the client. The 
+following is a diagram of an axample login request.
+
+\begin{center}
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
+		,rounded corners}]
+		% create the nodes
+		\node (masterserver) {Master Server};
+		\node (workerserver) [left=2cm of masterserver] {Worker Server};
+		\node (client) [left=2cm of workerserver] {Client};
+		\node (masterlogin) [below=of masterserver] {login(sessionID)};
+		\node (workerlogin) [below=of workerserver] {login(sessionID)};
+		\node (clientlogin) [below=of client] {login(sessionID)};
 		\node(masterret) [below=1cm of masterlogin] {sessionID()/loginFail()};
 		\node(workerret) [below=1.7cm of workerlogin]{sessionID()/loginFail()};
 		\node(clientret) [below=2.4cm of clientlogin]{sessionID()/loginFail()};
