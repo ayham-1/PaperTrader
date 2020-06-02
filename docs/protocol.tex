@@ -916,7 +916,7 @@ request.
 \subsubsection{Login - Second Method}
 The second method of login is done by the `login(sessionID)'. This method is
 very close the previous one, the only difference is that it uses the sesssionID
-for authorization. This message is senet to the worker server from an already 
+for authorization. This message is sent to the worker server from an already 
 registered and past logged in. Then it is routed to the master server. The 
 master server approves/disapproves the login attempt and returns back the 
 return codes (ref ...). The return code is routed back to the client. The 
@@ -944,6 +944,47 @@ following is a diagram of an axample login request.
 		\draw[->] (clientlogin) -- (clientret);
 		\draw[->] (clientlogin) -- (workerlogin);
 		\draw[->] (workerlogin) -- (masterlogin);
+		\draw[<-] (clientret) -- (workerret);
+		\draw[<-] (workerret) -- (masterret);
+	\end{tikzpicture}
+\end{center}
+
+\subsubsection{Register}
+The registeration method is done with the `register(username, email,
+hashedPass)' instruction. This communication is very close to the previously
+mentioned ones. The message is sent from a client to a worker server and then
+routed to the master server. The master server approves/disapproves the
+register request and returns back the return codes (ref ...). The return code
+is routed back to the client through the worker server. The following diagram
+is an example of such exchange:
+
+\begin{center}
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
+		,rounded corners}]
+		% create the nodes
+		\node (masterserver) {Master Server};
+		\node (workerserver) [left=2cm of masterserver] {Worker Server};
+		\node (client) [left=2cm of workerserver] {Client};
+		\node (masterregister) [below=of masterserver] {register(username,
+		...)};
+		\node (workerregister) [below=of workerserver] {register(username, 
+		...)};
+		\node (clientregister) [below=of client] {register(username, ...)};
+		\node(masterret) [below=1cm of masterlogin] {registerSuccess()/
+		registerFail()};
+		\node(workerret) [below=1.7cm of workerlogin]{registerSuccess()/
+		registerFail()};
+		\node(clientret) [below=2.4cm of clientlogin]{registerSuccess()/
+		registerFail()};
+		% link the nodes
+		\draw[->] (masterserver) -- (masterregister);
+		\draw[->] (workerserver) -- (workerregister);
+		\draw[->] (client) -- (clientlogin);
+		\draw[->] (masterregister) -- (masterret);
+		\draw[->] (workerregister) -- (workerret);
+		\draw[->] (clientregister) -- (clientret);
+		\draw[->] (clientregister) -- (workerregister);
+		\draw[->] (workerregister) -- (masterregister);
 		\draw[<-] (clientret) -- (workerret);
 		\draw[<-] (workerret) -- (masterret);
 	\end{tikzpicture}
