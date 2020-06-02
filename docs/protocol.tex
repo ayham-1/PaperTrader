@@ -965,17 +965,19 @@ is an example of such exchange:
 		\node (masterserver) {Master Server};
 		\node (workerserver) [left=2cm of masterserver] {Worker Server};
 		\node (client) [left=2cm of workerserver] {Client};
-		\node (masterregister) [below=of masterserver] {register(username,
-		...)};
-		\node (workerregister) [below=of workerserver] {register(username, 
-		...)};
-		\node (clientregister) [below=of client] {register(username, ...)};
-		\node(masterret) [below=1cm of masterlogin] {registerSuccess()/
-		registerFail()};
-		\node(workerret) [below=1.7cm of workerlogin]{registerSuccess()/
-		registerFail()};
-		\node(clientret) [below=2.4cm of clientlogin]{registerSuccess()/
-		registerFail()};
+		\node (masterregister) [below=of masterserver] 
+		{register(username,	...)};
+		\node (workerregister) [below=of workerserver] 
+		{register(username, ...)};
+		\node (clientregister) [below=of client] 
+		{register(username, ...)};
+		\node(masterret) [below=1cm of masterlogin] 
+		{registerSuccess()/registerFail()};
+		\node(workerret) [below=1.7cm of workerlogin]
+		{registerSuccess()/registerFail()};
+		\node(clientret) [below=2.4cm of clientlogin]
+		{registerSuccess()/registerFail()};
+
 		% link the nodes
 		\draw[->] (masterserver) -- (masterregister);
 		\draw[->] (workerserver) -- (workerregister);
@@ -985,6 +987,51 @@ is an example of such exchange:
 		\draw[->] (clientregister) -- (clientret);
 		\draw[->] (clientregister) -- (workerregister);
 		\draw[->] (workerregister) -- (masterregister);
+		\draw[<-] (clientret) -- (workerret);
+		\draw[<-] (workerret) -- (masterret);
+	\end{tikzpicture}
+\end{center}
+
+\subsubsection{Purchase}
+The purchase sequence is done with the `purchaseAsset(sessionID, name, 
+quantity)' instruction. This communication is ver yclose the the previously
+mentioned ones. The message is sent from a client to a worker. The worker
+stores the message in it's cache and sends them to the master server in order
+of time. The master server approves/disapproves the purchase and returns a code
+(ref ...). The return code is routed back to the client through the worker
+server. The following diagram is an example of such exchange:
+
+\begin{center}
+	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
+		,rounded corners}]
+		% create the nodes
+		\node (masterserver) {Master Server};
+		\node (workerserver) [left=2cm of masterserver] {Worker Server};
+		\node (client) [left=2cm of workerserver] {Client};
+
+		\node (masterpurchase) [below=1cm of masterserver] 
+		{purchaseAsset(username, ...)};
+		\node (workerpurchase) [below=1.7cm of workerserver] 
+		{purchaseAsset(username, ...)};
+		\node (clientpurchase) [below=2.4cm of client] 
+		{purchaseAsset(username, ...)};
+
+		\node(masterret) [below=1cm of masterlogin] 
+		{purchaseSuccess()/purchaseFail()};
+		\node(workerret) [below=1.7cm of workerlogin]
+		{purchaseSuccess()/purchaseFail()};
+		\node(clientret) [below=2.4cm of clientlogin]
+		{purchaseSuccess()/purchaseFail()};
+
+		% link the nodes
+		\draw[->] (masterserver) -- (masterpurchase);
+		\draw[->] (workerserver) -- (workerpurchase);
+		\draw[->] (client) -- (clientpurchase);
+		\draw[->] (masterpurchase) -- (masterret);
+		\draw[->] (workerpurchase) -- (workerret);
+		\draw[->] (clientpurchase) -- (clientret);
+		\draw[->] (clientpurchase) -- (workerpurchase);
+		\draw[->] (workerpurchase) -- (masterpurchase);
 		\draw[<-] (clientret) -- (workerret);
 		\draw[<-] (workerret) -- (masterret);
 	\end{tikzpicture}
