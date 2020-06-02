@@ -1082,4 +1082,15 @@ following diagram is an example of such exchange:
 	\end{tikzpicture}
 \end{center}
 
+\subsubsection{get(Data)}
+The retrieval of data is done by a subset of instructions. These instructions
+are prefixed with `get'. The mechanism of the transfer of data is explained in
+(ref ...). The client or the worker server requests data from the master 
+server, the instruction is routed to the master server if needed. Meaning, if
+the data requested is available in the worker server the data is sent from
+there. If the data isn't available the server master server is requested to
+update the worker servers caches. Incase of non-existent data being requested,
+the master server requests data from the stocks API. Refering to the graph in
+(ref ...) shows how the data is transfered from a party to another.
+
 \end{document}
