@@ -16,11 +16,9 @@
 \label{intro}
 This is the document for the specification of PaperTrader. PaperTrader is an
 application for 'fake' trading assets, to practice investing. The document
-contains explainations on how to implement the papertrader application. It 
-should be noted that the document isn't `production-ready' until this sentence 
-is removed. The document will go over the roles of the master server, and the
-worker servers, how they interact with eachother and the communication 
-protocol, and finally, suggestions on server side implementations.
+contains explainations on how to implement the Papertrader application. The
+document will go over the roles of the master server, and the worker servers, 
+how they interact with eachother and the communication protocol.
 
 \section{Overview}
 This section contains the required terminology and modelling of the PaperTrader
@@ -31,8 +29,8 @@ infrastructure.
 
 \subsubsection{Inner World}
 \label{term_inner}
-This is Master server, and all worker servers. This should be kept under high
-lockdown. Meaning, critical data should be kept secure.
+This is the Master server, and all worker servers. This should be kept under 
+high lockdown. Meaning, critical data should be kept secure.
 
 \subsubsection{Outer World}
 \label{term_outer}
@@ -59,20 +57,21 @@ means data that is attached to a data transfer to identify client (IP?).
 
 \subsubsection{Module}
 \label{term_module}
-The module is a set of functions. Usually there would be a main header file
+A module is a set of functions. Usually there would be a main header file
 containing the declarations of the functions, a folder with the name of the
-header file containing the individual functions definitions of the header file.
+header file containing the individual function definitions of the header file.
 
 \subsubsection{Master Server}
 \label{term_master}
 This is the main server that \emph{MUST} be run when deploying the application.
 Contains critical data, it would only interact to the outside world by the
-worker servers.
+worker servers. The only exception to this rule is that when clients request
+list of worker servers.
 
 \subsubsection{Worker Servers}
 \label{term_worker}
 These are servers that contact the outer world. Worker Servers will
-interact with the Master Server acting like a `cache' servers. Data should be 
+interact with the Master Server acting like `cache' servers. Data should be 
 routed through worker servers to the master server. The main job for worker 
 server is to add timestamps onto commands sent from the user. The data sent to
 the main server must contain the data of the client/user. There MUST be ATLEAST
@@ -81,7 +80,7 @@ one instance running to have a functional infrastructure.
 \subsubsection{User Accounts}
 \label{term_user_acc}
 This is the account that abstractly is a the data structure that contains
-information about hte user and their account.
+information about the user and their account.
 
 \subsection{Infrastructure Model}
 \label{infrastructure}
@@ -955,9 +954,9 @@ shows how a data transfer can happen from master to worker server.
 The first method of login is done by the `login(name, hashedPass, 
 isExpirable)'. This message is sent to the worker server from a client. Then it
 is routed to the master server. The master server approves/disapproves the 
-login attempt and returns back the return codes (ref ...). The return code is 
-routed back to the client. The following is a diagram of an example login 
-request.
+login attempt and returns back the return codes (ref 
+\ref{protocol_serverret_inst}). The return code is routed back to the client. 
+The following is a diagram of an example login request.
 
 \begin{center}
 	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
@@ -993,8 +992,8 @@ very close the previous one, the only difference is that it uses the sesssionID
 for authorization. This message is sent to the worker server from an already 
 registered and past logged in. Then it is routed to the master server. The 
 master server approves/disapproves the login attempt and returns back the 
-return codes (ref ...). The return code is routed back to the client. The 
-following is a diagram of an axample login request.
+return codes (ref \ref{protocol_serverret_inst}). The return code is routed 
+back to the client. The following is a diagram of an axample login request.
 
 \begin{center}
 	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
@@ -1029,9 +1028,10 @@ The registeration method is done with the `register(username, email,
 hashedPass)' instruction. This communication is very close to the previously
 mentioned ones. The message is sent from a client to a worker server and then
 routed to the master server. The master server approves/disapproves the
-register request and returns back the return codes (ref ...). The return code
-is routed back to the client through the worker server. The following diagram
-is an example of such exchange:
+register request and returns back the return codes (ref 
+\ref{protocol_serverret_inst}). The return code is routed back to the client 
+through the worker server. The following diagram is an example of such 
+exchange:
 
 \begin{center}
 	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
@@ -1073,8 +1073,9 @@ quantity)' instruction. This communication is very close the the previously
 mentioned ones. The message is sent from a client to a worker. The worker
 stores the message in it's cache and sends them to the master server in order
 of time. The master server approves/disapproves the purchase and returns a code
-(ref ...). The return code is routed back to the client through the worker
-server. The following diagram is an example of such exchange:
+(ref \ref{protocol_serverret_inst}). The return code is routed back to the 
+client through the worker server. The following diagram is an example of such 
+exchange:
 
 \begin{center}
 	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
@@ -1118,9 +1119,10 @@ The sell sequence is done with the `sellAsset(sessionID, name, quantity)'
 instruction. This communication is very close the the purchase mentioned 
 ones. The message is sent from a client to a worker. The worker stores the 
 message in it's cache and sends them to the master server in order of time. The 
-master server approves/disapproves the sell and returns a code (ref ...). The 
-return code is routed back to the client through the worker server. The 
-following diagram is an example of such exchange:
+master server approves/disapproves the sell and returns a code (ref 
+\ref{protocol_serverret_inst}). The return code is routed back to the client 
+through the worker server. The following diagram is an example of such 
+exchange:
 
 \begin{center}
 	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
@@ -1162,12 +1164,14 @@ following diagram is an example of such exchange:
 \label{protocol_communication_data}
 The retrieval of data is done by a subset of instructions. These instructions
 are prefixed with `get'. The mechanism of the transfer of data is explained in
-(ref ...). The client or the worker server requests data from the master 
-server, the instruction is routed to the master server if needed. Meaning, if
-the data requested is available in the worker server the data is sent from
-there. If the data isn't available the server master server is requested to
-update the worker servers caches. Incase of non-existent data being requested,
-the master server requests data from the stocks API. Refering to the graph in
-(ref ...) shows how the data is transfered from a party to another.
+(ref \ref{protocol_communication_data_transfer}).The client or the worker 
+server requests data from the master server, the instruction is routed to the 
+master server if needed. Meaning, if the data requested is available in the 
+worker server the data is sent from there. If the data isn't available the 
+server master server is requested to update the worker servers caches. Incase 
+of non-existent data being requested, the master server requests data from the 
+stocks API. Refering to the graph in (ref 
+\ref{protocol_communication_data_transfer}) shows how the data is transfered
+from a party to another.
 
 \end{document}
