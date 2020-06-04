@@ -13,6 +13,7 @@
 \newpage
 
 \section{Introduction}
+\label{intro}
 This is the document for the specification of PaperTrader. PaperTrader is an
 application for 'fake' trading assets, to practice investing. The document
 contains explainations on how to implement the papertrader application. It 
@@ -26,41 +27,50 @@ This section contains the required terminology and modelling of the PaperTrader
 infrastructure.
 
 \subsection{Terminology}
+\label{term}
 
 \subsubsection{Inner World}
+\label{term_inner}
 This is Master server, and all worker servers. This should be kept under high
 lockdown. Meaning, critical data should be kept secure.
 
 \subsubsection{Outer World}
+\label{term_outer}
 This is the frontend, including the desktop cleint, mobile client, or the
 website client. The data here is controlled by the authorization of the 
 account.
 
 \subsubsection{Critical Data}
+\label{term_criticaldata}
 Cirtical Data are all data types that shouldn't be tampered with without
 authorization. For example, accounts, personal information, messages, and in
 this context user's portfolios.
 
 \subsubsection{User/Client}
+\label{term_user}
 In this context it is the frontend, which is either the desktop client,
 mobile client, or the website client.
 
 \subsubsection{User/Client Data}
+\label{term_user_data}
 This is the data of the user. The meaning depends on the specific conext. It
 could mean the personal information, credentials, etc. Most of the time it
 means data that is attached to a data transfer to identify client (IP?).
 
 \subsubsection{Module}
+\label{term_module}
 The module is a set of functions. Usually there would be a main header file
 containing the declarations of the functions, a folder with the name of the
 header file containing the individual functions definitions of the header file.
 
 \subsubsection{Master Server}
+\label{term_master}
 This is the main server that \emph{MUST} be run when deploying the application.
 Contains critical data, it would only interact to the outside world by the
 worker servers.
 
 \subsubsection{Worker Servers}
+\label{term_worker}
 These are servers that contact the outer world. Worker Servers will
 interact with the Master Server acting like a `cache' servers. Data should be 
 routed through worker servers to the master server. The main job for worker 
@@ -69,10 +79,12 @@ the main server must contain the data of the client/user. There MUST be ATLEAST
 one instance running to have a functional infrastructure.
 
 \subsubsection{User Accounts}
+\label{term_user_acc}
 This is the account that abstractly is a the data structure that contains
 information about hte user and their account.
 
 \subsection{Infrastructure Model}
+\label{infrastructure}
 A fully deployed infrastructure cotains \emph{ONE} master server, 
 \emph{ATLEAST} one worker server, theoretically across the world to maintain 
 speed and reliabilty. An overview diagram of the infrastructure: \newline
@@ -98,6 +110,7 @@ speed and reliabilty. An overview diagram of the infrastructure: \newline
 \end{center}
 
 \subsubsection{Master Server Infrastructure Model}
+\label{infrastructure_master}
 The master can be defined into modules as demonstrated in the following 
 diagram: \newline
 \begin{center}
@@ -133,6 +146,7 @@ diagram: \newline
 \end{center}
 
 \subsubsection{Worker Servers Infrastructure Model}
+\label{infrastructure_server}
 The worker servers can be defined into modules as demonstrated in the following
 diagram:\newline
 
@@ -169,6 +183,7 @@ diagram:\newline
 \end{center}
 
 \subsection{Global Deployment Variables}
+\label{var_global}
 This section contains an overview of the global deployment variables.
 
 \subsubsection{List of assets to retrieve}
@@ -281,11 +296,13 @@ The worker state structure is:
 \end{itemize}
 
 \section{A more Technical Overview}
+\label{technical_overview}
 This is the section that describes the functioning parts of the project in
 detail. We will start with modules, including master server modules, and worker
 server modules.
 
 \subsection{Master Server}
+\label{technical_master_server}
 The master server has multiple modules:
 \begin{itemize}
 	\item Main Module, i.e the driver.
@@ -351,6 +368,7 @@ account marked to be 'logginable' with third-party logins, making it possible
 to login with the password and using third-party logins.
 
 \subsubsection{Log System}
+\label{master_mods_log}
 The log system should be able to do the following things:
 \begin{itemize}
 	\item To capture the date and time.
@@ -364,6 +382,7 @@ entries than specified in the global variable: memory size of log system
 (\ref{var_log_size}).
 
 \subsubsection{Worker Management}
+\label{master_mods_worker}
 The worker management module should be able to do the following things:
 \begin{itemize}
 	\item Keep track of worker servers.
@@ -385,6 +404,7 @@ A list of IPs should be given to the client when a session is connected. The
 list of IPs are the workers' IPs.
 
 \subsubsection{Assets Data Retrieval}
+\label{master_mods_assets}
 The assets data retrieval model should be able to do the following things:
 \begin{itemize}
 	\item Retrieve data in intervals of the global variable: data update 
@@ -400,6 +420,7 @@ memory and retrieved in a thread-safe manner. This module is preferably to be
 run on a thread.
 
 \subsubsection{Assets Buy \& Sell}
+\label{master_mods_buysell}
 Thie assets buy \& sell module should be able to do the following things:
 \begin{itemize}
 	\item Buy assets and store them into users' portfolios.
@@ -417,6 +438,7 @@ history should be able to show the time of the transaction going through. All
 transaction go through a queue. The queue is cleared every update interval.
 
 \subsection{Worker Server}
+\label{technical_worker_server}
 The worker server has multiple modules:
 \begin{itemize}
 	\item Main module. i.e The driver.
@@ -428,6 +450,7 @@ The worker server has multiple modules:
 \end{itemize}
 
 \subsubsection{Main Module}
+\label{worker_mods_main}
 The main module should be able to do the following things:
 \begin{itemize}
 	\item Start the master server communication thread.
@@ -441,7 +464,7 @@ master server and authorize with the mater server -> start listening to clients
 -> parse it -> pass it to the appropriate thread.
 
 \subsubsection{Master Server Communication}
-\label{worker_master_comms}
+\label{worker_mods_master_comms}
 The master server communication module should be able to do the following:
 \begin{itemize}
 	\item Parse commands.
@@ -451,6 +474,7 @@ The master server communication module should be able to do the following:
 The parsing is quite important and it is explained further in the document.
 
 \subsubsection{Client Management}
+\label{worker_mods_client}
 The client management module should be able to do the following:
 \begin{itemize}
 	\item Keep track of connected clients.
@@ -464,6 +488,7 @@ Keeping track of the clients data structure is explained in the data structure
 section of the document TODO.
 
 \subsubsection{Account Authorization Tunnel}
+\label{worker_mods_acc}
 The account authorization tunnel module should be able to do the following
 things:
 \begin{itemize}
@@ -481,6 +506,7 @@ send them to the master server. Wait for reply, if successfully logged in, make
 a new session token and send it to the client.
 
 \subsubsection{Logging System}
+\label{worker_mods_log}
 The log system should be able to do the following things:
 \begin{itemize}
 	\item To capture the date and time.
@@ -494,6 +520,7 @@ entries than specified in the global variable: memory size of log system
 (\ref{var_log_size}).
 
 \subsubsection{Cache Management}
+\label{worker_mods_cache}
 The cache management module shoudl be able to do the following things:
 \begin{itemize}
 	\item Keep track of memory pointers, and destroy them correctly.
@@ -506,9 +533,12 @@ cache system, it is recommended though due to the limited number of API calls
 to assets/stock values.
 
 \section{The Protocol}
+\label{protocol}
+The cache management module shoudl be able to do the following things:
 This section will describe the protcol used in PaperTrader.
 
 \subsection{Design Goals}
+\label{protocol_goals}
 \begin{itemize}
 	\item Based on the TCP protocol.
 	\item Connectionless model.
@@ -548,7 +578,7 @@ between the clients and the worker servers, and is permanent for the worker and
 master servers communication connection.
 
 \subsection{States}
-\label{states}
+\label{protocol_states}
 There will be two states in any given communication phase:
 \begin{itemize}
 	\item Command State
@@ -556,19 +586,21 @@ There will be two states in any given communication phase:
 \end{itemize}
 
 \subsubsection{Command State}
-\label{state_command}
+\label{protocol_state_command}
 The command state will be the begining of all communication phases. In the
 command state commands that don't require transfer of Assets/Profile data are
 available to command to the worker/master server. These commands include but
 not limited to: login, register, purchase asset, sell asset.
 
 \subsubsection{Data Transfer State}
+\label{protocol_data_command}
 The data transfer state is switchable from the command state. Switching back to
 command state is done at the end of the data transfer. The data transfer
 commands include but are not limited to: get asset value, get past asset value,
 get predicted future asset value.
 
 \subsection{The Connection}
+\label{protocol_connection}
 There are multiple types of connections that are running in the program. The
 rules for communication are discussed later in this document.
 \begin{itemize}
@@ -577,17 +609,20 @@ rules for communication are discussed later in this document.
 \end{itemize}
 
 \subsubsection{Master-Worker Server Connection}
+\label{protocol_masterserver_comms}
 The connection is a TCP socket listening on port 2048 on the Master server. The
 worker server can connect to this port, and after the authentication process
 the master-worker server connection is said to be established.
 
 \subsubsection{Client-Worker Server Connection}
+\label{protocol_clientworker_comms}
 The connection is a TCP socket listening on port 2049 on the Worker server. The
 clients can connect to this port using any port from their end, and after the
 authentication process the client-worker server connection is said to be 
 established.
 
 \subsection{Message Structure}
+\label{protocol_message}
 As mentioned before, all messages are in binary, big-endian format. All
 messages follow a certain data structure:
 \begin{itemize}
@@ -601,7 +636,7 @@ messages follow a certain data structure:
 \end{itemize}
 
 \subsection{Instructions}
-\label{instructions}
+\label{protocol_instructions}
 The instructions listed in this section are organized into the two states 
 explained in \ref{states}, with the addition of the server return instructions.
 Instructions and commands are interchangable in this context, not to be 
@@ -615,6 +650,7 @@ understanding and not meant to be used as literal strings passed on the
 network.
 
 \subsubsection{Command State Instructions}
+\label{protocol_commandstate_inst}
 This a list of instructions that can be executed in the command state of a
 connection:
 \begin{itemize}
@@ -627,6 +663,7 @@ connection:
 \end{itemize}
 
 \subsubsection{Data Transfer State Instructions}
+\label{protocol_datastate_inst}
 This is a list of instructions that can be executed in the command state of a
 connection:
 \begin{itemize}
@@ -644,6 +681,7 @@ connection:
 \end{itemize}
 
 \subsubsection{Server Return Instructions}
+\label{protocol_serverret_inst}
 These instructions are more of return formats. This is a list of instructions 
 that can be returned by a server due to a previous instruction:
 \begin{itemize}
@@ -665,10 +703,13 @@ This is ofcourse not a comprehensive list, and will be updated with further
 releases of the application.
 
 \subsection{Overivew of The Instructions}
+\label{protocol_inst_overview}
+These instructions are more of return formats. This is a list of instructions 
 This would be a comprehensive overview of the instructions mentioned at
 \ref{instructions} 
 
 \subsubsection{login(name, hashedPass, isExpirable)}
+\label{protocol_inst_login1}
 The `login' instruction is from the set of command state instructions, and does
 not require an active session ID to be provided from the worker server. The
 first argument is the username of the account, notice that this is not the
@@ -681,6 +722,7 @@ return the `sessionID' instruction with the sessionID attached to it. On
 failure, the server would return `loginFail'.
 
 \subsubsection{login(sessionID)}
+\label{protocol_inst_login2}
 The `login' instructions is from the set of command state instructions. This
 version of the login instruction requires a sessionID. It is used when the
 client has already logged and and got a sessionID. The sessionID should be
@@ -689,6 +731,7 @@ stored locally on the client's machine. On success, the server would return the
 server would return `loginFail'.
 
 \subsubsection{register(username, email, hashedPass)}
+\label{protocol_inst_register}
 The `register' instruction is from the set of command state instructions, and
 does not requrie an active session ID to be provided from the worker server.
 The first argument is the username of the account, that would be used to login
@@ -698,6 +741,7 @@ success, the server would reurn the `registerSuccess' instruction. On failure,
 the server would return the `registerFail' instruction.
 
 \subsubsection{purchaseAsset(sessionID, name, quantity)}
+\label{protocol_inst_purchase}
 The `purchaseAsset' instruction is from the set of command state instructions,
 and requires an active session ID to be provided from and to the worker server.
 The sessionID argument will identify the caller of the function. The second
@@ -707,6 +751,7 @@ failure, the server would return `purchaseFail' instruction with the reason
 in the command's arguments.
 
 \subsubsection{sellAsset(sessionID, name, quantity)}
+\label{protocol_inst_sellasset}
 The `sellAsset' instruction is from the set of command state instructions, and
 requires an active sesion ID to be provided from and to the worker server. The
 sessoinID argument will identify the caller of the function. The second
@@ -716,6 +761,7 @@ failure, the server would return `sellFail' instruction with the reason in
 the command's arguments.
 
 \subsubsection{switchState(sessionID, state)}
+\label{protocol_inst_switchstate}
 The `switchState' instruction is from the set of command state instructions,
 and requires an active session ID to be provided from and to the worker server.
 The sessionID argument will identify the caller of the function. The second
@@ -725,18 +771,22 @@ should be agreed on per implementation. On success, the server would return
 with the reason in the command's arguments.
 
 \subsubsection{getAssetInfo(asset)}
+\label{protocol_inst_getassetinfo}
 The `getAssetInfo' instruction is from the set of data state instructions. It
 gets the assets information refer to \ref{ds_asset} for the structure of the
 data sent back. On success, the server would return using the data transaction
 mechanism. On failure, the server would return the `dataFail' instruction.
 
 \subsubsection{getAssetValueCurrent(asset)}
+\label{protocol_inst_getassetvaluecurrent}
+The `getAssetInfo' instruction is from the set of data state instructions. It
 The `getAssetValueCurrent' instruction is from the set of data instructions. It
 gets the latest asset value available in the master server. On success, the
 server would return using the data transaction mechanism. On failure, the
 server would return the `dataFail' instruction.
 
 \subsubsection{getAssetValueDay(asset, date)}
+\label{protocol_inst_getassetvalueday}
 The `getAssetValueDay' instruction is from the set of data instructions. It
 gets the 24Hours time frame of data of the date and time specified in the
 second argument. The frequency of these updates depends on the global variable
@@ -745,6 +795,7 @@ would return using the data transaction mechanism. On failure, the server would
 return the `dataFail' instruction.
 
 \subsubsection{getAssetValueWeek(asset, date)}
+\label{protocol_inst_getassetvalueweek}
 The `getAssetValueWeek' instruction is from the set of data instructions. It
 gets the past week day's time frame of the data starting from the date passed 
 in with the arguments. On success, the server would return using the data 
@@ -752,6 +803,7 @@ transaction mechanism. On failure, the server would return the `dataFail'
 instruction.
 
 \subsubsection{getAssetValueMonth(asset, date)}
+\label{protocol_inst_getassetvaluemonth}
 The `getAssetValueMonth' instruction is from the set of data instructions. It
 gets the past months day's time frame of the data starting from the date passed
 in with the arguments. On success, the server would return using the data
@@ -759,6 +811,7 @@ transaction mechanism. On failure, the server would return the `dataFail'
 instructionn.
 
 \subsubsection{getAssetValueYear(asset, date)}
+\label{protocol_inst_getassetvalueyear}
 The `getAssetValueYear' instruction is from the set of data instructions. It
 gets the past years month's time frame of the data starting from the date
 passed in with the arguments. On succuess, the server would return using the
@@ -766,12 +819,14 @@ data transaction mechanism. On ailure, teh server would return the `dataFail'
 instruction.
 
 \subsubsection{getAssetValueAllTime(asset)}
+\label{protocol_inst_getassetvaluealltime}
 The `getAssetValueAllTime' instruction is from the set of data instructions. It
 gets all of the value data stored for the asset per month. On success, the
 server would return using the data transfer mechanism. On failure, the server
 would retunr the `dataFail' instruction.
 
 \subsubsection{getUserInfo(sessionID, username)}
+\label{protocol_inst_getuserinfo}
 The `getUserInfo' instruction is from the set of data instructions. It gets the
 data of a user. Public/Private data returning is based on the sessionID, i.e if
 the sessionID is for username all data is returned. On success, the server
@@ -779,6 +834,7 @@ would return using the data transfer mechanism. On failure, the server would
 return the `dataFail' instruction.
 
 \subsubsection{getUserPortfolio(sessionID, username)}
+\label{protocol_inst_getuserportfolio}
 The `getUserPortfolio' instruction is from the set of data instructions. It
 gets the portfolio of a user. Public/Private data returning is based on the
 sessionID, i.e if the sessionID is for username all data is returned. On
@@ -786,6 +842,7 @@ success, the server would return the data transfer mechanism. On failure, the
 server would return the `dataFail' instruction.
 
 \subsubsection{getUserTransactionHistroy(sessionID, username)}
+\label{protocol_inst_getusertransactionhistory}
 The `getUserTransactionHistory' instruction is from the data instructions. It
 gets the transaction history of a user. Public/Private data returning is based
 on the sessionID, i.e if the sessionID is for username all data is returned. On
@@ -793,57 +850,72 @@ success, the server would return teh data transfer mechanism. On failure, the
 server would return the `dataFill' instruction.
 
 \subsubsection{loginFail}
+\label{protocol_inst_loginfail}
 This is a server return instruction. It means that a login has failed. The
 reason/message is in the arguments attached with the instruction.
 
 \subsubsection{sessionID}
+\label{protocol_inst_sessionID}
+This is a server return instruction. It means that a login has failed. The
 This is a server return instuction. It returns an active session ID. The ID is
 attached in the message's arguments.
 
 \subsubsection{registerSuccess}
+\label{protocol_inst_registersuccess}
 This is a server return instruction. It means that a register action has
 succeeded.
 
 \subsubsection{registerFail}
+\label{protocol_inst_registerfail}
 This is a server return instruciton. It means that a register action has
 failed. The reason/message is in the arguments attached with the instruction.
 
 \subsubsection{purchaseSuccess}
+\label{protocol_inst_purchasesuccess}
 This is a server return instruction. It means that a purchase action has
 succeeded.
 
 \subsubsection{purchaseFail}
+\label{protocol_inst_purchasefail}
 This is a server return instruction. It means that a purchase action has
 failed. The reason/message is in the arguments attached with the instruction.
 
 \subsubsection{sellSucecss}
+\label{protocol_inst_sellsuccess}
 This is a server return instruction. It means that a sell action has succeeded.
 
 \subsubsection{sellFail}
+\label{protocol_inst_sellfail}
 This is a server return instruction. It means that a sell action has failed.
 The reason/message is in the arguments attached with the instruction.
 
 \subsubsection{stateSwitchSuccess}
+\label{protocol_inst_stateswitchsuccess}
 This is a server return instruction. It means that a switchState action has
 succeeded.
 
 \subsubsection{stateSwitchFail}
+\label{protocol_inst_stateswitchfail}
 This is a server return instruction. It means that a swtichState action has
 failed. The reason/message is in the arguments attached with the instructions.
 
 \subsubsection{data}
+\label{protocol_inst_data}
 This is a server return instruction. It means that data is being sent from the
 server to the client/worker server. Data transfer mechanism is explained in
 details later in the document.
 
 \subsubsection{dataFail}
+\label{protocol_inst_datafail}
 This is a server return instruction. It means that the data transfer action
 failed. The reason/message is in the arguments attached with the instruction.
 
 \subsection{Communication}
+\label{protocol_communication}
 The following section describe the communication rules.
 
 \subsubsection{Data Transfer Mechanism}
+\label{protocol_communication_data_transfer}
 The data transfer mechanism is also refered to as the `data' instruction is
 used to transfer bunch of data. The data is transfered in within the a message
 in it's data field. The data instruction is passed a number of times until the 
@@ -879,6 +951,7 @@ shows how a data transfer can happen from master to worker server.
 \end{center}
 
 \subsubsection{Login - First Method}
+\label{protocol_communication_login1}
 The first method of login is done by the `login(name, hashedPass, 
 isExpirable)'. This message is sent to the worker server from a client. Then it
 is routed to the master server. The master server approves/disapproves the 
@@ -914,6 +987,7 @@ request.
 \end{center}
 
 \subsubsection{Login - Second Method}
+\label{protocol_communication_login2}
 The second method of login is done by the `login(sessionID)'. This method is
 very close the previous one, the only difference is that it uses the sesssionID
 for authorization. This message is sent to the worker server from an already 
@@ -950,6 +1024,7 @@ following is a diagram of an axample login request.
 \end{center}
 
 \subsubsection{Register}
+\label{protocol_communication_register}
 The registeration method is done with the `register(username, email,
 hashedPass)' instruction. This communication is very close to the previously
 mentioned ones. The message is sent from a client to a worker server and then
@@ -961,8 +1036,7 @@ is an example of such exchange:
 \begin{center}
 	\begin{tikzpicture}[>=stealth,every node/.style={shape=rectangle,draw
 		,rounded corners}]
-		% create the nodes
-		\node (masterserver) {Master Server};
+		% create the nodes \node (masterserver) {Master Server};
 		\node (workerserver) [left=2cm of masterserver] {Worker Server};
 		\node (client) [left=2cm of workerserver] {Client};
 		\node (masterregister) [below=of masterserver] 
@@ -993,6 +1067,7 @@ is an example of such exchange:
 \end{center}
 
 \subsubsection{Purchase}
+\label{protocol_communication_purchase}
 The purchase sequence is done with the `purchaseAsset(sessionID, name, 
 quantity)' instruction. This communication is very close the the previously
 mentioned ones. The message is sent from a client to a worker. The worker
@@ -1038,6 +1113,7 @@ server. The following diagram is an example of such exchange:
 \end{center}
 
 \subsubsection{Sell}
+\label{protocol_communication_sell}
 The sell sequence is done with the `sellAsset(sessionID, name, quantity)' 
 instruction. This communication is very close the the purchase mentioned 
 ones. The message is sent from a client to a worker. The worker stores the 
@@ -1083,6 +1159,7 @@ following diagram is an example of such exchange:
 \end{center}
 
 \subsubsection{get(Data)}
+\label{protocol_communication_data}
 The retrieval of data is done by a subset of instructions. These instructions
 are prefixed with `get'. The mechanism of the transfer of data is explained in
 (ref ...). The client or the worker server requests data from the master 
