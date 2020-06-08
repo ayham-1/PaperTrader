@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <stdlib.h>
-#include <stddef.h>
 
 #include "list.h"
 
@@ -19,7 +18,6 @@ struct LinkedListNode *createLinkedListNode(void *data,
 bool destroyLinkedListNode(struct LinkedListNode *node)
 {
 	assert(node);
-	free(node->data);
 
 	/* connect nodes */
 	if (node->prev && node->next) {
@@ -66,7 +64,7 @@ bool destroyLinkedList(LinkedList *list)
 	return true;
 }
 
-bool linkedlist_verify(LinkedList *list)
+bool linkedList_verify(LinkedList *list)
 {
 	assert(list);
 	/* verify given nodes */

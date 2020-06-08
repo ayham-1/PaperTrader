@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
-project("PaperTrader")
+project("PaperTrader" C CXX)
+
+enable_testing()
 
 # Set output directories.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

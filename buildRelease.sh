@@ -1,6 +1,6 @@
 #!/bin/sh
 
 mkdir -p buildRelease && cd buildRelease
-cmake -GNinja --config=Release ..
-ninja -j$(nproc)
+cmake --config=Release ..
+make -j$(nproc)
 cd ..

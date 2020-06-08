@@ -1,6 +1,6 @@
 #!/bin/sh
 
 mkdir -p build && cd build
-cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ..
-ninja -j$(nproc)
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make -j$(nproc)
 cd ..
