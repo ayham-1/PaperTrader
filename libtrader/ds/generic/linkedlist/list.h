@@ -2,6 +2,7 @@
 #define DS_GENERIC_LINKED_LIST_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 struct LinkedListNode {
 	void *data;

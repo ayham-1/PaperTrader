@@ -4,7 +4,6 @@ set(CMAKE_C_STANDARD 11)
 
 set(libtrader_hdrs)
 set(libtrader_srcs 
-	test.c
 	ds/account/account.h
 	ds/account/account.c
 	ds/account/portfolio.h
@@ -24,3 +23,7 @@ else()
 	target_compile_options(${PROJECT_NAME} PUBLIC "-Wall" "-Wextra" "-Werror" 
 		"$<$<CONFIG:RELEASE>:-O3>")
 endif()
+
+# Setup testing
+enable_testing()
+add_subdirectory(tests)
