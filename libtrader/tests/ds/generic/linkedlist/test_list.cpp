@@ -3,28 +3,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CATCH_CONFIG_MAIN
 #include "vendor/catch.hpp"
 
 #include "libtrader.h"
 
-bool test_list_node()
+TEST_CASE("linkedListNode testing", "[node]")
 {
 	struct LinkedListNode *prev = NULL, *node = NULL, *next = NULL;
 
 	/* test node with no prev and next */
 	node = createLinkedListNode(NULL, NULL, NULL);
-	assert(node);
+	REQUIRE(node);
 	free(node);
 
 	/* test node with prev and next */
-	prev = createLinkedListNode(NULL, node, NULL);
-	node = createLinkedListNode(NULL, next, prev);
-	next = createLinkedListNode(NULL, NULL, node);
+	next = createLinkedListNode(NULL, NULL, NULL);
+	prev = createLinkedListNode(NULL, NULL, NULL);
+	node = createLinkedListNode(NULL, prev, next);
 
-	assert((int *)(node->prev) == (int *)prev);
-	assert((int *)(node->next) == (int *)next);
-	assert((int *)(prev->next) == (int *)node);
-	assert((int *)(next->prev) == (int *)node);
+	REQUIRE((int *)(node->prev) == (int *)prev);
+	REQUIRE((int *)(node->next) == (int *)next);
 
 	free(node);
 	free(prev);
@@ -34,18 +33,9 @@ bool test_list_node()
 	int *data = (int *)malloc(sizeof(int));
 	memset(data, 42, sizeof(int));
 	node = createLinkedListNode(&data, NULL, NULL);
-	assert(node);
-	assert(node->data);
-	assert(node->data == &data);
+	REQUIRE(node);
+	REQUIRE(node->data);
+	REQUIRE(node->data == &data);
 	free(node);
-	assert(data);
-
-	return true;
-}
-
-int main()
-{
-	if (!test_list_node())
-		return false;
-	return 0;
+	REQUIRE(data);
 }

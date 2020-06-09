@@ -4,14 +4,14 @@
 #include "list.h"
 
 struct LinkedListNode *createLinkedListNode(void *data,
-					    struct LinkedListNode *next,
-					    struct LinkedListNode *prev)
+					    struct LinkedListNode *prev,
+					    struct LinkedListNode *next)
 {
 	struct LinkedListNode *node =
 		(struct LinkedListNode *)malloc(sizeof(struct LinkedListNode));
 	node->data = data;
-	node->next = next;
 	node->prev = prev;
+	node->next = next;
 	return node;
 }
 
