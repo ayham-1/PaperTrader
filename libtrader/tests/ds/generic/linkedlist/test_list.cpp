@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define CATCH_CONFIG_MAIN
 #include "vendor/catch.hpp"
@@ -12,6 +11,8 @@
 TEST_CASE("linkedListNode testing", "[node]")
 {
 	struct LinkedListNode *prev = NULL, *node = NULL, *next = NULL;
+	int *data = (int *)malloc(sizeof(int));
+	*data = 42;
 
 	/* test node creation with no prev and next */
 	node = createLinkedListNode(NULL, NULL, NULL);
@@ -32,14 +33,24 @@ TEST_CASE("linkedListNode testing", "[node]")
 	free(next);
 
 	/* test node creation with data */
-	int *data = (int *)malloc(sizeof(int));
-	memset(data, 42, sizeof(int));
 	node = createLinkedListNode(&data, NULL, NULL);
-	REQUIRE(node);
 	REQUIRE(node->data);
 	REQUIRE(node->data == &data);
 	free(node);
+	node = NULL;
 	REQUIRE(data);
+	REQUIRE(*data == 42);
+
+	/* test node deletion */
+	node = createLinkedListNode(NULL, NULL, NULL);
+	node = destroyLinkedListNode(node);
+	REQUIRE(node == NULL);
+
+	/* test node deletion with data */
+	node = createLinkedListNode(&data, NULL, NULL);
+	node = destroyLinkedListNode(node);
+	REQUIRE(data);
+	REQUIRE(*data == 42);
 }
 
 TEST_CASE("linkedList testing", "[linkedlist]")
@@ -64,7 +75,6 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 
 	list = createLinkedList(3, prev);
 
-	REQUIRE(list);
 	REQUIRE(list->len == 3);
 	REQUIRE(list->start == prev);
 	REQUIRE(list->start->next == node);
@@ -82,5 +92,5 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 	node->prev = prev;
 
 	list = createLinkedList(3, prev);
-	REQUIRE(!list);
+	REQUIRE(list == NULL);
 }
