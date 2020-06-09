@@ -12,7 +12,7 @@ struct LinkedListNode {
 struct LinkedListNode *createLinkedListNode(void *data,
 					    struct LinkedListNode *prev,
 					    struct LinkedListNode *next);
-bool destroyLinkedListNode(struct LinkedListNode *node);
+struct LinkedListNode *destroyLinkedListNode(struct LinkedListNode *node);
 
 typedef struct LinkedList {
 	size_t len;

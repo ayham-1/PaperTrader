@@ -15,7 +15,7 @@ struct LinkedListNode *createLinkedListNode(void *data,
 	return node;
 }
 
-bool destroyLinkedListNode(struct LinkedListNode *node)
+struct LinkedListNode *destroyLinkedListNode(struct LinkedListNode *node)
 {
 	assert(node);
 
@@ -27,11 +27,10 @@ bool destroyLinkedListNode(struct LinkedListNode *node)
 		node->prev->next = NULL;
 	else if (node->next)
 		node->next->prev = NULL;
-	else
-		return false;
 
 	free(node);
-	return true;
+	node = NULL;
+	return node;
 }
 
 LinkedList *createLinkedList(size_t starting_size,
@@ -61,8 +60,7 @@ bool destroyLinkedList(LinkedList *list)
 	struct LinkedListNode *ticker = list->start;
 	while (list->len && list->start) {
 		ticker = list->start->next;
-		if (!destroyLinkedListNode(list->start))
-			return false;
+		destroyLinkedListNode(list->start);
 		list->start = ticker;
 		list->len--;
 	}
