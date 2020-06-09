@@ -10,8 +10,8 @@ struct LinkedListNode {
 	struct LinkedListNode *prev;
 };
 struct LinkedListNode *createLinkedListNode(void *data,
-					    struct LinkedListNode *next,
-					    struct LinkedListNode *prev);
+					    struct LinkedListNode *prev,
+					    struct LinkedListNode *next);
 bool destroyLinkedListNode(struct LinkedListNode *node);
 
 typedef struct LinkedList {
