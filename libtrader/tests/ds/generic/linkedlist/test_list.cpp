@@ -93,4 +93,12 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 
 	list = createLinkedList(3, prev);
 	REQUIRE(list == NULL);
+	REQUIRE(prev);
+	REQUIRE(node);
+	free(prev);
+	free(node);
+	node = NULL;
+	prev = NULL;
+
+	/* test addition of new node to list */
 }
