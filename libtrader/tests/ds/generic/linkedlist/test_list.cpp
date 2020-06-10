@@ -100,5 +100,22 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 	node = NULL;
 	prev = NULL;
 
-	/* test addition of new node to list */
+	/* test wrong backward connection of nodes' linkedlist creation */
+	prev = createLinkedListNode(NULL, NULL, NULL);
+	node = createLinkedListNode(NULL, NULL, NULL);
+	next = createLinkedListNode(NULL, NULL, NULL);
+	prev->next = node;
+	node->next = next;
+
+	list = createLinkedList(3, prev);
+	REQUIRE(list == NULL);
+	REQUIRE(prev);
+	REQUIRE(node);
+	REQUIRE(next);
+	free(prev);
+	free(node);
+	free(next);
+	prev = NULL;
+	node = NULL;
+	next = NULL;
 }

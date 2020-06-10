@@ -76,14 +76,16 @@ bool linkedList_verify(LinkedList *list)
 		return true;
 
 	struct LinkedListNode *ticker = list->start;
-	/* verify given nodes size */
-	for (size_t i = list->len; (i != 0) && ticker; i--) {
-		if (ticker->next == NULL && i != 1)
+	/* verify given nodes */
+	for (size_t i = list->len - 1; (i != 0) && ticker; i--) {
+		if (ticker->next == NULL) /* verify forward connection */
 			return false;
-		else if (ticker->next == NULL && i == 1)
-			break;
-		else if (ticker->next != NULL)
+		else if (ticker->next != NULL) {
+			if (ticker->next->prev !=
+			    ticker) /* verify backward connection*/
+				return false;
 			ticker = ticker->next;
+		}
 	}
 
 	return true;
