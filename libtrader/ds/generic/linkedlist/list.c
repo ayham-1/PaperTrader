@@ -55,7 +55,7 @@ LinkedList *createLinkedList(size_t starting_size,
 bool destroyLinkedList(LinkedList *list)
 {
 	assert(list);
-	linkedList_verify(list);
+	assert(linkedList_verify(list));
 
 	struct LinkedListNode *ticker = list->start;
 	while (list->len && list->start) {
@@ -78,7 +78,8 @@ bool linkedList_verify(LinkedList *list)
 	struct LinkedListNode *ticker = list->start;
 	/* verify given nodes */
 	for (size_t i = list->len - 1; (i != 0) && ticker; i--) {
-		if (ticker->next == NULL) /* verify forward connection */
+		if (ticker->next ==
+		    NULL) /* verify forward connection & size (indirectly) */
 			return false;
 		else if (ticker->next != NULL) {
 			if (ticker->next->prev !=
@@ -101,13 +102,22 @@ void linkedList_add(LinkedList *list, struct LinkedListNode *new_node,
 	assert(list->len >= position);
 
 	struct LinkedListNode *node = linkedList_getNode(list, position);
-	assert(node);
-	if (node->next) {
+	if (!node) {
+		struct LinkedListNode *last_node =
+			linkedList_getNode(list, position - 1);
+		last_node->next = new_node;
+		new_node->prev = last_node;
+	} else if (node && node->next) {
 		node->next->prev = new_node;
 		node->next = new_node;
-	} else
+		new_node->prev = node;
+	} else {
 		node->next = new_node;
+		new_node->prev = node;
+	}
 	list->len++;
+
+	assert(linkedList_verify(list));
 }
 
 size_t linkedList_getPos(LinkedList *list, struct LinkedListNode *node)
@@ -128,10 +138,18 @@ size_t linkedList_getPos(LinkedList *list, struct LinkedListNode *node)
 struct LinkedListNode *linkedList_getNode(LinkedList *list, size_t position)
 {
 	assert(list);
+	assert(linkedList_verify(list));
 	assert(position || position == 0);
 
+	/* no need to search for node if it is the start */
+	if (position == 0)
+		return list->start;
+
+	/* search for the node */
 	struct LinkedListNode *ticker = list->start;
 	while (position) {
+		if (ticker == NULL)
+			return NULL;
 		ticker = ticker->next;
 		position--;
 	}

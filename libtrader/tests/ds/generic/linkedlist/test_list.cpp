@@ -118,4 +118,29 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 	prev = NULL;
 	node = NULL;
 	next = NULL;
+
+	/* test appendication of node to list */
+	prev = createLinkedListNode(NULL, NULL, NULL);
+	node = createLinkedListNode(NULL, NULL, NULL);
+	next = createLinkedListNode(NULL, NULL, NULL);
+	prev->next = node;
+	node->prev = prev;
+
+	list = createLinkedList(2, prev);
+	linkedList_add(list, next, list->len);
+	REQUIRE(list->len == 3);
+	REQUIRE(prev);
+	REQUIRE(node);
+	REQUIRE(next);
+	REQUIRE(list->start == prev);
+	REQUIRE(list->start->next == node);
+	REQUIRE(list->start->next->prev == prev);
+	REQUIRE(list->start->next->next == next);
+	REQUIRE(list->start->next->next->prev == node);
+	free(prev);
+	free(node);
+	free(next);
+	prev = NULL;
+	node = NULL;
+	next = NULL;
 }
