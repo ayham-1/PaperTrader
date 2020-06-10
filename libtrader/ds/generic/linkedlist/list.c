@@ -72,21 +72,20 @@ bool linkedList_verify(LinkedList *list)
 	assert(list);
 
 	/* check if empty */
-	if (list->len == 0 && list->start == NULL)
+	if (list->len == 0 || list->start == NULL)
 		return true;
 
-	/* verify given nodes */
 	struct LinkedListNode *ticker = list->start;
-	assert(ticker);
-	for (size_t i = 0; i < list->len - 1; i++) {
-		if (ticker && ticker->next) {
-			if (ticker->next->prev == ticker)
-				ticker = ticker->next;
-		} else
+	/* verify given nodes size */
+	for (size_t i = list->len; (i != 0) && ticker; i--) {
+		if (ticker->next == NULL && i != 1)
 			return false;
+		else if (ticker->next == NULL && i == 1)
+			break;
+		else if (ticker->next != NULL)
+			ticker = ticker->next;
 	}
-	if (!ticker && ticker->prev->next == ticker)
-		return false;
+
 	return true;
 }
 
