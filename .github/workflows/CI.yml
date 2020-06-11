@@ -10,20 +10,23 @@ jobs:
         steps:
         - uses: actions/checkout@v2
         - name: Install Dependencies
-          run: |
-              vcpkg install catch2
+          run: vcpkg install catch2
         - name: Build Debug
-          run: |
-              ./build.sh
+          run: ./build.sh
         - name: Build Release
-          run: |
-              ./buildRelease.sh
+          run: ./buildRelease.sh
+        - name: Build Docker Debug
+          run: ./buildDocker.sh
+        - name: Build Docker Release
+          run: ./buildDockerRelease.sh
     windows-build:
       runs-on: windows-latest
       steps:
       - uses: actions/checkout@v2
       - name: Setup MSBuild.exe
         uses: warrenbuckley/Setup-MSBuild@v1
+      - name: Install Dependencies
+        run:  vcpkg install catch2
       - name: Build Debug
         run: |
           cmake --config=Debug .
@@ -32,15 +35,3 @@ jobs:
         run: |
           cmake --config=Release .
           msbuild PaperTrader.sln
-    docker-build:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v2
-        - name: Checkout submodules
-          uses: textbook/git-checkout-submodule-action@master
-        - name: Build Debug
-          run: |
-            ./buildDocker.sh
-        - name: Build Release
-          run: |
-            ./buildDockerRelease.sh
