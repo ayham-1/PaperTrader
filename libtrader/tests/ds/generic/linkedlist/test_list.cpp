@@ -119,7 +119,7 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 	node = NULL;
 	next = NULL;
 
-	/* test appendication of node to list */
+	/* test appendication of node to a list */
 	prev = createLinkedListNode(NULL, NULL, NULL);
 	node = createLinkedListNode(NULL, NULL, NULL);
 	next = createLinkedListNode(NULL, NULL, NULL);
@@ -137,6 +137,26 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 	REQUIRE(list->start->next->prev == prev);
 	REQUIRE(list->start->next->next == next);
 	REQUIRE(list->start->next->next->prev == node);
+	free(prev);
+	free(node);
+	free(next);
+	prev = NULL;
+	node = NULL;
+	next = NULL;
+
+	/* test retrieval of position in linkedlist */
+	prev = createLinkedListNode(NULL, NULL, NULL);
+	node = createLinkedListNode(NULL, NULL, NULL);
+	next = createLinkedListNode(NULL, NULL, NULL);
+	prev->next = node;
+	node->prev = prev;
+	node->next = next;
+	next->prev = node;
+
+	list = createLinkedList(3, prev);
+	REQUIRE(linkedList_getPos(list, prev) == 0);
+	REQUIRE(linkedList_getPos(list, node) == 1);
+	REQUIRE(linkedList_getPos(list, next) == 2);
 	free(prev);
 	free(node);
 	free(next);
