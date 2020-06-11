@@ -1,11 +1,9 @@
-FROM opensuse/tumbleweed
+FROM archlinux
 
-RUN zypper -n update
-RUN zypper -n install cmake
-RUN zypper -n install ninja
-RUN zypper -n install gcc
-RUN zypper -n install gcc-c++
-
+RUN pacman --noconfirm -Syu
+RUN pacman --noconfirm -S base-devel
+RUN pacman --noconfirm -S cmake
+RUN pacman --noconfirm -S catch2
 COPY . PaperTrader
 WORKDIR PaperTrader
 
