@@ -163,4 +163,26 @@ TEST_CASE("linkedList testing", "[linkedlist]")
 	prev = NULL;
 	node = NULL;
 	next = NULL;
+
+	/* test retrieval of node in linkedlist */
+	prev = createLinkedListNode(NULL, NULL, NULL);
+	node = createLinkedListNode(NULL, NULL, NULL);
+	next = createLinkedListNode(NULL, NULL, NULL);
+	prev->next = node;
+	node->prev = prev;
+	node->next = next;
+	next->prev = node;
+	list = createLinkedList(3, prev);
+	REQUIRE(prev);
+	REQUIRE(node);
+	REQUIRE(next);
+	REQUIRE(linkedList_getNode(list, 0) == prev);
+	REQUIRE(linkedList_getNode(list, 1) == node);
+	REQUIRE(linkedList_getNode(list, 2) == next);
+	free(prev);
+	free(node);
+	free(next);
+	prev = NULL;
+	node = NULL;
+	next = NULL;
 }
