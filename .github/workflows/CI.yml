@@ -11,6 +11,7 @@ jobs:
         - uses: actions/checkout@v2
         - name: Install Dependencies
           run: |
+              echo ${VCPKG_ROOT}
               vcpkg install catch2
         - name: Build Debug
           run: ./build.sh
