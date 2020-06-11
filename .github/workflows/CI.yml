@@ -2,16 +2,11 @@ name: CI
 on: push
 
 jobs:
-    linux-build:
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v2
-      - name: Build Debug
-        run: ./build.sh
-      - name: Build Release
-        run: ./buildRelease.sh
-    macOS-build:
-      runs-on: macOS-latest
+    posix-build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
       steps:
       - uses: actions/checkout@v2
       - name: Build Debug
