@@ -14,11 +14,9 @@ jobs:
               vcpkg install catch2
         - name: Build Debug
           run: |
-              vcpkg env
               ./build.sh
         - name: Build Release
           run: |
-              vcpkg env
               ./buildRelease.sh
     windows-build:
       runs-on: windows-latest
