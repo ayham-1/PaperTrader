@@ -19,6 +19,10 @@ jobs:
           run: ./buildDocker.sh
         - name: Build Docker Release
           run: ./buildDockerRelease.sh
+        - name: Upload Code Coverage.
+          run: |
+            bash <(curl -s https://codecov.io/bash)
+                -t ${{ secrets.CODECOV_TOKEN }}
     windows-build:
       runs-on: windows-latest
       steps:
