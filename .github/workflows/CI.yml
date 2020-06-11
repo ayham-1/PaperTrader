@@ -7,10 +7,11 @@ jobs:
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-latest]
-        env:
-            OS: ${{ matrix.os }}
         steps:
         - uses: actions/checkout@v2
+        - name: Install Dependencies
+          run: |
+              vcpkg install catch2
         - name: Build Debug
           run: ./build.sh
         - name: Build Release
