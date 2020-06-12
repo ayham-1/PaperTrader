@@ -21,6 +21,8 @@ jobs:
           run: ./buildDockerRelease.sh
         - name: Upload Code Coverage.
           run: |
+            cd build
+            ctest -j9
             bash <(curl -s https://codecov.io/bash)
                 -t ${{ secrets.CODECOV_TOKEN }}
     windows-build:
