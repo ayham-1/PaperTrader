@@ -39,9 +39,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
+        - name: Install Dependencies
+          run: vcpkg install catch2
         - name: Upload Code Coverage.
           run: |
-            ./buildDocker.sh
+            ./build.sh
             cd build
             ctest -j9
             bash <(curl -s https://codecov.io/bash)
