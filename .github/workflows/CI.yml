@@ -2,7 +2,7 @@ name: CI
 on: push
 
 jobs:
-    posix-build:
+    posix:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
@@ -19,13 +19,7 @@ jobs:
           run: ./buildDocker.sh
         - name: Build Docker Release
           run: ./buildDockerRelease.sh
-        - name: Upload Code Coverage.
-          run: |
-            cd build
-            ctest -j9
-            bash <(curl -s https://codecov.io/bash)
-                -t ${{ secrets.CODECOV_TOKEN }}
-    windows-build:
+    windows:
       runs-on: windows-latest
       steps:
       - uses: actions/checkout@v2
@@ -41,3 +35,14 @@ jobs:
         run: |
           cmake --config=Release .
           msbuild PaperTrader.sln
+    codecov:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        - name: Upload Code Coverage.
+          run: |
+            ./buildDocker.sh
+            cd build
+            ctest -j9
+            bash <(curl -s https://codecov.io/bash)
+                -t ${{ secrets.CODECOV_TOKEN }}
