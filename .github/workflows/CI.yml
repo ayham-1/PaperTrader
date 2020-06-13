@@ -43,8 +43,9 @@ jobs:
           run: vcpkg install catch2
         - name: Build Project
           run: ./build.sh
-        - name: Upload Code Coverage.
+        - name: Run Tests
           working-directory: build
-          run: |
-            ctest -j9
-            bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
+          run: ctest -j$(nproc)
+        - uses: codecov/codecov-action@v1
+          with:
+              token: ${{ secrets.CODECOV }}
