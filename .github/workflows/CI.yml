@@ -46,6 +46,7 @@ jobs:
         - name: Run Tests
           working-directory: build
           run: ctest -j$(nproc)
-        - uses: codecov/codecov-action@v1
-          with:
-              token: ${{ secrets.CODECOV }}
+        - name: Upload Coverage
+          run: |
+              bash <(curl -s https://codecov.io/bash) -v
+              
