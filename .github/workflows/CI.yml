@@ -44,8 +44,7 @@ jobs:
         - name: Build Project
           run: ./build.sh
         - name: Run Tests
-          working-directory: build
-          run: ctest -j$(nproc)
+          run: cd build && ctest -j$(nproc)
         - name: Upload Coverage
           run: |
             bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
