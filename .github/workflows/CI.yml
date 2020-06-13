@@ -41,9 +41,10 @@ jobs:
         - uses: actions/checkout@v2
         - name: Install Dependencies
           run: vcpkg install catch2
+        - name: Build Project
+          run: ./build.sh
         - name: Upload Code Coverage.
+          working-directory: build
           run: |
-            ./build.sh
-            cd build
             ctest -j9
             bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
