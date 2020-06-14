@@ -1,0 +1,19 @@
+[package]
+name = "PaperTrader"
+version = "0.1.0"
+authors = ["realaltffour <56314286+realaltffour@users.noreply.github.com>"]
+edition = "2018"
+
+[lib]
+name = "libtrader"
+path = "src/libtrader/libtrader.rs"
+test = true
+bench = true
+
+[[bin]]
+name = "sandbox"
+path = "src/bin/sandbox/sandbox.rs"
+test = false
+bench = false
+
+[dependencies]
