@@ -1,12 +1,9 @@
-use chrono::{DateTime, Utc}
+use chrono::{DateTime, Utc};
 
 #[derive(PartialEq, Debug)]
 pub enum PositionType { Sell, Buy }
-impl Default for TransactionType {
-    fn default() -> Self { PositionType::Buy }
-}
 
-#[derive(Default, PartialEq, Debug)]
+#[derive(PartialEq, Debug)]
 pub struct Position {
     pub action_type: PositionType,
     pub stock_symbol: String,
