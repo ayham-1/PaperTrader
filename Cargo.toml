@@ -17,3 +17,4 @@ test = false
 bench = false
 
 [dependencies]
+chrono = "0.4"
