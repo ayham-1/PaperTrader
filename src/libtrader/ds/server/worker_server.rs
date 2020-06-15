@@ -1,5 +1,5 @@
-#[derive(PartialEq, Debug)]
+#[derive(Default, PartialEq, Debug)]
 pub struct WorkerServer {
-    name: String,
-    server_ip: Ipv4Addr,
+    pub name: String,
+    pub server_ip: Ipv4Addr,
 }
