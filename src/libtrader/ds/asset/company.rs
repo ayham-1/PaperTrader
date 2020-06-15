@@ -5,6 +5,6 @@ pub struct Company {
     pub primary_exchange: String,
     pub sector: String,
     pub industry: String,
-    pub primary_sic_code: i64,
-    pub employees: i64,
+    pub primary_sic_code: i16,
+    pub employees: i32,
 }
