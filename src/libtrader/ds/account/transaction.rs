@@ -9,5 +9,4 @@ pub struct Transaction {
     pub action_type: TransactionType,
     pub cost: i64,
     pub stocks_amount: i64,
-    pub is_open: bool
 }
