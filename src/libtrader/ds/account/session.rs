@@ -5,8 +5,8 @@ static EXPIY_DATE: DateTime<Utc> = DateTime::<Utc>::from_utc(NaiveDateTime::from
 
 #[derive(PartialEq, Debug)]
 pub struct SessionID  {
-    sess_id: String,
-    client_ip: Ipv4Addr,
-    expiry_date: DateTime<Utc>,
-    is_active: bool,
+    pub sess_id: String,
+    pub client_ip: Ipv4Addr,
+    pub expiry_date: DateTime<Utc>,
+    pub is_active: bool,
 }
