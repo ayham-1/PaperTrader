@@ -1,7 +1,5 @@
-use chrono::{DateTime, NaiveDateTime};
-use std::next::Ipv4Addr;
-
-static EXPIY_DATE: DateTime<Utc> = DateTime::<Utc>::from_utc(NaiveDateTime::from_ymd(0, 0, 30), Utc);
+use chrono::{DateTime, Utc};
+use std::net::Ipv4Addr;
 
 #[derive(PartialEq, Debug)]
 pub struct SessionID  {
