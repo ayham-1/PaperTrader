@@ -1,0 +1,7 @@
+FROM rust
+
+# Set up Root directory project
+RUN mkdir /pt_proj/
+WORKDIR pt_proj
+
+ENTRYPOINT [ "cargo", "run", "sandbox" ]
