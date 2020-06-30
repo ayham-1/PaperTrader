@@ -2,6 +2,7 @@ version: '3.1'
 
 services:
     db:
+        container_name: pt_db
         image: postgres
         restart: always
         environment:
@@ -13,7 +14,29 @@ services:
         volumes:
             - ./.db:/var/lib/postgresql/data
     adminer:
+        container_name: pt_admin
         image: adminer
         restart: always
         ports:
             - 8080:8080
+
+    dbbackups:
+        container_name: pt_backup
+        image: prodrigestivill/postgres-backup-local
+        restart: always
+        volumes:
+            - ./.bak:/backups
+        links:
+            - db:db
+        depends_on:
+            - db
+        environment:
+            - POSTGRES_HOST=db
+            - POSTGRES_DB=pt_db
+            - POSTGRES_USER=pt_usr
+            - POSTGRES_PASSWORD=test
+            - POSTGRES_EXTRA_OPTS=-Z9 --schema=public --blobs
+            - SCHEDULE=@every 0h00m03s
+            - BACKUP_KEEP_DAYS=7
+            - BACKUP_KEEP_WEEKS=4
+            - BACKUP_KEEP_MONTHS=6
