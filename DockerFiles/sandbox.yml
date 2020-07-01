@@ -2,6 +2,7 @@ version: '3.1'
 
 services:
     db:
+        container_name: pt_sandbox_db
         image: postgres
         restart: always
         environment:
@@ -11,6 +12,7 @@ services:
         ports:
             - 5432:5432
     adminer:
+        container_name: pt_sandbox_admin
         image: adminer
         restart: always
         ports:

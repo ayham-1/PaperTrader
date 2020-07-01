@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker-compose -f ../DockerFiles/dockComp_master_server.yml up
+docker-compose -f ../DockerFiles/master_server.yml ${1:-up}

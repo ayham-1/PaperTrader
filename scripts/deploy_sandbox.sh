@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker-compose -f ../DockerFiles/dockComp_sandbox.yml up
+docker-compose -f ../DockerFiles/sandbox.yml ${1:-up}
