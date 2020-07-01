@@ -1,6 +1,7 @@
 #[derive(Default, PartialEq, Debug)]
 pub struct Company {
     pub symbol: String,
+    pub isin: String,
     pub company_name: String,
     pub primary_exchange: String,
     pub sector: String,
