@@ -1,1 +1,1 @@
-CREATE SCHEMA asset;
+CREATE SCHEMA asset_schema;
