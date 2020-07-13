@@ -1,7 +1,5 @@
 use postgres_types::{ToSql, FromSql};
 
-use chrono::{DateTime, Utc};
-
 #[derive(PartialEq, Debug, ToSql, FromSql)]
 pub enum PositionType { Sell, Buy }
 
