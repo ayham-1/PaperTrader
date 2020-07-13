@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 static INST_SWITCH_STATE: isize = 0;
 
 #[derive(PartialEq, Debug)]
@@ -8,6 +9,8 @@ pub enum CommandInst {
     PurchaseAsset = 4,
     SellAsset = 5
 }
+
+#[allow(dead_code)]
 static INST_COMMAND_MAX_ID: isize = CommandInst::SellAsset as isize;
 
 #[derive(PartialEq, Debug)]
@@ -23,4 +26,6 @@ pub enum DataTransferInst {
     GetUserPortfolio = 14,
     GetUserTransactionHist = 15,
 }
+
+#[allow(dead_code)]
 static INST_DATA_MAX_ID: isize = DataTransferInst::GetUserTransactionHist as isize;
