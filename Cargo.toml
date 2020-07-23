@@ -16,6 +16,9 @@ path = "src/bin/sandbox/sandbox.rs"
 test = false
 bench = false
 
+[features]
+master_server = []
+
 [dependencies]
 chrono = "0.4"
 postgres = "0.17.3"
