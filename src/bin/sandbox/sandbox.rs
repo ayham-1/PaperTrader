@@ -2,7 +2,7 @@ use libtrader::initializer::libtrader_init;
 
 fn main() {
     match libtrader_init() {
-        Ok(()) => println!("connected successfully"),
+        Ok(state) => println!("inited state: {:?}", state),
         Err(err) => println!("Failed with error: {}", err),
     }
    

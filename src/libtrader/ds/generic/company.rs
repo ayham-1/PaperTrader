@@ -1,3 +1,4 @@
+#[derive(Default, PartialEq, Debug)]
 pub struct Company {
     pub id: u8,
     pub symbol: String,
