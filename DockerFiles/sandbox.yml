@@ -11,6 +11,9 @@ services:
             POSTGRES_PASSWORD: PASSWORD
         ports:
             - 5432:5432
+        volumes:
+            - ./.db:/var/lib/postgresql/data
+            - ../src/libtrader/db/sql:/docker-entrypoint-initdb.d/
     adminer:
         container_name: pt_sandbox_admin
         image: adminer

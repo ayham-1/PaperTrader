@@ -15,6 +15,8 @@ pub struct GlobalState {
     #[cfg(feature="worker_server")]
     pub state: WorkerState,
 
-    pub companies: HashMap<String, Company>,
-    pub stock_vals: HashMap<String, StockVal>,
+    pub db_connect_str: String,
+
+    pub companies: HashMap<String, Company>, // symbol, company
+    pub stock_vals: HashMap<String, StockVal>, // symbol, stockval
 }
