@@ -1,4 +1,4 @@
-CREATE TABLE asset_schema.stock_vals (
+CREATE TABLE asset_schema.stock_{} (
 	id					BIGSERIAL PRIMARY KEY,
 	isin				text NOT NULL,
 	time_since_epoch 	timestamp NOT NULL,
