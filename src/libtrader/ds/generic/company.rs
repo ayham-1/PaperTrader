@@ -1,6 +1,8 @@
-#[derive(Default, PartialEq, Debug)]
+use postgres_types::{ToSql, FromSql};
+
+#[derive(Default, PartialEq, Debug, ToSql, FromSql)]
 pub struct Company {
-    pub id: u8,
+    pub id: i8,
     pub symbol: String,
     pub isin: String,
     pub company_name: String,
@@ -8,5 +10,5 @@ pub struct Company {
     pub sector: String,
     pub industry: String,
     pub primary_sic_code: String,
-    pub employees: u8,
+    pub employees: i8,
 }
