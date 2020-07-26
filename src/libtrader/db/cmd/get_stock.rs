@@ -11,7 +11,7 @@ pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Re
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match client.query(format!("SELECT * FROM asset_schema.{}", searched_symbol), &[]) {
+    match client.query(format!("SELECT * FROM asset_schema.{}", searched_symbol).as_str(), &[]) {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();
@@ -38,7 +38,7 @@ pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: S
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_since_epoch >= {}", searched_symbol, time_epoch), &[]) {
+    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_since_epoch >= {}", searched_symbol, time_epoch).as_str(), &[]) {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();
@@ -65,7 +65,7 @@ pub fn get_stock_from_db_between_epochs(state: &mut GlobalState, searched_symbol
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_since_epoch >= {} AND time_since_epoch <= {}", searched_symbol, first_time_epoch, second_time_epoch), &[]) {
+    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_since_epoch >= {} AND time_since_epoch <= {}", searched_symbol, first_time_epoch, second_time_epoch).as_str(), &[]) {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();
