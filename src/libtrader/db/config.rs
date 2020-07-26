@@ -7,3 +7,6 @@ pub static DB_PASS: &'static str = "PASSWORD";
 
 pub static DB_SESS_USER: &'static str = "sessions_schema_usr";
 pub static DB_SESS_PASS: &'static str = "PASSWORD";
+
+pub static DB_ACC_USER: &'static str = "accounts_schema_usr";
+pub static DB_ACC_PAss: &'static str = "PASSWORD";
