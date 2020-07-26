@@ -1,6 +1,7 @@
 use libtrader::initializer::libtrader_init;
 use libtrader::db::cmd::create_company::create_company;
 use libtrader::db::cmd::get_company::get_company_from_db;
+use libtrader::db::cmd::create_stock::create_stock;
 use libtrader::ds::generic::company::Company;
 use libtrader::ds::server::global_state::GlobalState;
 
@@ -24,6 +25,11 @@ fn main() {
     match get_company_from_db(&mut state, "TEST".to_string()) {
         Ok(found_company) => println!("we found it! {:?}", found_company),
         Err(err) => panic!("we must found the sacred company! err: {}", err),
+    }
+
+    match create_stock(&mut state, "test".to_string()) {
+        Ok(()) => println!("created stock table"),
+        Err(err) => panic!("failed to create stock table {}", err),
     }
    
     println!("state: {:?}\n", state);

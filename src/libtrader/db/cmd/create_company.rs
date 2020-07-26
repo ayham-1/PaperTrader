@@ -2,6 +2,9 @@ use crate::db::init::db_connect;
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
+/*
+ * Creates a comany entry in database in public.companies.
+ */
 pub fn create_company(state: &mut GlobalState, company: Company) -> Result<(), String> {
     // Connect to database.
     let mut client = db_connect(&state)?;
@@ -12,8 +15,7 @@ pub fn create_company(state: &mut GlobalState, company: Company) -> Result<(), S
         &[&company.id, &company.symbol, &company.isin, &company.company_name, 
             &company.primary_exchange, &company.sector, &company.industry,
             &company.primary_sic_code, &company.employees]) {
-        #[allow(unused_variables)] /* We do not need the number of rows modified. */
-        Ok(row) => {
+        Ok(_row) => {
             // add company to state
             state.companies.insert(company.symbol.to_string(), company);
             Ok(())
