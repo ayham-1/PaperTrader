@@ -2,6 +2,9 @@ use crate::db::init::db_connect;
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
+/*
+ * Returns company entry from database
+ */
 pub fn get_company_from_db(state: &mut GlobalState, searched_symbol: String) -> Result<&Company, String> {
     /*
      * Searches in database if company is available
