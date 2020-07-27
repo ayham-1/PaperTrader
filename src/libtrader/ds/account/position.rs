@@ -13,7 +13,7 @@ pub struct Position {
     pub stock_close_amount: i64,
     pub stock_close_price: f64,
     pub stock_close_cost: f64,
-    //pub open_date: DateTime<Utc>,
-    //pub close_date: DateTime<Utc>,
+    pub open_epoch: i64,
+    pub close_epoch: i64,
     pub is_open: bool,
 }
