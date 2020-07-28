@@ -20,6 +20,6 @@ pub fn create_company(state: &mut GlobalState, company: Company) -> Result<(), S
             state.companies.insert(company.symbol.to_string(), company);
             Ok(())
         },
-        Err(error) => Err(format!("Failed to create company with error: {}", error))
+        Err(error) => Err(format!("CMD_COMPANY_CREATE_FAILED: {}", error))
     }
 }
