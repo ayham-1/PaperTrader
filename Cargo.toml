@@ -18,8 +18,12 @@ bench = false
 
 [features]
 master_server = []
+worker_server = []
+client = []
 
 [dependencies]
 chrono = "0.4"
 postgres = "0.17.3"
 postgres-types = {version = "0.1.1", features = ["derive"]}
+log = "0.4"
+simplelog = "0.8.0"

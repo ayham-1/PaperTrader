@@ -10,7 +10,7 @@ pub fn db_gen_connect_str(state: &mut GlobalState, user: &'static str, pass: &'s
 pub fn db_connect(state: &GlobalState) -> Result<postgres::Client, String> {
     match postgres::Client::connect(state.db_connect_str.as_str(), postgres::NoTls) {
         Ok(client) => return Ok(client),
-        Err(error) => return Err(format!("Failed to Init DB with error: {}", error))
+        Err(error) => return Err(format!("DB_FAILED_INIT: {}", error))
     }
 }
 
