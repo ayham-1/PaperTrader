@@ -9,6 +9,11 @@ pub enum CommandInst {
     PurchaseAsset = 4,
     SellAsset = 5
 }
+impl std::fmt::Display for CommandInst {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:#?}", self)
+    }
+}
 
 #[allow(dead_code)]
 static INST_COMMAND_MAX_ID: isize = CommandInst::SellAsset as isize;
@@ -25,6 +30,11 @@ pub enum DataTransferInst {
     GetUserInfo = 13,
     GetUserPortfolio = 14,
     GetUserTransactionHist = 15,
+}
+impl std::fmt::Display for DataTransferInst {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:#?}", self)
+    }
 }
 
 #[allow(dead_code)]
