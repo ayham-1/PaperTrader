@@ -17,6 +17,7 @@ test = false
 bench = false
 
 [features]
+default = ["master_server"]
 master_server = []
 worker_server = []
 client = []
