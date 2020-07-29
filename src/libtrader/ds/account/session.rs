@@ -8,3 +8,8 @@ pub struct SessionID  {
     pub expiry_date: DateTime<Utc>,
     pub is_active: bool,
 }
+impl std::fmt::Display for SessionID {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {}, {}, {})", self.sess_id, self.client_ip, self.expiry_date, self.is_active)
+    }
+}
