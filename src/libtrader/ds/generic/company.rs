@@ -1,6 +1,4 @@
-use postgres_types::{ToSql, FromSql};
-
-#[derive(Default, PartialEq, Debug, ToSql, FromSql)]
+#[derive(Default, PartialEq, Debug)]
 pub struct Company {
     pub id: i64,
     pub symbol: String,
@@ -11,4 +9,9 @@ pub struct Company {
     pub industry: String,
     pub primary_sic_code: String,
     pub employees: i64,
+}
+impl std::fmt::Display for Company {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {}, {}, {}, {}, {}, {}, {}, {})", self.id, self.symbol, self.isin, self.company_name, self.primary_exchange, self.sector, self.industry, self.primary_sic_code, self.employees)
+    }
 }
