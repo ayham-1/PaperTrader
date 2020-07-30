@@ -1,14 +1,14 @@
-use postgres_types::{ToSql, FromSql};
-
-#[derive(PartialEq, Debug, ToSql, FromSql)]
-pub enum PositionType { Sell, Buy }
-impl std::fmt::Display for PositionType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {PositionType::Sell=>"SELL", PositionType::Buy=>"BUY"})
-    }
+enum_from_primitive! {
+#[derive(PartialEq, Debug)]
+    pub enum PositionType { Sell = 0, Buy = 1 }
 }
+impl std::fmt::Display for PositionType {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{}", match self {PositionType::Sell=>"SELL", PositionType::Buy=>"BUY"})
+        }
+    }
 
-#[derive(PartialEq, Debug, ToSql, FromSql)]
+#[derive(PartialEq, Debug)]
 pub struct Position {
     pub action_type: PositionType,
     pub stock_symbol: String,
