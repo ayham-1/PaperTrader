@@ -18,7 +18,7 @@ pub fn create_company(state: &mut GlobalState, company: Company) -> Result<(), S
             &company.primary_sic_code, &company.employees]) {
         Ok(_row) => {
             // add company to state
-            state.companies.insert(company.symbol.to_string(), company);
+            state.companies.insert(company.symbol.into(), company);
             Ok(())
         },
         Err(error) => Err(format!("CMD_COMPANY_CREATE_FAILED: {}", error))

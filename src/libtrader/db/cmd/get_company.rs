@@ -31,7 +31,7 @@ pub fn get_company_from_db(state: &mut GlobalState, searched_symbol: String) -> 
 
             match state.companies.get(&searched_symbol) {
                 Some(company) => Ok(company),
-                None => Err("DB_SEARCH_COMPANY_NOT_FOUND".to_string())
+                None => Err("DB_SEARCH_COMPANY_NOT_FOUND".into())
             }
         },
         Err(err) => Err(format!("DB_SEARCH_COMPANY_NOT_FOUND: {}", err)),
