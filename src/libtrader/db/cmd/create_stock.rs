@@ -1,3 +1,4 @@
+use crate::db::config::{DB_USER, DB_PASS};
 use crate::db::init::db_connect;
 use crate::ds::server::global_state::GlobalState;
 
@@ -6,7 +7,7 @@ use crate::ds::server::global_state::GlobalState;
  */
 pub fn create_stock(state: &mut GlobalState, stock_name: String) -> Result<(), String> {
     // Connect to database.
-    let mut client = db_connect(&state)?;
+    let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
     // Create the table.
     match client.execute(format!("CREATE TABLE asset_schema.{} ( \

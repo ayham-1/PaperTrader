@@ -1,3 +1,4 @@
+use crate::db::config::{DB_USER, DB_PASS};
 use crate::db::init::db_connect;
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
@@ -10,7 +11,7 @@ pub fn get_company_from_db(state: &mut GlobalState, searched_symbol: String) -> 
      * Searches in database if company is available
      */
     // Connect to database.
-    let mut client = db_connect(&state)?;
+    let mut client = db_connect(state, DB_USER, DB_PASS)?;
     match client.query("SELECT * FROM public.companies WHERE symbol=$1",
                        &[&searched_symbol]) {
         Ok(row) => {

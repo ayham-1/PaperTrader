@@ -1,5 +1,4 @@
-use crate::db::config::{*};
-use crate::db::init::{db_init, db_gen_connect_str};
+use crate::db::init::{db_init};
 use crate::ds::server::global_state::GlobalState;
 
 pub fn libtrader_init_log() -> Result<(), String> {
@@ -24,9 +23,6 @@ pub fn libtrader_init() -> Result<GlobalState, String> {
         Ok(()) => {},
         Err(err) => panic!("This should not happen!\n{}", err),
     };
-
-    // Generate db_connect_str.
-    db_gen_connect_str(&mut state, DB_USER, DB_PASS);
 
     // Initialize database.
     match db_init(&mut state) {

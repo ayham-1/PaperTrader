@@ -1,3 +1,4 @@
+use crate::db::config::{DB_USER, DB_PASS};
 use crate::db::init::db_connect;
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::stock_val::StockVal;
@@ -7,7 +8,7 @@ use crate::ds::generic::stock_val::StockVal;
  */
 pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Result<Vec<StockVal>, String> {
     // Connect to database.
-    let mut client = db_connect(&state)?;
+    let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
@@ -34,7 +35,7 @@ pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Re
  */
 pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: String, time_epoch: i64) -> Result<Vec<StockVal>, String> {
     // Connect to database.
-    let mut client = db_connect(&state)?;
+    let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
@@ -61,7 +62,7 @@ pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: S
  */
 pub fn get_stock_from_db_between_epochs(state: &mut GlobalState, searched_symbol: String, first_time_epoch: i64, second_time_epoch: i64) -> Result<Vec<StockVal>, String> {
     // Connect to database.
-    let mut client = db_connect(&state)?;
+    let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();

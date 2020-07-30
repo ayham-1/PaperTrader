@@ -2,12 +2,10 @@ use crate::db::config::{*};
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
-pub fn db_gen_connect_str(state: &mut GlobalState, user: &'static str, pass: &'static str) {
+pub fn db_connect(state: &mut GlobalState, user: &'static str, pass: &'static str) -> Result<postgres::Client, String> {
+    /* Generate the requested string */
     state.db_connect_str = format!("host={} port={} dbname={} user={} password={}",
                                    DB_HOST, DB_HOST_PORT, DB_NAME, user, pass);
-}
-
-pub fn db_connect(state: &GlobalState) -> Result<postgres::Client, String> {
     match postgres::Client::connect(state.db_connect_str.as_str(), postgres::NoTls) {
         Ok(client) => return Ok(client),
         Err(error) => return Err(format!("DB_FAILED_INIT: {}", error))
@@ -19,7 +17,7 @@ pub fn db_init(state: &mut GlobalState) -> Result<(), String> {
      * Load companies from database
      */
     // Connect to database
-    let mut client = db_connect(&state)?;
+    let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
     // Query database for companies and store them.
     for row in client.query("SELECT * FROM public.companies", &[]).unwrap() {
