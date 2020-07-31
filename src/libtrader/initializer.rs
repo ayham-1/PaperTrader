@@ -1,17 +1,10 @@
-use crate::db::initializer::{db_init};
+use crate::misc::gen_log::gen_log;
+use crate::db::initializer::db_init;
 use crate::ds::server::global_state::GlobalState;
 
 pub fn libtrader_init_log() -> Result<(), String> {
-    use simplelog::*;
-    use std::fs::File;
-    CombinedLogger::init(vec![
-                         #[cfg(debug_assertions)]
-                         TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Mixed),
-                         #[cfg(not(debug_assertions))]
-                         TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-                         WriteLogger::new(LevelFilter::Info, Config::default(), File::create("log.txt").unwrap())
-    ]).unwrap();
     info!("Started Logger.");
+    gen_log();
     Ok(())
 }
 

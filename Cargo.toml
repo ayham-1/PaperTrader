@@ -29,3 +29,4 @@ postgres-types = {version = "0.1.1", features = ["derive"]}
 log = "0.4"
 simplelog = "0.8.0"
 enum_primitive = "*"
+os_type="2.2"
