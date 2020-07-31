@@ -1,3 +1,5 @@
+use crate::misc::path_exists::path_exists;
+
 pub fn gen_log() {
     /* 
      * Linux will use /var/log/papertrader/.
@@ -9,10 +11,12 @@ pub fn gen_log() {
 
     match os_type::current_platform().os_type {
         os_type::OSType::Unknown => {
-            match std::fs::create_dir("log") {
-                Ok(()) => {},
-                Err(err) => panic!("GEN_LOG_FAILED_DIR_CREATION: {}", err)
-            };
+            if !path_exists("log") {
+                match std::fs::create_dir("log") {
+                    Ok(()) => {},
+                    Err(err) => panic!("GEN_LOG_FAILED_DIR_CREATION: {}", err)
+                };
+            }
             CombinedLogger::init(vec![
                                  #[cfg(debug_assertions)]
                                  TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Mixed),
@@ -24,10 +28,12 @@ pub fn gen_log() {
             ]).unwrap();
         },
         _ => {
-            match std::fs::create_dir("/var/log/papertrader/") {
-                Ok(()) => {},
-                Err(err) => panic!("GEN_LOG_FAILED_DIR_CREATION: {}", err)
-            };
+            if !path_exists("/var/log/papertrader/") {
+                match std::fs::create_dir("/var/log/papertrader/") {
+                    Ok(()) => {},
+                    Err(err) => panic!("GEN_LOG_FAILED_DIR_CREATION: {}", err)
+                };
+            }
             CombinedLogger::init(vec![
                                  #[cfg(debug_assertions)]
                                  TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Mixed),
