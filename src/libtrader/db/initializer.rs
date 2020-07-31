@@ -2,7 +2,8 @@ use crate::db::config::{*};
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
-pub fn db_connect(state: &mut GlobalState, user: &'static str, pass: &'static str) -> Result<postgres::Client, String> {
+pub fn db_connect(state: &mut GlobalState, user: &'static str, 
+                  pass: &'static str) -> Result<postgres::Client, String> {
     /* Generate the requested string */
     state.db_connect_str = format!("host={} port={} dbname={} user={} password={}",
                                    DB_HOST, DB_HOST_PORT, DB_NAME, user, pass);

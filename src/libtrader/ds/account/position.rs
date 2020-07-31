@@ -24,6 +24,8 @@ pub struct Position {
 }
 impl std::fmt::Display for Position {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", self.action_type, self.stock_symbol, self.stock_open_amount, self.stock_open_price, self.stock_open_cost, self.stock_close_amount, self.stock_close_price, self.stock_close_cost, self.open_epoch, self.close_epoch, self.is_open)
+        write!(f, "({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})", self.action_type, self.stock_symbol, 
+               self.stock_open_amount, self.stock_open_price, self.stock_open_cost, self.stock_close_amount, 
+               self.stock_close_price, self.stock_close_cost, self.open_epoch, self.close_epoch, self.is_open)
     }
 }

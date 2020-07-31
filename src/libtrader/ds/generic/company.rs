@@ -12,6 +12,7 @@ pub struct Company {
 }
 impl std::fmt::Display for Company {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {}, {}, {}, {})", self.id, self.symbol, self.isin, self.company_name, self.primary_exchange, self.sector, self.industry, self.primary_sic_code, self.employees)
+        write!(f, "({}, {}, {}, {}, {}, {}, {}, {}, {})", self.id, self.symbol, self.isin, self.company_name, 
+               self.primary_exchange, self.sector, self.industry, self.primary_sic_code, self.employees)
     }
 }
