@@ -1,4 +1,4 @@
-use crate::db::config::{*};
+use crate::db::config::{DB_HOST, DB_HOST_PORT, DB_USER, DB_NAME, DB_PASS};
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
