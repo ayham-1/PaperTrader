@@ -1,4 +1,4 @@
-#[derive(Default, PartialEq, Debug)]
+#[derive(Default, Eq, PartialEq, Clone, Debug)]
 pub struct Company {
     pub id: i64,
     pub symbol: String,

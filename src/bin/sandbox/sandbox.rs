@@ -20,7 +20,7 @@ fn main() {
     company.isin = "TEST".to_string();
     company.company_name = "TEST".to_string();
     company.primary_exchange = "TEST".to_string();
-    match create_company(&mut state, company) {
+    match create_company(&mut state, &company) {
         Ok(()) => info!("created company"),
         Err(err) => error!("Failed to create company with error: {}", err),
     }
