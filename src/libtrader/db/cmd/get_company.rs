@@ -37,3 +37,44 @@ pub fn get_company_from_db(state: &mut GlobalState, searched_symbol: String) -> 
         Err(err) => Err(format!("DB_SEARCH_COMPANY_NOT_FOUND: {}", err)),
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::db::cmd::create_company::create_company;
+
+    #[test]
+    fn test_cmd_get_company_from_db() {
+        /* create global state */
+        let mut state: GlobalState = GlobalState::default();
+
+        /* create a new company */
+        let mut company = Company::default();
+        company.id = 454;
+        company.symbol = "BBP".to_string();
+        company.isin = "14141".to_string();
+        company.company_name = "BBP?".to_string();
+        company.primary_exchange = "NYSE".to_string();
+        company.sector = "Tech".to_string();
+        company.industry = "Tech".to_string();
+        company.primary_sic_code = "141499".to_string();
+        company.employees = 1;
+        create_company(&mut state, company.clone()).unwrap();
+
+        /* test get_company_from_db() */
+        match get_company_from_db(&mut state, "BBP".into()) {
+            Ok(found_company) => {
+                assert_eq!(found_company.id, company.id);
+                assert_eq!(found_company.symbol, company.symbol);
+                assert_eq!(found_company.isin, company.isin);
+                assert_eq!(found_company.company_name, company.company_name);
+                assert_eq!(found_company.primary_exchange, company.primary_exchange);
+                assert_eq!(found_company.sector, company.sector);
+                assert_eq!(found_company.industry, company.industry);
+                assert_eq!(found_company.primary_sic_code, company.primary_sic_code);
+                assert_eq!(found_company.employees, company.employees);
+            },
+            Err(err) => panic!("TEST_CMD_GET_COMPANY_FROM_DB_FAILED: {}", err)
+        }
+    }
+}
