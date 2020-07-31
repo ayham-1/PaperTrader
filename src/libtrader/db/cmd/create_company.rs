@@ -32,10 +32,10 @@ mod test {
 
     #[test]
     fn test_cmd_create_company() {
-        /* connect to db */
+        /* create global state */
         let mut state: GlobalState = GlobalState::default();
 
-        /* use create_company() */
+        /* create a new company */
         let mut company = Company::default();
         company.id = 1;
         company.symbol = "APP".to_string();
@@ -47,6 +47,7 @@ mod test {
         company.primary_sic_code = "1".to_string();
         company.employees = 1;
         
+        /* test create_company() with created company */
         match create_company(&mut state, company.clone()) {
             Ok(()) => {
                 /* test create_company() */
