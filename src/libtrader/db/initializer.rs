@@ -51,4 +51,44 @@ mod test {
             Err(err) => panic!("TEST_DB_CONNECT_FAILED: {}", err),
         }
     }
+    #[test]
+    fn test_db_init() {
+        /* connect to db */
+        let mut state: GlobalState = GlobalState::default();
+        let mut client = db_connect(&mut state, DB_USER, DB_PASS).unwrap();
+
+        /* add test compnay */
+        let mut company = Company::default();
+        company.id = 123;
+        company.symbol = "AAPL".to_string();
+        company.isin = "1".to_string();
+        company.company_name = "Apple".to_string();
+        company.primary_exchange = "NYSE".to_string();
+        company.sector = "Tech".to_string();
+        company.industry = "Tech".to_string();
+        company.primary_sic_code = "1".to_string();
+        company.employees = 1;
+        client.execute(
+            "INSERT INTO public.companies VALUES ($1,$2, $3, $4, $5, $6, $7, $8, $9)",
+            &[&company.id, &company.symbol, &company.isin, &company.company_name, 
+            &company.primary_exchange, &company.sector, &company.industry,
+            &company.primary_sic_code, &company.employees]).unwrap();
+        /* test db init */ 
+        match db_init(&mut state) {
+            Ok(()) => {
+                println!("{}", state);
+                assert_eq!(state.companies["AAPL"].id, company.id);
+                assert_eq!(state.companies["AAPL"].symbol, company.symbol);
+                assert_eq!(state.companies["AAPL"].isin, company.isin);
+                assert_eq!(state.companies["AAPL"].company_name, company.company_name);
+                assert_eq!(state.companies["AAPL"].primary_exchange, company.primary_exchange);
+                assert_eq!(state.companies["AAPL"].sector, company.sector);
+                assert_eq!(state.companies["AAPL"].industry, company.industry);
+                assert_eq!(state.companies["AAPL"].primary_sic_code, company.primary_sic_code);
+                assert_eq!(state.companies["AAPL"].employees, company.employees);
+            },
+            Err(err) => panic!("TEST_DB_INIT_FAILED: {}", err)
+        };
+    }
+
 }
