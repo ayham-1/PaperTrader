@@ -39,3 +39,16 @@ pub fn db_init(state: &mut GlobalState) -> Result<(), String> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_db_connect() {
+        let mut state: GlobalState = GlobalState::default();
+        match db_connect(&mut state, DB_USER, DB_PASS) {
+            Ok(client) => assert_ne!(client.is_closed(), false),
+            Err(err) => panic!("TEST_DB_CONNECT_FAILED: {}", err),
+        }
+    }
+}
