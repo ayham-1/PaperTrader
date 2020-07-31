@@ -52,3 +52,15 @@ pub fn libtrader_init() -> Result<GlobalState, String> {
     Ok(state)
 }
 
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_libtrader_log() {
+        match libtrader_init_log() {
+            Ok(()) => {},
+            Err(err) => panic!("TEST_INIT_LOG_FAILED: {}", err)
+        }
+    }
+}
