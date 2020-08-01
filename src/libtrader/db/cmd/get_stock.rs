@@ -87,3 +87,36 @@ pub fn get_stock_from_db_between_epochs(state: &mut GlobalState, searched_symbol
         Err(err) => Err(format!("DB_SEARCH_STOCK_NOT_FOUND: {}", err))
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::db::cmd::create_stock::create_stock;
+    
+    #[test]
+    fn test_cmd_get_stock() {
+        /* create global state */
+        let mut state: GlobalState = GlobalState::default();
+
+        /* create stock to be tested */
+        create_stock(&mut state, "haha").unwrap();
+
+        /* insert some data into the stock */
+        let mut client = db_connect(&mut state, DB_USER, DB_PASS).unwrap();
+        client.execute("INSERT INTO asset_schema.aapl VALUES (1, 999, CAST(4 AS timestamp), 50, 50, 10)", &[]).unwrap();
+
+        /* test get_stock_from_db() */
+        match get_stock_from_db(&mut state, "haha".into()) {
+            Ok(vals) => {
+                /* confirm that the data is correct */
+                assert_eq!(vals[0].id, 1);
+                assert_eq!(vals[0].isin, "999".to_string());
+                assert_eq!(vals[0].time_since_epoch, 4);
+                assert_eq!(vals[0].ask_price, 50);
+                assert_eq!(vals[0].bid_price, 50);
+                assert_eq!(vals[0].volume, 10);
+            },
+            Err(err) => panic!("TEST_CMD_GET_STOCK_FAILED: {}", err) 
+        };
+    }
+}

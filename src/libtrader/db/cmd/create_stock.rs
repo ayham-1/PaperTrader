@@ -13,7 +13,7 @@ pub fn create_stock(state: &mut GlobalState, stock_name: &str) -> Result<(), Str
     match client.execute(format!("CREATE TABLE asset_schema.{} ( \
                         id                  BIGSERIAL PRIMARY KEY, \
                         isin                TEXT NOT NULL, \
-                        time_since_epoch    TIMESTAMP NOT NULL, \
+                        time_since_epoch    BIGINT NOT NULL, \
                         ask_price           BIGINT NOT NULL, \
                         bid_price           BIGINT NOT NULL, \
                         volume              BIGINT NOT NULL \
