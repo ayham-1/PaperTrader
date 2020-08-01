@@ -15,9 +15,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build
       run: cargo build
-    - name: Run tests
-      run: |
-          sh scripts/deploy_sandbox.sh
-          cargo test
     - name: Run benches
       run: cargo bench
