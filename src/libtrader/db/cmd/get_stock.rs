@@ -18,7 +18,7 @@ pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Re
                 let mut val: StockVal = StockVal::default();
                 val.id = row.get(0);
                 val.isin = row.get(1);
-                val.time_since_epoch = row.get(2);
+                val.time_epoch = row.get(2);
                 val.ask_price = row.get(3);
                 val.bid_price = row.get(4);
                 val.volume = row.get(5);
@@ -40,14 +40,14 @@ pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: S
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_since_epoch >= {}", searched_symbol, 
+    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_epoch >= {}", searched_symbol, 
                                time_epoch).as_str(), &[]) {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();
                 val.id = row.get(0);
                 val.isin = row.get(1);
-                val.time_since_epoch = row.get(2);
+                val.time_epoch = row.get(2);
                 val.ask_price = row.get(3);
                 val.bid_price = row.get(4);
                 val.volume = row.get(5);
@@ -69,14 +69,14 @@ pub fn get_stock_from_db_between_epochs(state: &mut GlobalState, searched_symbol
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_since_epoch >= {} AND time_since_epoch <= {}",
+    match client.query(format!("SELECT * FROM asset_schema.{} WHERE time_epoch >= {} AND time_epoch <= {}",
                                searched_symbol, first_time_epoch, second_time_epoch).as_str(), &[]) {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();
                 val.id = row.get(0);
                 val.isin = row.get(1);
-                val.time_since_epoch = row.get(2);
+                val.time_epoch = row.get(2);
                 val.ask_price = row.get(3);
                 val.bid_price = row.get(4);
                 val.volume = row.get(5);
@@ -94,7 +94,7 @@ mod test {
     use crate::db::cmd::create_stock::create_stock;
     
     #[test]
-    fn test_cmd_get_stock() {
+    fn test_cmd_get_stock_from_db() {
         /* create global state */
         let mut state: GlobalState = GlobalState::default();
 
@@ -103,15 +103,16 @@ mod test {
 
         /* insert some data into the stock */
         let mut client = db_connect(&mut state, DB_USER, DB_PASS).unwrap();
-        client.execute("INSERT INTO asset_schema.aapl VALUES (1, 999, CAST(4 AS timestamp), 50, 50, 10)", &[]).unwrap();
+        client.execute("INSERT INTO asset_schema.haha VALUES (1, 999, 4, 50, 50, 10)", &[]).unwrap();
 
         /* test get_stock_from_db() */
         match get_stock_from_db(&mut state, "haha".into()) {
             Ok(vals) => {
                 /* confirm that the data is correct */
+                assert_eq!(vals.len(), 1);
                 assert_eq!(vals[0].id, 1);
                 assert_eq!(vals[0].isin, "999".to_string());
-                assert_eq!(vals[0].time_since_epoch, 4);
+                assert_eq!(vals[0].time_epoch, 4);
                 assert_eq!(vals[0].ask_price, 50);
                 assert_eq!(vals[0].bid_price, 50);
                 assert_eq!(vals[0].volume, 10);
