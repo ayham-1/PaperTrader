@@ -14,10 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo build
     - name: Run tests
       run: |
           ./scripts/deploy_sandbox.sh
-          cargo test --verbose
+          cargo test
     - name: Run benches
-      run: cargo bench --verbose
+      run: cargo bench
