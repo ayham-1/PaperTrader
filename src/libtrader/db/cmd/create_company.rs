@@ -3,10 +3,28 @@ use crate::db::initializer::db_connect;
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
-/*
- * Creates a comany entry in database in public.companies.
- */
+/// Creates a company on the postgres SQL database.
+/// 
+/// Takes in a company and writes an entry in public.companies, and adds it to the global state
+/// cache.
+///
+/// Arguments:
+/// state - The global state, mutable to add company to the cache.
+/// company - The compan to create.
+///
+/// Returns: nothing on success, a string containing reason of failure on error.
+///
+/// Example:
+/// ```rust
+///    match create_company(&mut state, company) {
+///        Ok(()) => info!("created company"),
+///        Err(err) => error!("Failed to create company with error: {}", err),
+///    }
+/// ```
 pub fn create_company(state: &mut GlobalState, company: Company) -> Result<(), String> {
+    /*
+     * Creates a comany entry in database in public.companies.
+     */
     // Connect to database.
     let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
