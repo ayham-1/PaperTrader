@@ -2,6 +2,23 @@ use crate::db::config::{DB_HOST, DB_HOST_PORT, DB_USER, DB_NAME, DB_PASS};
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
+/// Establishes a postgresql connection to the SQL database.
+///
+/// Creates a postgresql connection. Uses and modifies the global state. Credentials are passed
+/// with the arguments.
+///
+/// Arguments:
+/// state - The global state used.
+/// user - The name of the user to connect to the database with.
+/// pass - The password of the user to connect to the database with.
+///
+/// Returns: ```std::Result```, ```postgres::Client``` on success, and a string containing the
+/// reason of failure on error.
+///
+/// Example:
+/// ```rust
+/// let mut client = db_connect(state, DB_USER, DB_PASS)?;
+/// ```
 pub fn db_connect(state: &mut GlobalState, user: &'static str, 
                   pass: &'static str) -> Result<postgres::Client, String> {
     /* Generate the requested string */
