@@ -3,10 +3,29 @@ use crate::db::initializer::db_connect;
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::stock_val::StockVal;
 
-/*
- * Returns all stock values from database.
- */
+/// Returns the whole stock data from the postgres SQL database.
+///
+/// Takes in a stock symbol and returns the whole data entries of the searched stock.
+///
+/// Arguments:
+/// state - The global state used.
+/// searched_symbol - The name of the stock table.
+///
+/// Returns: a Vec<StockVal> on success, and a string containing the reason of failure on error.
+///
+/// Example:
+/// ```rust
+///    match get_stock_from_db(&mut state, "AAPL".into()) {
+///         Ok(vals) => {
+///             /* do something with the values */
+///         },
+///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
+///   };
+/// ```
 pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Result<Vec<StockVal>, String> {
+    /*
+     * Returns all stock values from database.
+     */
     // Connect to database.
     let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
