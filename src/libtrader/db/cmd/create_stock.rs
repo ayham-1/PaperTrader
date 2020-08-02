@@ -10,6 +10,8 @@ use crate::ds::server::global_state::GlobalState;
 /// state - The global state used.
 /// stock_name - The name of the stock to create.
 ///
+/// Returns: nothing on success, a string containing the reason of failure on error.
+///
 /// Example:
 /// ```rust
 ///    match create_stock(&mut state, "AAPL") {

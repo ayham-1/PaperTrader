@@ -3,12 +3,27 @@ use crate::db::initializer::db_connect;
 use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
 
-/*
- * Returns company entry from database
- */
+/// Returns a company from the postgres SQL database.
+///
+/// Takes in a company symbol and returns a company.
+///
+/// Arguments:
+/// state - The global state used.
+/// search_symbol - The specific company symbol to find.
+/// 
+/// Returns: a reference to the found company on success, and a string containing the reason of
+/// failure on error.
+///
+/// Example:
+/// ```rust
+///    match get_company_from_db(&mut state, "AAPL".to_string()) {
+///        Ok(found_company) => info!("we found it! {:?}", found_company),
+///        Err(err) => error!("we must found the sacred company! err: {}", err),
+///    }
+/// ```
 pub fn get_company_from_db(state: &mut GlobalState, searched_symbol: String) -> Result<&Company, String> {
     /*
-     * Searches in database if company is available
+     * Returns company entry from database
      */
     // Connect to database.
     let mut client = db_connect(state, DB_USER, DB_PASS)?;
