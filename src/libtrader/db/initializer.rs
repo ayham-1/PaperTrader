@@ -12,7 +12,7 @@ use crate::ds::generic::company::Company;
 /// user - The name of the user to connect to the database with.
 /// pass - The password of the user to connect to the database with.
 ///
-/// Returns: ```std::Result```, ```postgres::Client``` on success, and a string containing the
+/// Returns: ```postgres::Client``` on success, and a string containing the
 /// reason of failure on error.
 ///
 /// Example:
@@ -37,7 +37,7 @@ pub fn db_connect(state: &mut GlobalState, user: &'static str,
 /// Arguments:
 /// state - The global state used to cache.
 ///
-/// Returns: ```std::Result```, nothing on success, a string containing reason of failure on error.
+/// Returns: nothing on success, a string containing reason of failure on error.
 pub fn db_init(state: &mut GlobalState) -> Result<(), String> {
     /* 
      * Load companies from database

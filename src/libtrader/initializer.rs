@@ -11,7 +11,7 @@ use crate::ds::server::global_state::GlobalState;
 /// On unix systems: /var/log/papertrader/
 /// On windows/unkown systems: $(pwd)/log/
 ///
-/// Returns: A ```std::Result```, on error contains the reason of failure.
+/// Returns: nothing on success, on error contains the reason of failure.
 ///
 /// Example:
 /// ```rust
@@ -55,7 +55,7 @@ fn libtrader_init_log() -> Result<(), String> {
 ///
 /// Public function that globaly initializes the library. Initializes log, and database.
 ///
-/// Returns: A ```std::Result```, ```GlobalState``` on success, and a string containing the reason
+/// Returns: ``GlobalState``` on success, and a string containing the reason
 /// of failure.
 ///
 /// Example:
