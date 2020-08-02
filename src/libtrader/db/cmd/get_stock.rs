@@ -49,11 +49,31 @@ pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Re
     }
 }
 
-/*
- * Returns all stock values from database since a time epoch.
- */
+/// Returns stock data since an unix epoch from the postgres SQL database.
+///
+/// Takes in a stock symbol and returns the data entries after a specified epoch of the searched stock.
+///
+/// Arguments:
+/// state - The global state used.
+/// searched_symbol - The name of the stock table.
+/// time_epoch - The time from which the stock data retrieved. 
+///
+/// Returns: a Vec<StockVal> on success, and a string containing the reason of failure on error.
+///
+/// Example:
+/// ```rust
+///    match get_stock_from_db_sine_epoch(&mut state, "AAPL".into(), 123456) {
+///         Ok(vals) => {
+///             /* do something with the filtered values */
+///         },
+///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
+///   };
+/// ```
 pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: String, 
                                      time_epoch: i64) -> Result<Vec<StockVal>, String> {
+    /*
+     * Returns all stock values from database since a time epoch.
+     */
     // Connect to database.
     let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
@@ -78,11 +98,33 @@ pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: S
     }
 }
 
-/*
- * Returns all stock values from database between two time epochs.
- */
+/// Returns stock data between two unix epochs from the postgres SQL database.
+///
+/// Takes in a stock symbol and returns the data entries between two specified unix epochs of the searched 
+/// stock.
+///
+/// Arguments:
+/// state - The global state used.
+/// searched_symbol - The name of the stock table.
+/// first_time_epoch - The time from which the stock data is first retrieved.
+/// second_time_epoch - The time from which the stock data ends.
+///
+/// Returns: a Vec<StockVal> on success, and a string containing the reason of failure on error.
+///
+/// Example:
+/// ```rust
+///    match get_stock_from_db_between_epochs(&mut state, "AAPL".into(), 123456, 123459) {
+///         Ok(vals) => {
+///             /* do something with the filtered values */
+///         },
+///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
+///   };
+/// ```
 pub fn get_stock_from_db_between_epochs(state: &mut GlobalState, searched_symbol: String, first_time_epoch: i64, 
                                         second_time_epoch: i64) -> Result<Vec<StockVal>, String> {
+    /*
+     * Returns all stock values from database between two time epochs.
+     */
     // Connect to database.
     let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
