@@ -4,7 +4,24 @@ use crate::misc::path_exists::path_exists;
 use crate::db::initializer::db_init;
 use crate::ds::server::global_state::GlobalState;
 
-pub fn libtrader_init_log() -> Result<(), String> {
+/// Initializes global logger.
+///
+/// Private function used by libtrader_init() to initialize the logger. Log destinations are
+/// platfrom dependent.
+/// On unix systems: /var/log/papertrader/
+/// On windows/unkown systems: $(pwd)/log/
+///
+/// Returns: A ```std::Result```, on error contains the reason of failure.
+///
+/// Example:
+/// ```rust
+///     match libtrader_init_log() {
+///         Ok(()) => {},
+///         Err(err) => panic!("failed initializing log, reason: {}", err)
+///     };
+/// ```
+///
+fn libtrader_init_log() -> Result<(), String> {
     info!("Started Logger.");
     #[cfg(not(debug_assertions))]
     gen_log();
@@ -34,6 +51,20 @@ pub fn libtrader_init_log() -> Result<(), String> {
     Ok(())
 }
 
+/// Generic Initialization of the library.
+///
+/// Public function that globaly initializes the library. Initializes log, and database.
+///
+/// Returns: A ```std::Result```, ```GlobalState``` on success, and a string containing the reason
+/// of failure.
+///
+/// Example:
+/// ```rust
+///     match libtrader_init() {
+///         Ok(state) => println!("here is the initialized state: {}", state),
+///         Err(err) => panic!("failed initializing libtrader, reason: {}", err)
+///     };
+/// ```
 pub fn libtrader_init() -> Result<GlobalState, String> {
     let mut state: GlobalState = GlobalState::default();
 
