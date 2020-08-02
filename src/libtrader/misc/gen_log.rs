@@ -2,7 +2,7 @@ use crate::misc::path_exists::path_exists;
 
 /// Generates the CombinedLogger for simplelog.rs
 ///
-/// Loggers are generated base on platform/configuration.
+/// Used in libtrader_init_log() Loggers are generated base on platform/configuration.
 /// Linux will use /var/log/papertrader/.
 /// macOS will use /var/log/papertrader/.
 /// Windows & other OSes will output to a file in the current directory.
