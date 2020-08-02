@@ -2,10 +2,25 @@ use crate::db::config::{DB_USER, DB_PASS};
 use crate::db::initializer::db_connect;
 use crate::ds::server::global_state::GlobalState;
 
-/*
- * Creates a stock table in database in assets schema.
- */
+/// Creates a stock on the postgres SQL database.
+/// 
+/// Takes in a stock name and creates a table in the ```asset_schema``` schema
+///
+/// Arguments:
+/// state - The global state used.
+/// stock_name - The name of the stock to create.
+///
+/// Example:
+/// ```rust
+///    match create_stock(&mut state, "AAPL") {
+///        Ok(()) => info!("created stock table"),
+///        Err(err) => error!("failed to create stock table {}", err),
+///    }
+/// ```
 pub fn create_stock(state: &mut GlobalState, stock_name: &str) -> Result<(), String> {
+    /*
+     * Creates a stock table in database in assets schema.
+     */
     // Connect to database.
     let mut client = db_connect(state, DB_USER, DB_PASS)?;
 
