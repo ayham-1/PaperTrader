@@ -30,6 +30,14 @@ pub fn db_connect(state: &mut GlobalState, user: &'static str,
     }
 }
 
+/// Generic Initialization of the database cache in GlobalState.
+///
+/// Currently only loads all of the companies in memory.
+///
+/// Arguments:
+/// state - The global state used to cache.
+///
+/// Returns: ```std::Result```, nothing on success, a string containing reason of failure on error.
 pub fn db_init(state: &mut GlobalState) -> Result<(), String> {
     /* 
      * Load companies from database
