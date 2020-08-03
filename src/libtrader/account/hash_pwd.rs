@@ -79,3 +79,47 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8;digest::SHA512_OUTPUT_LEN]), ()> {
 
     Ok((hash, salt))
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use data_encoding::HEXUPPER; 
+    #[test]
+    fn test_account_hash_pwd_client() {
+        let pass = "goodlilpassword";
+
+        /* generate server salt */
+        let rng = rand::SystemRandom::new();
+        let mut server_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
+        rng.fill(&mut server_salt).unwrap();
+
+        /* ensure that hash_pwd_client() works */
+        match hash_pwd_client(pass, server_salt) {
+            Ok(output) => {
+                assert_ne!(output.0.len(), 0);
+                assert_ne!(output.1.len(), 0);
+            },
+            Err(()) => panic!("TEST_HASH_PWD_FAILED")
+        };
+
+        /* ensure that hash_pwd_client() doesn't generate same output 
+         * with the same server salt.
+         * */
+        let mut enc0 = hash_pwd_client(pass, server_salt).unwrap();
+        let mut enc1 = hash_pwd_client(pass, server_salt).unwrap();
+        assert_ne!(HEXUPPER.encode(&enc0.0), HEXUPPER.encode(&enc1.0));
+        assert_ne!(HEXUPPER.encode(&enc0.1), HEXUPPER.encode(&enc1.1));
+
+        /* ensure that hash_pwd_client() generates different output
+         * with different server salts.
+         * */
+        // Generate new server salt.
+        let mut server_salt2 = [0u8; digest::SHA512_OUTPUT_LEN/2];
+        rng.fill(&mut server_salt2).unwrap();
+
+        enc0 = hash_pwd_client(pass, server_salt).unwrap();
+        enc1 = hash_pwd_client(pass, server_salt).unwrap();
+        assert_ne!(HEXUPPER.encode(&enc0.0), HEXUPPER.encode(&enc1.0));
+        assert_ne!(HEXUPPER.encode(&enc0.1), HEXUPPER.encode(&enc1.1));
+    }
+}

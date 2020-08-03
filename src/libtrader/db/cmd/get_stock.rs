@@ -62,7 +62,7 @@ pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Re
 ///
 /// Example:
 /// ```rust
-///    match get_stock_from_db_sine_epoch(&mut state, "AAPL".into(), 123456) {
+///    match get_stock_from_db_since_epoch(&mut state, "AAPL".into(), 123456) {
 ///         Ok(vals) => {
 ///             /* do something with the filtered values */
 ///         },
