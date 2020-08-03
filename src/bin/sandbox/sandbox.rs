@@ -7,7 +7,7 @@ use libtrader::db::cmd::get_company::get_company_from_db;
 use libtrader::db::cmd::create_stock::create_stock;
 use libtrader::ds::generic::company::Company;
 use libtrader::ds::server::global_state::GlobalState;
-use libtrader::account::hash_pwd::hash_pwd_client;
+use libtrader::account::hash_pwd::{hash_pwd_client, hash_pwd_server};
 
 use data_encoding::HEXUPPER;
 
@@ -40,7 +40,12 @@ fn main() {
    
     info!("state: {:?}\n", state);
 
-    let enc = hash_pwd_client("this is my real password").unwrap();
+    let mut enc = hash_pwd_client("this is my real password").unwrap();
+
+    println!("Hash: {}", HEXUPPER.encode(&enc.0));
+    println!("Salt: {}", HEXUPPER.encode(&enc.1));
+
+    enc = hash_pwd_server(HEXUPPER.encode(&enc.0).as_str()).unwrap();
 
     println!("Hash: {}", HEXUPPER.encode(&enc.0));
     println!("Salt: {}", HEXUPPER.encode(&enc.1));

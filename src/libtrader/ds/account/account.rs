@@ -6,6 +6,8 @@ pub struct Account {
     pub email: String,
     pub is_pass: bool,
     pub pass_hash: String,
+    pub pass_salt: String,
+    pub client_pass_salt: String,
     pub portfolio: Portfolio,
     pub transactions: Vec<f64>
 }
