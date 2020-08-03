@@ -9,6 +9,7 @@ name = "libtrader"
 path = "src/libtrader/libtrader.rs"
 test = true
 bench = true
+doctest = false
 
 [[bin]]
 name = "sandbox"
