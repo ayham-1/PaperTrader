@@ -10,6 +10,8 @@ use libtrader::ds::server::global_state::GlobalState;
 use libtrader::account::hash_pwd::{hash_pwd_client, hash_pwd_server};
 
 use data_encoding::HEXUPPER;
+use ring::rand::SecureRandom;
+use ring::{digest, rand};
 
 fn main() {
     let mut state: GlobalState = match libtrader_init() {
@@ -40,14 +42,18 @@ fn main() {
    
     info!("state: {:?}\n", state);
 
-    let mut enc = hash_pwd_client("this is my real password").unwrap();
+    let rng = rand::SystemRandom::new();
+    let mut server_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
+    rng.fill(&mut server_salt).unwrap();
+    let enc = hash_pwd_client("this is my real password", 
+                                  server_salt).unwrap();
 
-    println!("Hash: {}", HEXUPPER.encode(&enc.0));
-    println!("Salt: {}", HEXUPPER.encode(&enc.1));
+    println!("Client Hash: {}", HEXUPPER.encode(&enc.0));
+    println!("Client Salt: {}", HEXUPPER.encode(&enc.1));
 
-    enc = hash_pwd_server(HEXUPPER.encode(&enc.0).as_str()).unwrap();
+    let enc1 = hash_pwd_server(HEXUPPER.encode(&enc.0).as_str()).unwrap();
 
-    println!("Hash: {}", HEXUPPER.encode(&enc.0));
-    println!("Salt: {}", HEXUPPER.encode(&enc.1));
+    println!("Server Hash: {}", HEXUPPER.encode(&enc1.0));
+    println!("Server Salt: {}", HEXUPPER.encode(&enc1.1));
 }
 
