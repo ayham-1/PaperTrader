@@ -124,4 +124,28 @@ mod test {
         assert_ne!(HEXUPPER.encode(&enc0.0), HEXUPPER.encode(&enc1.0));
         assert_ne!(HEXUPPER.encode(&enc0.1), HEXUPPER.encode(&enc1.1));
     }
+
+    #[test]
+    fn test_account_hash_email_server() {
+        let email = "totallyrealemail@anemail.c0m";
+
+        /* ensure that hash_email_server() works */
+        match hash_email_server(email) {
+            Ok(output) => {
+                assert_ne!(output.0.len(), 0);
+                assert_ne!(output.1.len(), 0);
+            },
+            Err(()) => panic!("TEST_HASH_EMAIL_SERVER_FAILED")
+        };
+
+        /* ensure that hash_email_server() generates different output
+         * each time it is run.
+         * */
+        // Generate new server salt.
+        let enc0 = hash_email_server(email).unwrap();
+        let enc1 = hash_email_server(email).unwrap();
+        assert_ne!(HEXUPPER.encode(&enc0.0), HEXUPPER.encode(&enc1.0));
+        assert_ne!(HEXUPPER.encode(&enc0.1), HEXUPPER.encode(&enc1.1));
+
+    }
 }
