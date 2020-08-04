@@ -1,13 +1,13 @@
 use crate::ds::message::message_type::{MessageType};
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Default)]
 pub struct Message {
     pub message_type: MessageType,
     pub instruction: i64,
     pub argument_count: usize,
     pub data_message_number: usize,
     pub data_message_max: usize,
-    pub data: [u8],
+    pub data: Vec<u8>,
 }
 impl std::fmt::Display for Message {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
