@@ -2,7 +2,7 @@ use ring::rand::SecureRandom;
 use ring::{digest, pbkdf2, rand};
 use std::num::NonZeroU32;
 
-/// Generates a client hash from a raw password.
+/// Generates a client password hash from a raw password.
 ///
 /// Takes in a raw password, outputs a hashed version of the client password to be sent to the
 /// server with the returned client random bits that make up the whole client salt. This function
@@ -18,8 +18,8 @@ use std::num::NonZeroU32;
 /// Example:
 /// ```rust
 ///     let enc = hash_pwd_client("this is my real password!", server_salt).unwrap();
-///     println!("Client Hash: {}", HEXUPPER.encode(&enc.0));
-///     println!("Client Salt: {}", HEXUPPER.encode(&enc.1));
+///     println!("Client Pass Hash: {}", HEXUPPER.encode(&enc.0));
+///     println!("Client Pass Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
 pub fn hash_pwd_client(pass: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) -> 
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()> { // client hash, client random bits
@@ -61,7 +61,7 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 ///     println!("Server Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
 pub fn hash_pwd_server(hashed_pass: &str) -> 
-Result<([u8; digest::SHA512_OUTPUT_LEN], [u8;digest::SHA512_OUTPUT_LEN]), ()> {
+Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> { // sever hash, server salt
     let client_iter: NonZeroU32 = NonZeroU32::new(500_000).unwrap();
     
     let rng = rand::SystemRandom::new();

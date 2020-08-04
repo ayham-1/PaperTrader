@@ -8,7 +8,7 @@ use libtrader::db::cmd::create_stock::create_stock;
 use libtrader::ds::generic::company::Company;
 use libtrader::ds::server::global_state::GlobalState;
 use libtrader::account::hash_pwd::{hash_pwd_client, hash_pwd_server};
-use libtrader::account::hash_email::{hash_email_client};
+use libtrader::account::hash_email::{hash_email_client, hash_email_server};
 
 use data_encoding::HEXUPPER;
 use ring::rand::SecureRandom;
@@ -63,7 +63,10 @@ fn main() {
 
     println!("Client Email Hash: {}", HEXUPPER.encode(&enc2.0));
     println!("Client Email Salt: {}", HEXUPPER.encode(&enc2.1));
-
-
+    
+    let enc3 = hash_email_server(HEXUPPER.encode(&enc2.0).as_str()).unwrap();
+    println!("Server Email Hash: {}", HEXUPPER.encode(&enc3.0));
+    println!("Server Email Salt: {}", HEXUPPER.encode(&enc3.1));
+    
 }
 
