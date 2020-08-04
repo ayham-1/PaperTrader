@@ -9,6 +9,7 @@ use libtrader::ds::generic::company::Company;
 use libtrader::ds::server::global_state::GlobalState;
 use libtrader::account::hash_pwd::{hash_pwd_client, hash_pwd_server};
 use libtrader::account::hash_email::{hash_email_client, hash_email_server};
+use libtrader::account::hash_usr::{hash_usr_client, hash_usr_server};
 
 use data_encoding::HEXUPPER;
 use ring::rand::SecureRandom;
@@ -68,5 +69,15 @@ fn main() {
     println!("Server Email Hash: {}", HEXUPPER.encode(&enc3.0));
     println!("Server Email Salt: {}", HEXUPPER.encode(&enc3.1));
     
+    rng.fill(&mut server_salt).unwrap();
+    let enc4 = hash_usr_client("n1ckn8me",
+                                 server_salt).unwrap();
+
+    println!("Client Username Hash: {}", HEXUPPER.encode(&enc4.0));
+    println!("Client Username Salt: {}", HEXUPPER.encode(&enc4.1));
+    
+    let enc5 = hash_usr_server(HEXUPPER.encode(&enc2.0).as_str()).unwrap();
+    println!("Server Username Hash: {}", HEXUPPER.encode(&enc5.0));
+    println!("Server Username Salt: {}", HEXUPPER.encode(&enc5.1));
 }
 
