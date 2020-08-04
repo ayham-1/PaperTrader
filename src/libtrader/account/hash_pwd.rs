@@ -43,7 +43,7 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
     Ok((hash, client_salt))
 }
 
-/// Generates a storable server hash from a client hashed password.
+/// Generates a storable server password hash from a client hashed password.
 /// 
 /// Takes in a client hashed password, outputs a storable new hash. The returned result is 'safe'
 /// to be stored on the server side. The salt returned is for the hashed version of the hashed

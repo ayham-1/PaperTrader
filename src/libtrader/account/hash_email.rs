@@ -44,6 +44,23 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
     Ok((hash, client_salt))
 }
 
+/// Generates a storable server email hash from a client hashed email.
+///
+/// Takes in a client hashed email, outputs a storable new hash. The returned result is 'safe' to
+/// be stored on the server side database. The salt returned is for the hashed version of the
+/// hashed client email.
+///
+/// Arguments:
+/// hashed_email - The client hashed email sent to the server.
+///
+/// Returns: a tuple containing the final hash and the hash's salt, nothing on failure.
+///
+/// Example:
+/// ```rust
+///     let enc = hash_email_server("THISISTOTALLYAHASHEDTHING...").unwrap();
+///     println!("Server Email Hash: {}", HEXUPPER.encode(&enc.0));
+///     println!("Server Email Salt: {}", HEXUPPER.encode(&enc.1));
+/// ```
 pub fn hash_email_server(hashed_email: &str) ->
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> {
     let client_iter: NonZeroU32 = NonZeroU32::new(350_000).unwrap();
