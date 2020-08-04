@@ -8,6 +8,7 @@ use libtrader::db::cmd::create_stock::create_stock;
 use libtrader::ds::generic::company::Company;
 use libtrader::ds::server::global_state::GlobalState;
 use libtrader::account::hash_pwd::{hash_pwd_client, hash_pwd_server};
+use libtrader::account::hash_email::{hash_email_client};
 
 use data_encoding::HEXUPPER;
 use ring::rand::SecureRandom;
@@ -48,12 +49,21 @@ fn main() {
     let enc = hash_pwd_client("this is my real password", 
                                   server_salt).unwrap();
 
-    println!("Client Hash: {}", HEXUPPER.encode(&enc.0));
-    println!("Client Salt: {}", HEXUPPER.encode(&enc.1));
+    println!("Client Pass Hash: {}", HEXUPPER.encode(&enc.0));
+    println!("Client Pass Salt: {}", HEXUPPER.encode(&enc.1));
 
     let enc1 = hash_pwd_server(HEXUPPER.encode(&enc.0).as_str()).unwrap();
 
-    println!("Server Hash: {}", HEXUPPER.encode(&enc1.0));
-    println!("Server Salt: {}", HEXUPPER.encode(&enc1.1));
+    println!("Server Pass Hash: {}", HEXUPPER.encode(&enc1.0));
+    println!("Server Pass Salt: {}", HEXUPPER.encode(&enc1.1));
+
+    rng.fill(&mut server_salt).unwrap();
+    let enc2 = hash_email_client("totallyrealemail@anemail.c0m",
+                                 server_salt).unwrap();
+
+    println!("Client Email Hash: {}", HEXUPPER.encode(&enc2.0));
+    println!("Client Email Salt: {}", HEXUPPER.encode(&enc2.1));
+
+
 }
 
