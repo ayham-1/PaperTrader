@@ -2,7 +2,19 @@ use ring::rand::SecureRandom;
 use ring::{digest, pbkdf2, rand};
 use std::num::NonZeroU32;
 
-pub fn acc_auth_client(username: &str, email: &str, password: &str) -> Result<(), String> {
+/// INCOMPLETE: authenticate user.
+///
+/// Takes in the username, email and password. Data is hashed and then sent to the server for
+/// further hashing and confirmation of authentication. A session token is returned.
+/// The function is not complete. NOT TO BE USED ANYWHERE.
+///
+/// Arguments:
+/// username - The raw username to be used.
+/// email - The raw email to be used.
+/// password - The raw password to be used.
+///
+/// Returns: nothing.
+pub fn acc_auth_client(username: &str, email: &str, password: &str) -> Result<(), ()> {
     let rng = rand::SystemRandom::new();
 
     /* 
@@ -47,7 +59,7 @@ pub fn acc_auth_client(username: &str, email: &str, password: &str) -> Result<()
         pbkdf2::PBKDF2_HMAC_SHA512,
         NonZeroU32::new(250_000).unwrap(),
         &password_client_salt,
-        email.as_bytes(),
+        password.as_bytes(),
         &mut hashed_password);
 
     /* TODO: send the data to the server and return a session id */
