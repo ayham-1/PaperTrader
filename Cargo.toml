@@ -33,3 +33,5 @@ enum_primitive = "*"
 os_type="2.2"
 ring="*"
 data-encoding="*"
+bincode="*"
+serde = { version = "1.0", features = ["derive"] }

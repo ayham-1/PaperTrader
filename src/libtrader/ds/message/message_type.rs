@@ -1,4 +1,6 @@
-#[derive(PartialEq, Debug)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum MessageType {
     Command = 0,
     DataTransfer = 1,
