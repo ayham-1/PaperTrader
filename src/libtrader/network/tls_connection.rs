@@ -1,20 +1,27 @@
+use std::io;
+use std::net;
+use std::io::{Read, Write};
+
 use mio;
 use mio::net::TcpStream;
+use rustls;
+use rustls::Session;
 
-struct TlsConnection {
-    socket: TcpStream,
-    token: mio::Token,
-    closing: bool,
-    closed: bool,
-    tls_session: rustls::ServerSession,
+#[derive(Debug)]
+pub struct TlsConnection {
+    pub socket: TcpStream,
+    pub token: mio::Token,
+    pub closing: bool,
+    pub closed: bool,
+    pub tls_session: rustls::ServerSession,
 }
 
 impl TlsConnection {
-    fn new(socket: TcpStream,
+    pub fn new(socket: TcpStream,
            token: mio::Token,
            tls_session: rustls::ServerSession)
-        -> Connection {
-            Connection {
+        -> TlsConnection {
+            TlsConnection {
                 socket,
                 token,
                 closing: false,
@@ -23,7 +30,7 @@ impl TlsConnection {
             }
         }
 
-    fn ready(&mut self, registry: &mio::Registry, ev: &mio::event::Event) {
+    pub fn ready(&mut self, registry: &mio::Registry, ev: &mio::event::Event) {
         if ev.is_readable() {
             self.do_tls_read();
             self.try_plain_read();
@@ -38,17 +45,17 @@ impl TlsConnection {
             self.closed = true;
             self.deregister(registry);
         } else {
-            self.register(registry);
+            self.reregister(registry);
         }
     }
 
-    fn do_tls_read(&mut self) {
+    pub fn do_tls_read(&mut self) {
         // read some tls data.
         let rc = self.tls_session.read_tls(&mut self.socket);
         if rc.is_err() {
             let err = rc.unwrap_err();
 
-            if let io::ErrorKind::WouldBock = err.Kind() {
+            if let io::ErrorKind::WouldBlock = err.kind() { /* make this simpler */
                 return;
             }
 
@@ -75,7 +82,7 @@ impl TlsConnection {
         }
     }
 
-    fn try_plain_read(&mut self) {
+    pub fn try_plain_read(&mut self) {
         // read and process all available plaintext.
         let mut buf = Vec::new();
 
@@ -92,15 +99,20 @@ impl TlsConnection {
         }
     }
 
-    fn incoming_plaintext(&mut self, buf: &[u8]) {
+    pub fn incoming_plaintext(&mut self, _buf: &[u8]) {
         /* TODO: handle the data. */
+        let response = b"HTTP/1.0 200 OK\r\nConnection: close\r\n\r\nHello world from rustls tlsserver\r\n";
+        self.tls_session
+            .write_all(response)
+            .unwrap();
+        self.tls_session.send_close_notify();
     }
 
-    fn tls_write(&mut self) -> io::Result<usize> {
-        self.tls_session.write_tls(&mut self.socket);
+    pub fn tls_write(&mut self) -> io::Result<usize> {
+        self.tls_session.write_tls(&mut self.socket)
     }
 
-    fn do_tls_write_and_handle_error(&mut self) {
+    pub fn do_tls_write_and_handle_error(&mut self) {
         let rc = self.tls_write();
         if rc.is_err() {
             error!("write failed: {:?}", rc);
@@ -109,25 +121,25 @@ impl TlsConnection {
         }
     }
 
-    fn register(&mut self, registry: &mio::Registry) {
+    pub fn register(&mut self, registry: &mio::Registry) {
         let event_set = self.event_set();
         registry.register(&mut self.socket,
                           self.token,
                           event_set).unwrap();
     }
 
-    fn reregister(&mut self, registry: &mio::Registry) {
+    pub fn reregister(&mut self, registry: &mio::Registry) {
         let event_set = self.event_set();
         registry.reregister(&mut self.socket,
                             self.token,
                             event_set).unwrap();
     }
     
-    fn deregister(&mut self, registry: &mio::Registry) {
+    pub fn deregister(&mut self, registry: &mio::Registry) {
         registry.deregister(&mut self.socket).unwrap();
     }
 
-    fn event_set(&self) -> mio::Interest {
+    pub fn event_set(&self) -> mio::Interest {
         let rd = self.tls_session.wants_read();
         let wr = self.tls_session.wants_write();
         

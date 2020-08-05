@@ -1,6 +1,9 @@
  #[macro_use] extern crate log;
 extern crate simplelog;
 
+pub mod tls_sandbox;
+use crate::tls_sandbox::tls_main;
+
 use libtrader::initializer::libtrader_init;
 use libtrader::db::cmd::create_company::create_company;
 use libtrader::db::cmd::get_company::get_company_from_db;
@@ -10,12 +13,14 @@ use libtrader::ds::server::global_state::GlobalState;
 use libtrader::account::hash_pwd::{hash_pwd_client, hash_pwd_server};
 use libtrader::account::hash_email::{hash_email_client, hash_email_server};
 use libtrader::account::hash_usr::{hash_usr_client, hash_usr_server};
-
 use data_encoding::HEXUPPER;
 use ring::rand::SecureRandom;
 use ring::{digest, rand};
 
 fn main() {
+    /* test for tls */
+    tls_main();
+
     let mut state: GlobalState = match libtrader_init() {
         Ok(state) => {info!("inited state: {:?}\n", state); state},
         Err(err) => panic!("Failed with error: {}", err),
