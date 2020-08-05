@@ -170,6 +170,10 @@ impl TlsConnection {
                             event_set).unwrap();
     }
 
+    /// Unregisters the TlsConnection from a mio::Registry
+    /// 
+    /// Arguments:
+    /// registry - The registry to unregister
     fn deregister(&mut self, registry: &mio::Registry) {
         registry.deregister(&mut self.socket).unwrap();
     }
