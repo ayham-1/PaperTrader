@@ -159,6 +159,10 @@ impl TlsConnection {
                           event_set).unwrap();
     }
 
+    /// Reregisters the TlsConnection to a mio::Registry
+    /// 
+    /// Arguments:
+    /// registry - The registry to reregister
     fn reregister(&mut self, registry: &mio::Registry) {
         let event_set = self.event_set();
         registry.reregister(&mut self.socket,
