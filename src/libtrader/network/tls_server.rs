@@ -40,6 +40,12 @@ impl TlsServer {
         }
     }
 
+    /// Accepts any new TLS connections.
+    ///
+    /// Arguments:
+    /// registry - The registry to register connections.
+    ///
+    /// Returns: nothing on success, io::Error on failure.
     pub fn accept(&mut self, registry: &mio::Registry) -> Result<(), io::Error> {
         loop {
             match self.server.accept() {
