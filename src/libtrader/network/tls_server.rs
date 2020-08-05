@@ -8,6 +8,14 @@ use rustls;
 
 use crate::network::tls_connection::TlsConnection;
 
+/// The TlsServer struct that represents a working TLS Server
+///
+/// Members:
+/// server - The TcpListener for which TLS is accepted.
+/// connections - The map of all connections.
+/// next_id - The next unused ID for registering in the mio::Poll
+/// tls_config - The TLS server configuration.
+#[derive(Debug)]
 pub struct TlsServer {
     pub server: TcpListener,
     pub connections: HashMap<mio::Token, TlsConnection>,
