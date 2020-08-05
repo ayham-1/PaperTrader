@@ -24,6 +24,13 @@ pub struct TlsServer {
 }
 
 impl TlsServer {
+    /// Returns a new TlsServer struct
+    ///
+    /// Arguments:
+    /// server - The ```TcpListener``` to be used for the TLS Server.
+    /// cfg - The TLS server configuration to be used.
+    ///
+    /// Returns: a new TlsServer
     pub fn new(server: TcpListener, cfg: Arc<rustls::ServerConfig>) -> TlsServer {
         TlsServer {
             server,
