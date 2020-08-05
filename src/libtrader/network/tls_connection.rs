@@ -138,12 +138,9 @@ impl TlsConnection {
         }
     }
 
-    fn tls_write(&mut self) -> io::Result<usize> {
-        self.tls_session.write_tls(&mut self.socket)
-    }
-
+    /// Private TlsConnection function that flushes TLS packets and handles any errors.
     fn do_tls_write_and_handle_error(&mut self) {
-        let rc = self.tls_write();
+        let rc = self.tls_session.write_tls(&mut self.socket);
         if rc.is_err() {
             error!("write failed: {:?}", rc);
             self.closing = true;
