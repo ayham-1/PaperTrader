@@ -148,6 +148,10 @@ impl TlsConnection {
         }
     }
 
+    /// Registers the TlsConnection to a mio::Registry
+    /// 
+    /// Arguments:
+    /// registry - The registry to register
     pub fn register(&mut self, registry: &mio::Registry) {
         let event_set = self.event_set();
         registry.register(&mut self.socket,
