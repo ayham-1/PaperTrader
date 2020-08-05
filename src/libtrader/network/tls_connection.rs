@@ -128,6 +128,9 @@ impl TlsConnection {
         }
     }
 
+    /// Private TlsConnection function that dispatches decrypted TLS packets.
+    ///
+    /// Dispatches decrypted TLS data to ```handle_data()```.
     fn incoming_plaintext(&mut self, buf: &[u8]) {
         match handle_data(self, buf) {
             Ok(()) => {},
