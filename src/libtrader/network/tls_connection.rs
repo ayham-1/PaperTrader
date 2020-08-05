@@ -107,6 +107,10 @@ impl TlsConnection {
         }
     }
 
+    /// Private TlsConnection function that reads decrypted TLS packets.
+    ///
+    /// Reads from ``self.tls_sessions``` and fills a buffer. The buffer is sent to
+    /// ```self.incoming_plaintext()```.
     fn try_plain_read(&mut self) {
         // read and process all available plaintext.
         let mut buf = Vec::new();
