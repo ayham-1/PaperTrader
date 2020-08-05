@@ -70,7 +70,11 @@ impl TlsConnection {
         }
     }
 
-    pub fn do_tls_read(&mut self) {
+    /// Private TlsConnection function that reads incoming TLS packets.
+    ///
+    /// Reads the ```self.tls_session``` received TLS packets and then handles any errors
+    /// generated. If reading TLS packets succeeds, issue new packets to be ready for reading.
+    fn do_tls_read(&mut self) {
         // read some tls data.
         let rc = self.tls_session.read_tls(&mut self.socket);
         if rc.is_err() {
@@ -103,7 +107,7 @@ impl TlsConnection {
         }
     }
 
-    pub fn try_plain_read(&mut self) {
+    fn try_plain_read(&mut self) {
         // read and process all available plaintext.
         let mut buf = Vec::new();
 
@@ -120,18 +124,18 @@ impl TlsConnection {
         }
     }
 
-    pub fn incoming_plaintext(&mut self, buf: &[u8]) {
+    fn incoming_plaintext(&mut self, buf: &[u8]) {
         match handle_data(self, buf) {
             Ok(()) => {},
             Err(err) => error!("Error processing TLS connection: {}", err)
         }
     }
 
-    pub fn tls_write(&mut self) -> io::Result<usize> {
+    fn tls_write(&mut self) -> io::Result<usize> {
         self.tls_session.write_tls(&mut self.socket)
     }
 
-    pub fn do_tls_write_and_handle_error(&mut self) {
+    fn do_tls_write_and_handle_error(&mut self) {
         let rc = self.tls_write();
         if rc.is_err() {
             error!("write failed: {:?}", rc);
@@ -147,14 +151,14 @@ impl TlsConnection {
                           event_set).unwrap();
     }
 
-    pub fn reregister(&mut self, registry: &mio::Registry) {
+    fn reregister(&mut self, registry: &mio::Registry) {
         let event_set = self.event_set();
         registry.reregister(&mut self.socket,
                             self.token,
                             event_set).unwrap();
     }
-    
-    pub fn deregister(&mut self, registry: &mio::Registry) {
+
+    fn deregister(&mut self, registry: &mio::Registry) {
         registry.deregister(&mut self.socket).unwrap();
     }
 
