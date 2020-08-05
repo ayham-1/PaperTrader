@@ -12,7 +12,7 @@ pub struct TlsServer {
     pub server: TcpListener,
     pub connections: HashMap<mio::Token, TlsConnection>,
     pub next_id: usize,
-    pub tls_config: Arc<rustls::ServerConfig>
+    pub tls_config: Arc<rustls::ServerConfig>,
 }
 
 impl TlsServer {

@@ -1,11 +1,13 @@
 use std::io;
 use std::net;
-use std::io::{Read, Write};
+use std::io::{Read};
 
 use mio;
 use mio::net::TcpStream;
 use rustls;
 use rustls::Session;
+
+use crate::network::handle_data::handle_data;
 
 #[derive(Debug)]
 pub struct TlsConnection {
@@ -99,13 +101,11 @@ impl TlsConnection {
         }
     }
 
-    pub fn incoming_plaintext(&mut self, _buf: &[u8]) {
-        /* TODO: handle the data. */
-        let response = b"HTTP/1.0 200 OK\r\nConnection: close\r\n\r\nHello world from rustls tlsserver\r\n";
-        self.tls_session
-            .write_all(response)
-            .unwrap();
-        self.tls_session.send_close_notify();
+    pub fn incoming_plaintext(&mut self, buf: &[u8]) {
+        match handle_data(self, buf) {
+            Ok(()) => {},
+            Err(err) => error!("Error processing TLS connection: {}", err)
+        }
     }
 
     pub fn tls_write(&mut self) -> io::Result<usize> {
