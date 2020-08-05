@@ -40,6 +40,17 @@ impl TlsConnection {
             }
         }
 
+    /// TlsConnection event reciever.
+    ///
+    /// Determines if the mio::event::Event is readable/writable or is closing. Calls the
+    /// appropriate TlsConnection function to handle the event. The event is not sent to the
+    /// receiving function.
+    ///
+    /// Arguments:
+    /// registry - The mio::Registry containing the mio::Tokens.
+    /// event - The event to be 'dispatched'.
+    ///
+    /// Returns: nothing
     pub fn ready(&mut self, registry: &mio::Registry, ev: &mio::event::Event) {
         if ev.is_readable() {
             self.do_tls_read();
