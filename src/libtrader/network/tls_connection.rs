@@ -19,6 +19,14 @@ pub struct TlsConnection {
 }
 
 impl TlsConnection {
+    /// Returns a new TlsConnection struct.
+    ///
+    /// Arguments:
+    /// socket - The TcpStream to be used for the TlsConnection
+    /// token - The mio::Token to be used to identify the TlsConnection
+    /// tls_session - The rustls::ServerSession to be used in the Tls Connection
+    ///
+    /// Returns: a new TlsConnection
     pub fn new(socket: TcpStream,
            token: mio::Token,
            tls_session: rustls::ServerSession)
