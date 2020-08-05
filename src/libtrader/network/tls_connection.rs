@@ -9,6 +9,14 @@ use rustls::Session;
 
 use crate::network::handle_data::handle_data;
 
+/// The TlsConnection struct that represents a tls connection.
+///
+/// Members:
+/// socket - The TcpStream for which TLS is used on.
+/// token - The ```mio::Token``` representing the TlsConnection.
+/// closing - Used for starting a closing TlsConnection state.
+/// closed - Used for determining whether the TlsConnection is closed.
+/// tls_session - The ServerSession that is the TLS connecton.
 #[derive(Debug)]
 pub struct TlsConnection {
     pub socket: TcpStream,
@@ -22,9 +30,9 @@ impl TlsConnection {
     /// Returns a new TlsConnection struct.
     ///
     /// Arguments:
-    /// socket - The TcpStream to be used for the TlsConnection
-    /// token - The mio::Token to be used to identify the TlsConnection
-    /// tls_session - The rustls::ServerSession to be used in the Tls Connection
+    /// socket - The ```TcpStream``` to be used for the TlsConnection
+    /// token - The ```mio::Token``` to be used to identify the TlsConnection
+    /// tls_session - The ```rustls::ServerSession``` to be used in the Tls Connection
     ///
     /// Returns: a new TlsConnection
     pub fn new(socket: TcpStream,
