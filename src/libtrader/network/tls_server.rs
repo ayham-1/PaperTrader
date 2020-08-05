@@ -70,6 +70,14 @@ impl TlsServer {
         }
     }
 
+    /// TLS Server Dispatcher
+    ///
+    /// Checks if the token issuing the event is in the list of active connections and then
+    /// dispatches the event to TlsConnection.
+    ///
+    /// Arguments:
+    /// registry - The registry to check the registered connections from.
+    /// event - The event to be dispatched.
     pub fn conn_event(&mut self, registry: &mio::Registry, event: &mio::event::Event) {
         let token = event.token();
 
