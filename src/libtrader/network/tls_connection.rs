@@ -178,7 +178,10 @@ impl TlsConnection {
         registry.deregister(&mut self.socket).unwrap();
     }
 
-    pub fn event_set(&self) -> mio::Interest {
+    /// Private TlsConnection function to return the ```self.tls_session```'s ```mio::Interest```
+    ///
+    /// Returns: the interests of ```self.tls_session```
+    fn event_set(&self) -> mio::Interest {
         let rd = self.tls_session.wants_read();
         let wr = self.tls_session.wants_write();
         
