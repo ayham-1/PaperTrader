@@ -20,12 +20,23 @@ mod danger {
                               _presented_certs: &[rustls::Certificate],
                               _dns_name: webpki::DNSNameRef<'_>,
                               _ocsp: &[u8]) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
-            warn!("IF THIS IS NOT A DEV BUILD DON'T PROCEED");
+            warn!("IF THIS IS NOT A DEV BUILD DO NOT PROCEED");
             Ok(rustls::ServerCertVerified::assertion())
         }
     }
 }
 
+/// Generates a TlsClient Config.
+///
+/// Uses defualt settings for:
+/// - TLS Protocol Version.
+/// - TLs Protocol CypherSuite.
+///
+/// Assumed Settings:
+/// - Certificate Authentication.
+/// - No persistent session storage.
+///
+/// Returns; the client configuration in an Arc.
 pub fn gen_tls_client_config() -> Arc<rustls::ClientConfig> {
     let mut config = rustls::ClientConfig::new();
     config.key_log = Arc::new(rustls::KeyLogFile::new());
