@@ -68,6 +68,9 @@ impl TlsClient {
         }
     }
 
+    /// Private TlsClient function that reads incoming TlS packets.
+    ///
+    /// Reads TLS packets, decrypts them and then calls handle_data() on them.
     fn do_read(&mut self) {
         let rc = self.tls_session.read_tls(&mut self.socket);
         if rc.is_err() {
