@@ -52,3 +52,13 @@ pub fn gen_tls_client_config() -> Arc<rustls::ClientConfig> {
 
     Arc::new(config)
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_gen_tls_cleint_config() {
+        let _ = gen_tls_client_config();
+    }
+}
