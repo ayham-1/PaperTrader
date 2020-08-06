@@ -4,7 +4,7 @@ use std::sync::Arc;
 use rustls;
 use rustls::NoClientAuth;
 
-/// Loads a TLS certificate
+/// Loads a TLS public certificate
 ///
 /// Arguments:
 /// filename - Path to .crt file.
@@ -16,6 +16,12 @@ fn load_certs(filename: &str) -> Vec<rustls::Certificate> {
     rustls::internal::pemfile::certs(&mut reader).unwrap()
 }
 
+/// Load a TLS private key.
+///
+/// Arguments:
+/// filename - Path to .key file.
+///
+/// Returns: rustls::PrivateKey
 fn load_private_key(filename: &str) -> rustls::PrivateKey {
     let rsa_keys = {
         let keyfile = fs::File::open(filename)
