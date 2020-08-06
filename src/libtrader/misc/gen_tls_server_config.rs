@@ -54,7 +54,7 @@ fn load_private_key(filename: &str) -> rustls::PrivateKey {
 /// filename - path to OCSP stapling key.
 ///
 /// Returns: u8 vec
-fn load_ocsp(filename: &Option<String>) -> Vec<u8> {
+fn load_ocsp(filename: &Option<&str>) -> Vec<u8> {
     let mut ret = Vec::new();
 
     if let &Some(ref name) = filename {
@@ -66,14 +66,31 @@ fn load_ocsp(filename: &Option<String>) -> Vec<u8> {
     ret
 }
 
-pub fn gen_tls_server_config(certs_file: &str, priv_key_file: &str) -> Arc<rustls::ServerConfig> {
+/// Generates a TlsServer Config.
+///
+/// Uses defualt settings for:
+/// - TLS Protocol Version.
+/// - TLS Protocol CypherSuite
+/// - Whether to use OCSP or not.
+///
+/// Assumed Settings:
+/// - TLS session resumption.
+/// - TLS session ticketing.
+///
+/// Arguments:
+/// certs_file - public certificate path.
+/// priv_key_file - private key for the public certificiate path.
+/// ocsp_key_file - ocsp certificate for public certificate path.
+///
+/// Returns: the server configuration in an Arc
+pub fn gen_tls_server_config(certs_file: &str, priv_key_file: &str, ocsp_key_file: Option<&str>) -> Arc<rustls::ServerConfig> {
     let mut config = rustls::ServerConfig::new(NoClientAuth::new());
     config.key_log = Arc::new(rustls::KeyLogFile::new());
 
     /* load TLS certificate */
     let certs = load_certs(certs_file);
     let privkey = load_private_key(priv_key_file);
-    let ocsp = load_ocsp(&None); 
+    let ocsp = load_ocsp(&ocsp_key_file); 
     config.set_single_cert_with_ocsp_and_sct(certs, privkey, ocsp, vec![]).expect("bad certs/priv key");
 
     /* enable session resumption */
