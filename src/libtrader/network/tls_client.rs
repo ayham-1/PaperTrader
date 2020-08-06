@@ -26,6 +26,14 @@ pub struct TlsClient {
 }
 
 impl TlsClient {
+    /// Returns a new TlsClient struct.
+    ///
+    /// Arguments:
+    /// sock - The ```TcpStream``` to be usd for the TlsClient.
+    /// hostname - The hostname to connect to.
+    /// cfg - The Client Configuration to be used.
+    ///
+    /// Returns: a new TlsClient
     pub fn new(sock: TcpStream, hostname: webpki::DNSNameRef<'_>, cfg: Arc<rustls::ClientConfig>) -> TlsClient {
         TlsClient {
             socket: sock,
