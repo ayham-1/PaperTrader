@@ -107,12 +107,13 @@ impl TlsClient {
 
         if rc.is_err() {
             let err = rc.unwrap_err();
-            error!("Pliantext read error: {:?}", err);
+            error!("tls plaintext read error: {:?}", err);
             self.clean_closure = err.kind() == io::ErrorKind::ConnectionAborted;
             self.closing = true;
         }
     }
     
+    /// Private TlsClient function that writes buffered TLS packets.
     fn do_write(&mut self) {
         self.tls_session.write_tls(&mut self.socket).unwrap();
     }
