@@ -1,23 +1,10 @@
-use std::net::SocketAddr;
 use mio;
 use mio::net::TcpStream;
 use std::io::Write;
 
 use libtrader::network::tls_client::TlsClient;
 use libtrader::misc::gen_tls_client_config::gen_tls_client_config;
-
-fn lookup_ipv4(host: &str, port: u16) -> SocketAddr {
-    use std::net::ToSocketAddrs;
-
-    let addrs = (host, port).to_socket_addrs().unwrap();
-    for addr in addrs {
-        if let SocketAddr::V4(_) = addr {
-            return addr;
-        }
-    }
-
-    unreachable!("Cannot lookup address");
-}
+use libtrader::misc::lookup_ipv4::lookup_ipv4;
 
 pub fn tls_main() {
     let addr = lookup_ipv4("localhost", 4000);

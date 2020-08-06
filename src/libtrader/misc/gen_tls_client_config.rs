@@ -21,7 +21,6 @@ mod danger {
     }
 }
 
-
 pub fn gen_tls_client_config() -> Arc<rustls::ClientConfig> {
     let mut config = rustls::ClientConfig::new();
     config.key_log = Arc::new(rustls::KeyLogFile::new());
