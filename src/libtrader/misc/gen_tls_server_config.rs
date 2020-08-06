@@ -48,6 +48,12 @@ fn load_private_key(filename: &str) -> rustls::PrivateKey {
     }
 }
 
+/// Loads OCSP stapling key.
+///
+/// Argument:
+/// filename - path to OCSP stapling key.
+///
+/// Returns: u8 vec
 fn load_ocsp(filename: &Option<String>) -> Vec<u8> {
     let mut ret = Vec::new();
 
