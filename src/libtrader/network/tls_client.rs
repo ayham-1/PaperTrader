@@ -123,16 +123,20 @@ impl TlsClient {
     /// Arguments:
     /// registry - The registry to register
     pub fn register(&mut self, registry: &mio::Registry) {
-        let interest = self.ready_interest();
+        let interest = self.event_set();
         registry.register(&mut self.socket, mio::Token(0), interest).unwrap();
     }
 
+    /// Reregisters the TlsClient to a mio::Registry
+    ///
+    /// Arguments:
+    /// registry - The registry to reregister
     pub fn reregister(&mut self, registry: &mio::Registry) {
-        let interest = self.ready_interest();
+        let interest = self.event_set();
         registry.reregister(&mut self.socket, mio::Token(0), interest).unwrap();
     }
 
-    fn ready_interest(&self) -> mio::Interest {
+    fn event_set(&self) -> mio::Interest {
         let rd = self.tls_session.wants_read();
         let wr = self.tls_session.wants_write();
 
