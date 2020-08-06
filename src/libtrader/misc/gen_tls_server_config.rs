@@ -4,6 +4,12 @@ use std::sync::Arc;
 use rustls;
 use rustls::NoClientAuth;
 
+/// Loads a TLS certificate
+///
+/// Arguments:
+/// filename - Path to .crt file.
+///
+/// Returns: vector of rustls' Certificate
 fn load_certs(filename: &str) -> Vec<rustls::Certificate> {
     let certfile = fs::File::open(filename).expect("cannot open certificate file");
     let mut reader = BufReader::new(certfile);
