@@ -83,6 +83,11 @@ fn load_ocsp(filename: &Option<&str>) -> Vec<u8> {
 /// ocsp_key_file - ocsp certificate for public certificate path.
 ///
 /// Returns: the server configuration in an Arc
+///
+/// Example:
+/// ```rust
+///      let config = gen_tls_server_config("tests.crt", "priv.key", None);
+/// ```
 pub fn gen_tls_server_config(certs_file: &str, priv_key_file: &str, ocsp_key_file: Option<&str>) -> Arc<rustls::ServerConfig> {
     let mut config = rustls::ServerConfig::new(NoClientAuth::new());
     config.key_log = Arc::new(rustls::KeyLogFile::new());
@@ -98,4 +103,14 @@ pub fn gen_tls_server_config(certs_file: &str, priv_key_file: &str, ocsp_key_fil
     config.ticketer = rustls::Ticketer::new();
 
     Arc::new(config)
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_gen_tls_server_config() {
+        let _ = gen_tls_server_config("test_tls.crt", "test_tls.key", None);
+    }
 }
