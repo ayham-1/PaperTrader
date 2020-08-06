@@ -3,6 +3,10 @@ use rustls;
 use webpki_roots;
 use ct_logs;
 
+/// A "always accept" Certficate verifier.
+///
+/// WARN: only to be used in development environments.
+/// using this in production envs will be a HUGE security vuln.
 #[cfg(feature = "tls_no_verify")]
 mod danger {
     use super::rustls;
@@ -16,6 +20,7 @@ mod danger {
                               _presented_certs: &[rustls::Certificate],
                               _dns_name: webpki::DNSNameRef<'_>,
                               _ocsp: &[u8]) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
+            warn!("IF THIS IS NOT A DEV BUILD DON'T PROCEED");
             Ok(rustls::ServerCertVerified::assertion())
         }
     }
