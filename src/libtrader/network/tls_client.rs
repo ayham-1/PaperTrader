@@ -117,7 +117,11 @@ impl TlsClient {
     fn do_write(&mut self) {
         self.tls_session.write_tls(&mut self.socket).unwrap();
     }
-
+    
+    /// Registers the TlsClient to a mio::Registry
+    ///
+    /// Arguments:
+    /// registry - The registry to register
     pub fn register(&mut self, registry: &mio::Registry) {
         let interest = self.ready_interest();
         registry.register(&mut self.socket, mio::Token(0), interest).unwrap();
