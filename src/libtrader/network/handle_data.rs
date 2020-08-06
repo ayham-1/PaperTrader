@@ -27,7 +27,8 @@ pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, _buf: &[u8]
 }
 
 #[cfg(feature="client")]
-pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, _buf: &[u8]) -> Result<(), String> {
+pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> Result<(), String> {
     assert_eq!(conn.is_right(), true);
+    println!("buffer: {}", String::from_utf8(buf.to_vec()).unwrap());
     Ok(())
 }

@@ -18,10 +18,11 @@ test = false
 bench = false
 
 [features]
-default = ["master_server"]
+default = []
 master_server = []
 worker_server = []
 client = []
+tls_no_verify = ["rustls/dangerous_configuration"]
 
 [dependencies]
 chrono = "0.4"
@@ -38,4 +39,6 @@ serde={ version = "1.0", features = ["derive"] }
 rustls="0.18.0"
 mio={ version = "0.7.0", features = ["os-poll", "tcp"] }
 webpki="0.21.0"
+webpki-roots="0.20"
+ct-logs="0.7"
 either="*"

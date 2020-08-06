@@ -95,8 +95,7 @@ impl TlsClient {
         registry.register(&mut self.socket, mio::Token(0), interest).unwrap();
     }
 
-    #[allow(dead_code)]
-    fn reregister(&mut self, registry: &mio::Registry) {
+    pub fn reregister(&mut self, registry: &mio::Registry) {
         let interest = self.ready_interest();
         registry.reregister(&mut self.socket, mio::Token(0), interest).unwrap();
     }
