@@ -58,7 +58,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_gen_tls_cleint_config() {
+    fn test_gen_tls_client_config() {
         let _ = gen_tls_client_config();
     }
 }
