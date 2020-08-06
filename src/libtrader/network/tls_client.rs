@@ -11,6 +11,13 @@ use either::*;
 
 use crate::network::handle_data::handle_data;
 
+/// The TlsClient struct that represents a TLS client from the prespective of a client.
+///
+/// Members:
+/// socket - The TcpStream for which TLS is used on.
+/// closing - Used for startin a closing TlsClient state.
+/// closed - Used for determining whether the TlsClient is closed.
+/// tls_session - The ClientSession that is the TLS connection.
 pub struct TlsClient {
     pub socket: TcpStream,
     pub closing: bool,
