@@ -43,6 +43,15 @@ impl TlsClient {
         }
     }
 
+    /// TlsClient event reciever.
+    ///
+    /// Determines  if the mio::event::Event is readable/writable or is closing. Calls the
+    /// appropriate TlsClient functin to handle the incoming event.
+    /// 
+    /// Arguments:
+    /// ev - The event to be handled
+    ///
+    /// Returns: nothing
     pub fn ready(&mut self, ev: &mio::event::Event) {
         assert_eq!(ev.token(), mio::Token(0));
 
@@ -55,7 +64,7 @@ impl TlsClient {
         }
 
         if self.closing {
-            info!("TlsClient Closed");
+            warn!("TlsClient Closed");
         }
     }
 
