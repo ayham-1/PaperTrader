@@ -111,6 +111,6 @@ mod test {
 
     #[test]
     fn test_gen_tls_server_config() {
-        let _ = gen_tls_server_config("test_tls.crt", "test_tls.key", None);
+        let _ = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);
     }
 }

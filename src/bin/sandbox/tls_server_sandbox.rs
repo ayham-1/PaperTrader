@@ -8,7 +8,7 @@ use libtrader::misc::gen_tls_server_config::gen_tls_server_config;
 pub fn tls_main() {
     let addr: net::SocketAddr = "0.0.0.0:4000".parse().unwrap();
 
-    let config = gen_tls_server_config("test_tls.crt", "test_tls.key", None);
+    let config = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);
 
     let mut listener = TcpListener::bind(addr).expect("cannot listen on port");
     let mut poll = mio::Poll::new().unwrap();
