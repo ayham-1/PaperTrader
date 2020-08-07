@@ -14,7 +14,7 @@ use std::num::NonZeroU32;
 /// password - The raw password to be used.
 ///
 /// Returns: nothing.
-pub fn acc_auth_client(username: &str, email: &str, password: &str) -> Result<(), ()> {
+pub fn acc_auth_client(username: &str, email: &str, password: &str) -> Result<(), String> {
     let rng = rand::SystemRandom::new();
 
     /* 
@@ -64,7 +64,7 @@ pub fn acc_auth_client(username: &str, email: &str, password: &str) -> Result<()
 
     /* TODO: send the data to the server and return a session id */
 
-    Ok(()) 
+    Ok(())
 }
 
 pub fn acc_auth_server() -> Result<(), String> { Ok(()) }

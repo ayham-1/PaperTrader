@@ -1,5 +1,6 @@
 #[macro_use] extern crate enum_primitive;
 #[macro_use] extern crate log;
+#[macro_use] extern crate arrayref;
 extern crate simplelog;
 extern crate os_type;
 extern crate bincode;

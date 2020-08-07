@@ -8,15 +8,15 @@ use crate::network::tls_connection::TlsConnection;
 use crate::network::tls_client::TlsClient;
 
 #[cfg(feature="master_server")]
-pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, _buf: &[u8]) -> Result<(), String> {
+pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> Result<(), String> {
     assert_eq!(conn.is_left(), true);
     let connection = conn.left().unwrap();
 
-    let response = b"HTTP/1.0 200 OK\r\nConnection: close\r\n\r\nHello world from rustls tlsserver\r\n";
+    println!("{:?}", buf);
+
     connection.tls_session
-        .write_all(response)
+        .write_all(buf)
         .unwrap();
-    connection.tls_session.send_close_notify();
     Ok(())
 }
 
@@ -29,6 +29,7 @@ pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, _buf: &[u8]
 #[cfg(feature="client")]
 pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> Result<(), String> {
     assert_eq!(conn.is_right(), true);
-    println!("buffer: {}", String::from_utf8(buf.to_vec()).unwrap());
+
+    println!("buffer: {:?}", buf);
     Ok(())
 }
