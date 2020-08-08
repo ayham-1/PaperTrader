@@ -8,8 +8,7 @@ use libtrader::network::tls_client::TlsClient;
 use libtrader::misc::gen_tls_client_config::gen_tls_client_config;
 use libtrader::misc::lookup_ipv4::lookup_ipv4;
 
-use libtrader::ds::message::inst::CommandInst;
-use libtrader::network::cmd::client::req_server_salt::req_server_salt;
+use libtrader::account::acc_auth::acc_auth_client;
 
 pub fn tls_main() {
     let addr = lookup_ipv4("0.0.0.0", 4000);
@@ -32,8 +31,8 @@ pub fn tls_main() {
             tlsclient.reregister(poll.registry());
             
             if ev.token() == mio::Token(0) && ev.is_writable() {
-                match req_server_salt(&mut tlsclient, &mut  poll, "test", CommandInst::GetEmailSalt as i64) {
-                    Ok(ret) => println!("server returned yes: {}", HEXUPPER.encode(&ret)),
+                match acc_auth_client(&mut tlsclient, &mut  poll, "test", "test", "test") {
+                    Ok(message) => println!("server returned yes: {:?}", message),
                     Err(err) => panic!("panik {}", err),
                 }
             }

@@ -1,9 +1,9 @@
-use ring::rand::SecureRandom;
-use ring::{digest, pbkdf2, rand};
+use ring::{digest, pbkdf2};
 use std::num::NonZeroU32;
 use std::io::Write;
 
 use crate::network::tls_client::TlsClient;
+use crate::network::cmd::client::req_server_salt::req_server_salt;
 
 use crate::parser::message_builder::message_builder;
 use crate::ds::message::message_type::MessageType;
@@ -26,39 +26,55 @@ pub fn acc_auth_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     /*
      * get email salt
      * */
-    let rng = rand::SystemRandom::new();
+    let email_salt = match req_server_salt(tls_client, poll, username, CommandInst::GetEmailSalt as i64) {
+        Ok(salt) => salt,
+        Err(err) => return Err(format!("ACC_AUTH_CLIENT_COULD_NOT_GET_SALT: {}", err))
+    };
+    /*
+     * get password salt
+     * */
+    let password_salt = match req_server_salt(tls_client, poll, username, CommandInst::GetPasswordSalt as i64) {
+        Ok(salt) => salt,
+        Err(err) => return Err(format!("ACC_AUTH_CLIENT_COULD_NOT_GET_SALT: {}", err))
+    };
+
+    println!("khello we are here");
 
     /*
      * hash the email
      */
-    /* generate false client salt TODO: get salt from the server */
-    let mut email_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
-    rng.fill(&mut email_client_salt).unwrap();
-
     let mut hashed_email = [0u8; digest::SHA512_OUTPUT_LEN];
     pbkdf2::derive(
         pbkdf2::PBKDF2_HMAC_SHA512,
         NonZeroU32::new(175_000).unwrap(),
-        &email_client_salt,
+        &email_salt,
         email.as_bytes(),
         &mut hashed_email);
 
     /*
      * hash the password
      */
-    /* generate false client salt TODO: get salt from the server */
-    let mut password_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
-    rng.fill(&mut password_client_salt).unwrap();
-
     let mut hashed_password = [0u8; digest::SHA512_OUTPUT_LEN];
     pbkdf2::derive(
         pbkdf2::PBKDF2_HMAC_SHA512,
         NonZeroU32::new(250_000).unwrap(),
-        &password_client_salt,
+        &password_salt,
         password.as_bytes(),
         &mut hashed_password);
 
-    /* TODO: send the data to the server and return a session id */
+    /* generate message to be sent to the server */
+    let mut data = Vec::new();
+    data.append(&mut bincode::serialize(&email_salt.to_vec()).unwrap());
+    data.append(&mut bincode::serialize(&password_salt.to_vec()).unwrap());
+    data.append(&mut bincode::serialize(&username.as_bytes()).unwrap());
+    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 3, 0, 0, data) {
+        Ok(message) => {
+            tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
+            /* TODO: handle a session id */
+        },
+        Err(_) => return Err("ACC_AUTH_CLIENT_COULD_NOT_BUILD_MESSAGE".to_string())
+    };
+
 
     Ok(())
 }
