@@ -21,7 +21,10 @@ use crate::network::handle_data::handle_data;
 pub struct TlsClient {
     pub socket: TcpStream,
     pub closing: bool,
+    pub closed: bool,
     pub clean_closure: bool,
+    pub branch_ctrl: bool,
+    pub read_plaintext: Vec<u8>,
     pub tls_session: rustls::ClientSession
 }
 
@@ -38,7 +41,10 @@ impl TlsClient {
         TlsClient {
             socket: sock,
             closing: false,
+            closed: false,
             clean_closure: false,
+            branch_ctrl: false,
+            read_plaintext: Vec::new(),
             tls_session: rustls::ClientSession::new(&cfg, hostname),
         }
     }
@@ -64,14 +70,15 @@ impl TlsClient {
         }
 
         if self.closing {
+            self.closed = true;
             warn!("TlsClient Closed");
         }
     }
 
-    /// Private TlsClient function that reads incoming TlS packets.
+    /// TlsClient function that reads incoming TlS packets.
     ///
     /// Reads TLS packets, decrypts them and then calls handle_data() on them.
-    fn do_read(&mut self) {
+    pub fn do_read(&mut self) {
         let rc = self.tls_session.read_tls(&mut self.socket);
         if rc.is_err() {
             let error = rc.unwrap_err();
@@ -98,7 +105,11 @@ impl TlsClient {
 
         let mut plaintext = Vec::new();
         let rc = self.tls_session.read_to_end(&mut plaintext);
-        if !plaintext.is_empty() {
+        if !plaintext.is_empty() { 
+            if self.branch_ctrl {
+                self.read_plaintext = plaintext;
+                return;
+            }
             match handle_data(Either::Right(self), &plaintext) {
                 Ok(()) => {},
                 Err(err) => error!("Error handling data: {}", err)
@@ -113,8 +124,8 @@ impl TlsClient {
         }
     }
     
-    /// Private TlsClient function that writes buffered TLS packets.
-    fn do_write(&mut self) {
+    /// TlsClient function that writes buffered TLS packets.
+    pub fn do_write(&mut self) {
         self.tls_session.write_tls(&mut self.socket).unwrap();
     }
     
