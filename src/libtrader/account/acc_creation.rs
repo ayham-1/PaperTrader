@@ -38,12 +38,8 @@ use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched
 pub fn acc_create_client(tls_client: &mut TlsClient, poll: &mut mio::Poll, 
                   username: &str, email: &str, password: &str) -> Result<(), String> {
     /*
-     * get three server salts for username, email, and password
+     * get three server salts for email, and password
      * */
-    let username_server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match get_server_salt(tls_client, poll) {
-        Ok(salt) => salt,
-        Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err))
-    };
     let email_server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match get_server_salt(tls_client, poll) {
         Ok(salt) => salt,
         Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err))
@@ -54,33 +50,23 @@ pub fn acc_create_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     };
 
     /*
-     * generate client salts for username, email, password
+     * generate client salts for email, password
      * */
     let rng = rand::SystemRandom::new();
-    let mut username_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
-    rng.fill(&mut username_client_salt).unwrap();
     let mut email_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
     rng.fill(&mut email_client_salt).unwrap();
     let mut password_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
     rng.fill(&mut password_client_salt).unwrap();
 
     /*
-     * generate final salts for username, email, password
+     * generate final salts for email, password
      * */
-    let username_salt = [username_server_salt, username_client_salt].concat();
     let email_salt = [email_server_salt, email_client_salt].concat();
     let password_salt = [password_server_salt, password_client_salt].concat();
 
     /*
-     * generate three hashes for username, email, password
+     * generate three hashes for email, password
      * */
-    let mut username_hash = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        NonZeroU32::new(100_000).unwrap(),
-        &username_salt,
-        username.as_bytes(),
-        &mut username_hash);
     let mut email_hash = [0u8; digest::SHA512_OUTPUT_LEN];
     pbkdf2::derive(
         pbkdf2::PBKDF2_HMAC_SHA512,
@@ -100,12 +86,11 @@ pub fn acc_create_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
 
     /* generate message to be sent to the server */
     let mut data = Vec::new();
-    data.append(&mut bincode::serialize(&username_hash.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&username_client_salt.to_vec()).unwrap());
     data.append(&mut bincode::serialize(&email_hash.to_vec()).unwrap());
     data.append(&mut bincode::serialize(&email_client_salt.to_vec()).unwrap());
     data.append(&mut bincode::serialize(&password_hash.to_vec()).unwrap());
     data.append(&mut bincode::serialize(&password_client_salt.to_vec()).unwrap());
+    data.append(&mut bincode::serialize(&username.as_bytes()).unwrap());
     match message_builder(MessageType::Command, CommandInst::Register as i64, 6, 0, 0, data) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
