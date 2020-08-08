@@ -3,8 +3,6 @@ use crate::ds::account::portfolio::Portfolio;
 #[derive(PartialEq, Debug)]
 pub struct Account {
     pub username: String,
-    pub server_username_salt: String,
-    pub client_username_salt: String,
 
     pub email: String,
     pub server_email_salt: String,

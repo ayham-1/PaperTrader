@@ -1,12 +1,15 @@
+use std::io::Write;
+
 use mio;
 use mio::net::TcpStream;
-use std::io::Write;
+use data_encoding::HEXUPPER;
 
 use libtrader::network::tls_client::TlsClient;
 use libtrader::misc::gen_tls_client_config::gen_tls_client_config;
 use libtrader::misc::lookup_ipv4::lookup_ipv4;
 
-use libtrader::account::acc_creation::acc_create_client;
+use libtrader::ds::message::inst::CommandInst;
+use libtrader::network::cmd::client::req_server_salt::req_server_salt;
 
 pub fn tls_main() {
     let addr = lookup_ipv4("0.0.0.0", 4000);
@@ -29,8 +32,8 @@ pub fn tls_main() {
             tlsclient.reregister(poll.registry());
             
             if ev.token() == mio::Token(0) && ev.is_writable() {
-                match acc_create_client(&mut tlsclient, &mut  poll, "test", "test", "test") {
-                    Ok(()) => println!("server returned yes"),
+                match req_server_salt(&mut tlsclient, &mut  poll, "test", CommandInst::GetEmailSalt as i64) {
+                    Ok(ret) => println!("server returned yes: {}", HEXUPPER.encode(&ret)),
                     Err(err) => panic!("panik {}", err),
                 }
             }

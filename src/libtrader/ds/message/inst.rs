@@ -9,6 +9,8 @@ pub enum CommandInst {
     PurchaseAsset = 4,
     SellAsset = 5,
     GenHashSalt = 6,
+    GetEmailSalt = 7,
+    GetPasswordSalt = 8,
 }
 impl std::fmt::Display for CommandInst {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -17,7 +19,7 @@ impl std::fmt::Display for CommandInst {
 }
 
 #[allow(dead_code)]
-static INST_COMMAND_MAX_ID: isize = CommandInst::GenHashSalt as isize;
+static INST_COMMAND_MAX_ID: isize = CommandInst::GetPasswordSalt as isize;
 
 #[derive(PartialEq, Debug)]
 pub enum DataTransferInst {

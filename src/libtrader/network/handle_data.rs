@@ -40,6 +40,19 @@ pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8])
             };
             connection.tls_session.write(bincode::serialize(&server_response).unwrap().as_slice()).unwrap();
         },
+        _ if client_response.instruction == CommandInst::GetEmailSalt as i64 => {
+            let rng = rand::SystemRandom::new();
+            let mut salt = [0u8; digest::SHA512_OUTPUT_LEN];
+            rng.fill(&mut salt).unwrap();
+
+            let server_response: Message = match message_builder(MessageType::DataTransfer, 
+                                                                 CommandInst::GetEmailSalt as i64, 1, 0, 1, 
+                                                                 salt.to_vec()) {
+                Ok(message) => message,
+                Err(_) => panic!("PANIK NO SALT")
+            };
+            connection.tls_session.write(bincode::serialize(&server_response).unwrap().as_slice()).unwrap();
+        },
         _ => {}
     };
         

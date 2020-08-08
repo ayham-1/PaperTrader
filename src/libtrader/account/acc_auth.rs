@@ -1,6 +1,13 @@
 use ring::rand::SecureRandom;
 use ring::{digest, pbkdf2, rand};
 use std::num::NonZeroU32;
+use std::io::Write;
+
+use crate::network::tls_client::TlsClient;
+
+use crate::parser::message_builder::message_builder;
+use crate::ds::message::message_type::MessageType;
+use crate::ds::message::inst::CommandInst;
 
 /// INCOMPLETE: authenticate user.
 ///
@@ -14,23 +21,12 @@ use std::num::NonZeroU32;
 /// password - The raw password to be used.
 ///
 /// Returns: nothing.
-pub fn acc_auth_client(username: &str, email: &str, password: &str) -> Result<(), String> {
-    let rng = rand::SystemRandom::new();
-
-    /* 
-     * hash the username 
+pub fn acc_auth_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
+                       username: &str, email: &str, password: &str) -> Result<(), String> {
+    /*
+     * get email salt
      * */
-    /* generate false client salt TODO: get salt from the server */
-    let mut user_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
-    rng.fill(&mut user_client_salt).unwrap();
-
-    let mut hashed_usr = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        NonZeroU32::new(100_000).unwrap(),
-        &user_client_salt,
-        username.as_bytes(),
-        &mut hashed_usr);
+    let rng = rand::SystemRandom::new();
 
     /*
      * hash the email
