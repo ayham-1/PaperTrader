@@ -3,9 +3,10 @@ use mio::net::TcpStream;
 use std::io::Write;
 
 use libtrader::network::tls_client::TlsClient;
-use libtrader::network::helper::get_server_salt::get_server_salt;
 use libtrader::misc::gen_tls_client_config::gen_tls_client_config;
 use libtrader::misc::lookup_ipv4::lookup_ipv4;
+
+use libtrader::account::acc_creation::acc_create_client;
 
 pub fn tls_main() {
     let addr = lookup_ipv4("0.0.0.0", 4000);
@@ -28,12 +29,11 @@ pub fn tls_main() {
             tlsclient.reregister(poll.registry());
             
             if ev.token() == mio::Token(0) && ev.is_writable() {
-                match get_server_salt(&mut tlsclient, &mut  poll) {
-                    Ok(salt) => println!("{:?}", salt),
+                match acc_create_client(&mut tlsclient, &mut  poll, "test", "test", "test") {
+                    Ok(()) => println!("server returned yes"),
                     Err(err) => panic!("panik {}", err),
                 }
             }
-
         }
     } 
 }

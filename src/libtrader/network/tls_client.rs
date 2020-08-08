@@ -166,7 +166,9 @@ impl TlsClient {
 
 impl io::Write for TlsClient {
     fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
-        self.tls_session.write(bytes)
+        let res = self.tls_session.write(bytes);
+        self.do_write();
+        res
     }
 
     fn flush(&mut self) -> io::Result<()> {
@@ -176,6 +178,8 @@ impl io::Write for TlsClient {
 
 impl io::Read for TlsClient {
     fn read(&mut self, bytes: &mut [u8]) -> io::Result<usize> {
-        self.tls_session.read(bytes)
+        let res = self.tls_session.read(bytes);
+        self.do_read();
+        res
     }
 }

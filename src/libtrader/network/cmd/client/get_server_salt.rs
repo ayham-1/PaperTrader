@@ -4,7 +4,7 @@ use mio;
 use std::io::{Write};
 
 use crate::network::tls_client::TlsClient;
-use crate::network::helper::wait_and_read_branched::wait_and_read_branched;
+use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
 use crate::parser::message_builder::message_builder;
 use crate::ds::message::message::Message;
 use crate::ds::message::message_type::MessageType;
@@ -17,7 +17,7 @@ Result<[u8; digest::SHA512_OUTPUT_LEN/2], String> {
      * */
     match message_builder(MessageType::Command, CommandInst::GenHashSalt as i64, 0, 0, 0, vec!()) {
         Ok(message) => {
-            tls_client.tls_session.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
+            tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
 
             wait_and_read_branched(tls_client, poll, None, None)?;
             let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
