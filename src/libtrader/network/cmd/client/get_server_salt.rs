@@ -10,6 +10,23 @@ use crate::ds::message::message::Message;
 use crate::ds::message::message_type::MessageType;
 use crate::ds::message::inst::{CommandInst};
 
+/// Issues a command to the connected TLS server to obtain a salt.
+///
+/// All salts returned are of size ```digest::SHA512_OUTPUT_LEN/2``` or 32 bytes.
+///
+/// Arguments:
+/// tls_client - The TLS connection to as for the salt.
+/// poll - The mio::Poll used to handle branched control of the TLS client.
+///
+/// Returns: a [u8; 32] on success, and a string on failure containing the reason of failure.
+///
+/// Example:
+/// ```rust
+///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match get_server_salt(tls_client, poll) {
+///         Ok(salt) => salt,
+///         Err(err) => panic!("could not retrieve server salt; err: {}", errj)
+///     };
+/// ```
 pub fn get_server_salt(tls_client: &mut TlsClient, poll: &mut mio::Poll) -> 
 Result<[u8; digest::SHA512_OUTPUT_LEN/2], String> {
     /*
