@@ -3,6 +3,23 @@ use std::{thread, time};
 use mio;
 use crate::network::tls_client::TlsClient;
 
+/// Waits and issues a branched read when TLS client recieves data to be processed.
+///
+/// Handles all events on TLS client as branched control. Checks if read data is ready and returns.
+///
+/// Arguments:
+/// tls_client - The TLS Client to use.
+/// poll - The mio::Poll to get the Events from.
+/// retries - Optional, number of times to retry reading from TLS session before giving up.
+/// sleep_time_ms - Optional, time in ms between each try.
+///
+/// Returns: nothing on success, a string on failure containing the reason of failure.
+///
+/// Example:
+/// ```rust
+///     /* wait for response */
+///     wait_and_read_branched(tls_client, poll, Some(15), Some(500))?;
+/// ```
 pub fn wait_and_read_branched(tls_client: &mut TlsClient, poll: &mut mio::Poll, 
                               retries: Option<i8>, sleep_time_ms: Option<u64>) -> Result<(), String> {
     tls_client.branch_ctrl = true;
