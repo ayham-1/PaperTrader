@@ -13,6 +13,28 @@ use crate::ds::message::inst::{CommandInst};
 
 use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
 
+/// Requests a TLS server to create an account.
+///
+/// Gets three server salts, generates three new salts, cancatenates both salts, and use the
+/// concatenated salt to hash the username, email, and password. Generates a message containing the
+/// hashes and sends it to the server. Waits for a response and returns.
+///
+/// Arguments:
+/// tls_client - The TLS client to use.
+/// poll - The mio::Poll to get the events from.
+/// username - The username to send to the server.
+/// email - The email to send to the server.
+/// password - The password to send to the server.
+///
+/// Returns: nothing on success, a string on error containing the reason of failure.
+///
+/// Example:
+/// ```rust
+///     match acc_create_client(&mut tlsclient, &mut  poll, "test", "test", "test") {
+///         Ok(()) => println!("server returned yes"),
+///         Err(err) => panic!("panik {}", err),
+///     }
+/// ```
 pub fn acc_create_client(tls_client: &mut TlsClient, poll: &mut mio::Poll, 
                   username: &str, email: &str, password: &str) -> Result<(), String> {
     /*
