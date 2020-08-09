@@ -1,5 +1,20 @@
 use crate::account::sessions::jwt_claim::JWTClaim;
 
+/// Encodes a JWT token.
+///
+/// Takes in the authorized user id and expiry date of the authorization.
+/// Outputs a string of the token.
+///
+/// Arguments:
+/// user_id - The DB entry id of the authorized user.
+/// exp - The unix epoch at which the token expires
+///
+/// Returns: a string of the token on success, string on error.
+///
+/// Example:
+/// ```rust
+///     let token = create_jwt_token(auth_user_id, unix_expiry_epoch).unwrap();
+/// ```
 #[cfg(not(feature="client"))]
 pub fn create_jwt_token(user_id: usize, exp: usize) -> Result<String, String> {
     use crate::account::sessions::jwt_claim::JWT_SECRET;
