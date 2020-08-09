@@ -44,7 +44,7 @@ Result<[u8; digest::SHA512_OUTPUT_LEN], String> {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
             wait_and_read_branched(tls_client, poll, None, None)?;
             let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-            match ret_msg.message_type {
+            match ret_msg.msgtype {
                 MessageType::Command => {
                     Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string())
                 },

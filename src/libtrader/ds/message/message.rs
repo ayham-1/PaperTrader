@@ -4,7 +4,7 @@ use crate::ds::message::message_type::{MessageType};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Message {
-    pub message_type: MessageType,
+    pub msgtype: MessageType,
     pub instruction: i64,
     pub argument_count: usize,
     pub data_message_number: usize,
@@ -13,7 +13,7 @@ pub struct Message {
 }
 impl std::fmt::Display for Message {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {:#?})", self.message_type, self.instruction, 
+        write!(f, "({}, {}, {}, {}, {}, {:#?})", self.msgtype, self.instruction, 
                self.argument_count, self.data_message_number, self.data_message_max, self.data)
     }
 }

@@ -105,7 +105,7 @@ pub fn acc_create_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
     
-    if response.message_type == MessageType::ServerReturn && response.instruction == 1 {
+    if response.msgtype == MessageType::ServerReturn && response.instruction == 1 {
         /* created successfully */
         return Ok(());
     } else {

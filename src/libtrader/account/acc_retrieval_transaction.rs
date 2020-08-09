@@ -47,7 +47,7 @@ pub fn acc_retrieve_transaction(tls_client: &mut TlsClient, poll: &mut mio::Poll
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
-    if response.message_type == MessageType::ServerReturn && response.instruction == 1 
+    if response.msgtype == MessageType::ServerReturn && response.instruction == 1 
         && response.argument_count == 1 && response.data.len() != 0 {
             /* returned data*/
             let transactions: Vec<Transaction> = bincode::deserialize(&response.data).unwrap();

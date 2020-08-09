@@ -85,7 +85,7 @@ pub fn acc_auth_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
-    if response.message_type == MessageType::ServerReturn && response.instruction == 1 
+    if response.msgtype == MessageType::ServerReturn && response.instruction == 1 
         && response.argument_count == 1 && response.data.len() != 0 {
             /* authorized */
             tls_client.auth_jwt = match String::from_utf8(response.data) {

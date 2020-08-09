@@ -38,7 +38,7 @@ Result<[u8; digest::SHA512_OUTPUT_LEN/2], String> {
 
             wait_and_read_branched(tls_client, poll, None, None)?;
             let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-            assert_eq!(ret_msg.message_type, MessageType::DataTransfer);
+            assert_eq!(ret_msg.msgtype, MessageType::DataTransfer);
             assert_eq!(ret_msg.instruction, CommandInst::GenHashSalt as i64);
             assert_eq!(ret_msg.argument_count, 1);
             assert_eq!(ret_msg.data_message_number, 0);
