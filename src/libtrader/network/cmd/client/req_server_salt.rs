@@ -28,7 +28,7 @@ use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched
 ///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match req_server_salt(tls_client, poll, "n1ckn8me", 
 ///                                                                     CommandInst::GetEmailSalt) {
 ///         Ok(salt) => salt,
-///         Err(err) => panic!("could not retrieve email salt; err: {}", errj)
+///         Err(err) => panic!("could not retrieve email salt; err: {}", err)
 ///     };
 /// ```
 pub fn req_server_salt(tls_client: &mut TlsClient, poll: &mut mio::Poll, username: &str, salt_type: i64) -> 

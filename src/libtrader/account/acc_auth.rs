@@ -9,11 +9,13 @@ use crate::parser::message_builder::message_builder;
 use crate::ds::message::message_type::MessageType;
 use crate::ds::message::inst::CommandInst;
 
-/// INCOMPLETE: authenticate user.
+/// Client authentication procedure.
 ///
 /// Takes in the username, email and password. Data is hashed and then sent to the server for
 /// further hashing and confirmation of authentication. A session token is returned.
-/// The function is not complete. NOT TO BE USED ANYWHERE.
+/// The function is not complete.
+///
+/// Currently only sends authentication request and does not process any returned values.
 ///
 /// Arguments:
 /// username - The raw username to be used.
