@@ -74,28 +74,29 @@ pub fn acc_auth_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 3, 0, 0, data) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
-            
+
             /* wait for a response */
             wait_and_read_branched(tls_client, poll, Some(15), Some(500))?;
-
-            /* decode response */
-            let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-            tls_client.read_plaintext.clear();
-
-            if response.message_type == MessageType::ServerReturn && response.instruction == 1 
-                && response.argument_count == 1 && response.data.len() != 0 {
-                    /* authorized */
-                    tls_client.auth_jwt = match String::from_utf8(response.data) {
-                        Ok(token) => token,
-                        Err(err) => return Err(format!("ACC_AUTH_CLIENT_INVALID_SESSION_ID: {}", err)),
-                    };
-                    Ok(())
-                } else {
-                    Err("ACC_AUTH_CLIENT_UNAUTHORIZED".to_string())
-                }
         },
-        Err(_) => Err("ACC_AUTH_CLIENT_COULD_NOT_BUILD_MESSAGE".to_string())
-    }
+        Err(_) => return Err("ACC_AUTH_CLIENT_COULD_NOT_BUILD_MESSAGE".to_string())
+    };
+
+    /* decode response */
+    let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
+    tls_client.read_plaintext.clear();
+
+    if response.message_type == MessageType::ServerReturn && response.instruction == 1 
+        && response.argument_count == 1 && response.data.len() != 0 {
+            /* authorized */
+            tls_client.auth_jwt = match String::from_utf8(response.data) {
+                Ok(token) => token,
+                Err(err) => return Err(format!("ACC_AUTH_CLIENT_INVALID_SESSION_ID: {}", err)),
+            };
+            Ok(())
+        } else {
+            Err("ACC_AUTH_CLIENT_UNAUTHORIZED".to_string())
+        }
+
 }
 
 pub fn acc_auth_server() -> Result<(), String> { Ok(()) }

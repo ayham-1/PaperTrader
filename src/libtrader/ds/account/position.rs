@@ -1,5 +1,7 @@
+use serde::{Serialize, Deserialize};
+
 enum_from_primitive! {
-#[derive(PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
     pub enum PositionType { Sell = 0, Buy = 1 }
 }
 impl std::fmt::Display for PositionType {
@@ -8,7 +10,7 @@ impl std::fmt::Display for PositionType {
         }
     }
 
-#[derive(PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Position {
     pub action_type: PositionType,
     pub stock_symbol: String,

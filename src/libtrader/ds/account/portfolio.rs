@@ -1,6 +1,8 @@
+use serde::{Serialize, Deserialize};
+
 use crate::ds::account::position::Position;
 
-#[derive(PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Portfolio {
     pub position_history: Vec<Position>,
     pub open_positions: Vec<Position>
