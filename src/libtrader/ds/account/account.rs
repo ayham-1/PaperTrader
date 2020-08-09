@@ -1,4 +1,5 @@
 use crate::ds::account::portfolio::Portfolio;
+use crate::ds::account::transaction::Transaction;
 
 #[derive(PartialEq, Debug)]
 pub struct Account {
@@ -14,7 +15,7 @@ pub struct Account {
 
     pub is_pass: bool,
     pub portfolio: Portfolio,
-    pub transactions: Vec<f64>
+    pub transactions: Vec<Transaction>
 }
 
 impl std::fmt::Display for Account {
