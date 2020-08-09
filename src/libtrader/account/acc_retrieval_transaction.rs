@@ -10,6 +10,24 @@ use crate::ds::message::message::Message;
 use crate::ds::message::message_type::MessageType;
 use crate::ds::message::inst::{DataTransferInst};
 
+/// Retrieves ffrom the connected TLS server an authorized transaction history.
+///
+/// Sends a request for a transaction history with the JWT token of the client connection. Handles
+/// any response and returns.
+///
+/// Arguments:
+/// tls_client - TLS client to use containing the JWT token to authorize.
+/// poll - For event handling.
+///
+/// Returns: transaction vector on success, string on error containing reason of failure.
+///
+/// Example:
+/// ```rust
+///     match acc_retrieve_transaction(&mut tls_client, &mut poll) {
+///         Ok(transaction) => {/* interesting stuff with portfolio */},
+///         Err(err) => panic!("can not retrieve transaction history! error: {}", err)
+///     };
+/// ```
 pub fn acc_retrieve_transaction(tls_client: &mut TlsClient, poll: &mut mio::Poll) -> Result<Vec<Transaction>, String> {
     assert_eq!(tls_client.auth_jwt.is_empty(), false);
 
