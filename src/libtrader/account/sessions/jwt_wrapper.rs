@@ -33,6 +33,19 @@ pub fn create_jwt_token(user_id: usize, exp: usize) -> Result<String, String> {
     }
 }
 
+/// Decodes and verifies a JWT token.
+///
+/// Takes in an encoded JWT token and outputs it's JWTClaim.
+///
+/// Arguments:
+/// token - the JWT token to be decoded
+///
+/// Returns: JWTClaim on success, nothing on error.
+///
+/// Example:
+/// ```rust
+///     assert_eq!(verify_jwt_token(token).unwrap(), true);
+/// ```
 #[cfg(not(feature="client"))]
 pub fn verify_jwt_token(token: String) -> Result<JWTClaim, ()> {
     use crate::account::sessions::jwt_claim::JWT_SECRET;
