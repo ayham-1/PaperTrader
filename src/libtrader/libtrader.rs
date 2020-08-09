@@ -4,6 +4,7 @@
 extern crate simplelog;
 extern crate os_type;
 extern crate bincode;
+extern crate crypto;
 
 pub mod ds;
 pub mod db;
