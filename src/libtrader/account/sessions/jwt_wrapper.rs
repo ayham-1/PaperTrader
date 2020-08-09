@@ -10,7 +10,6 @@ pub fn create_jwt_token(user_id: usize, exp: usize) -> Result<String, String> {
 
     let claim = JWTClaim {
         user_id: user_id,
-        issuer: "ISSUE-R".to_string(),
         exp: exp
     };
     match encode(&header, &claim, &EncodingKey::from_secret(JWT_SECRET.as_bytes())) {
@@ -24,12 +23,11 @@ pub fn verify_jwt_token(token: String) -> Result<JWTClaim, ()> {
     use crate::account::sessions::jwt_claim::JWT_SECRET;
     use jsonwebtoken::{decode, DecodingKey, Validation, Algorithm};
 
-    let mut validation = Validation::new(Algorithm::HS256);
+    let mut validation = Validation::new(Algorithm::HS512);
     validation.leeway = 25;
-    validation.iss = Some("ISSUE-R".to_string());
-    match decode::<JWTClaim>(&token, &DecodingKey::from_secret(JWT_SECRET.to_string().as_bytes()), 
+    match decode::<JWTClaim>(&token, &DecodingKey::from_secret(JWT_SECRET.as_bytes()), 
                                               &validation) {
-        Ok(data) => Ok(data.claims),
+        Ok(data) => { Ok(data.claims)},
         Err(_) => Err(())
     }
 }
