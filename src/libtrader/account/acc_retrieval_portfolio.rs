@@ -10,6 +10,21 @@ use crate::ds::message::message::Message;
 use crate::ds::message::message_type::MessageType;
 use crate::ds::message::inst::{DataTransferInst};
 
+/// Retrieves from the connected TLS server a portfolio.
+///
+/// Arguments:
+/// tls_client - TlS client to use containing the JWT token to authorize.
+/// poll - For event handling.
+///
+/// Returns: portfolio on success, string on error containing reason of failure.
+///
+/// Example:
+/// ```rust
+///     match acc_retrieve_portfolio(&mut tls_client, &mut poll) {
+///         Ok(portfolio) => {/* interesting stuff with portfolio */},
+///         Err(err) => panic!("can not retrieve portfolio! error: {}", err)
+///     }
+/// ```
 pub fn acc_retrieve_portfolio(tls_client: &mut TlsClient, poll: &mut mio::Poll) -> Result<Portfolio, String> {
     assert_eq!(tls_client.auth_jwt.is_empty(), false);
 
