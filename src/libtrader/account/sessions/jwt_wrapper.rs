@@ -59,3 +59,22 @@ pub fn verify_jwt_token(token: String) -> Result<JWTClaim, ()> {
         Err(_) => Err(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_create_jwt_token() {
+        use std::time::{SystemTime, UNIX_EPOCH, Duration};
+        let start = SystemTime::now() + Duration::from_secs(4*60*60);
+        match create_jwt_token(1usize, start.duration_since(UNIX_EPOCH).unwrap().as_secs() as usize) {
+            Ok(token) => {
+                let claims = verify_jwt_token(token).unwrap();
+                assert_eq!(claims.user_id, 1usize);
+                assert_eq!(claims.exp, start.duration_since(UNIX_EPOCH).unwrap().as_secs() as usize);
+            },
+            Err(_) => panic!("TEST_CREATE_JWT_TOKEN_FAILED")
+        }
+    }
+}
