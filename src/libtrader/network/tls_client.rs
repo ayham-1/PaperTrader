@@ -25,7 +25,8 @@ pub struct TlsClient {
     pub clean_closure: bool,
     pub branch_ctrl: bool,
     pub read_plaintext: Vec<u8>,
-    pub tls_session: rustls::ClientSession
+    pub tls_session: rustls::ClientSession,
+    pub auth_jwt: String,
 }
 
 impl TlsClient {
@@ -46,6 +47,7 @@ impl TlsClient {
             branch_ctrl: false,
             read_plaintext: Vec::new(),
             tls_session: rustls::ClientSession::new(&cfg, hostname),
+            auth_jwt: String::default()
         }
     }
 
