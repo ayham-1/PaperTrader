@@ -10,6 +10,27 @@ use crate::ds::message::inst::CommandInst;
 
 use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
 
+/// Issues a command to the connected TLS server to obtain a stored salt for either email or
+/// password.
+///
+/// All salts returned are of size ```digest::SHA512_OUTPUT_LEN``` or 64 bytes.
+///
+/// Arguments:
+/// tls_client - The TLS connection to use for the salt.
+/// poll - The mio::Poll used to handle branched control of the TLS client events.
+/// username - The username to obtain the salt.
+/// salt_type - The CommmandInst, either GetEmailSalt, or GetPasswordSalt.
+///
+/// Returns: a [u8; 64] on success, and a string on error containing the reason of failure.
+///
+/// Example:
+/// ```rust
+///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match req_server_salt(tls_client, poll, "n1ckn8me", 
+///                                                                     CommandInst::GetEmailSalt) {
+///         Ok(salt) => salt,
+///         Err(err) => panic!("could not retrieve email salt; err: {}", errj)
+///     };
+/// ```
 pub fn req_server_salt(tls_client: &mut TlsClient, poll: &mut mio::Poll, username: &str, salt_type: i64) -> 
 Result<[u8; digest::SHA512_OUTPUT_LEN], String> {
     /* enforce salt_type to be either email or password */

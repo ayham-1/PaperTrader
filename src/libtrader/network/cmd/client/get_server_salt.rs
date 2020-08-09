@@ -15,10 +15,10 @@ use crate::ds::message::inst::{CommandInst};
 /// All salts returned are of size ```digest::SHA512_OUTPUT_LEN/2``` or 32 bytes.
 ///
 /// Arguments:
-/// tls_client - The TLS connection to as for the salt.
+/// tls_client - The TLS connection to use for the salt.
 /// poll - The mio::Poll used to handle branched control of the TLS client.
 ///
-/// Returns: a [u8; 32] on success, and a string on failure containing the reason of failure.
+/// Returns: a [u8; 32] on success, and a string on error containing the reason of failure.
 ///
 /// Example:
 /// ```rust
