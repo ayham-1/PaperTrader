@@ -83,7 +83,7 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
         },
-        Err(err) => return Err(format!("ACC_CREATE_MESSAGE_BUILD_FAILED: {}", err))
+        Err(_) => return Err("ACC_CREATE_MESSAGE_BUILD_FAILED".to_string())
     };
 
     /* wait for response */

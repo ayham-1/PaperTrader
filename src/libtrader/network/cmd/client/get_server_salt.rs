@@ -46,6 +46,6 @@ Result<[u8; digest::SHA512_OUTPUT_LEN/2], String> {
             assert_eq!(ret_msg.data.len(), digest::SHA512_OUTPUT_LEN/2);
             Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN/2))
         },
-        Err(err) => Err(format!("AUTH_SALT_RETRIEVAL_FAILED: {}", err))
+        Err(_) => Err("AUTH_SALT_RETRIEVAL_MESSAGE_FAILED".to_string())
     }
 }

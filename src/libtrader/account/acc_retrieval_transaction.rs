@@ -37,7 +37,7 @@ pub fn acc_retrieve_transaction(tls_client: &mut TlsClient, poll: &mut mio::Poll
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
         },
-        Err(err) => return Err(err),
+        Err(_) => return Err("ACC_RETRIEVE_TRANSACTION_FAILED_MESSAGE".to_string()),
     };
 
     /* wait for response */
@@ -54,6 +54,6 @@ pub fn acc_retrieve_transaction(tls_client: &mut TlsClient, poll: &mut mio::Poll
             return Ok(transactions);
         } else {
             /* could not get data */
-            return Err("ACC_RETRIEVAL_TRANSACTION_UNAUTHORIZED".to_string());
+            return Err("ACC_RETRIEVE_TRANSACTION_UNAUTHORIZED".to_string());
         }
 }
