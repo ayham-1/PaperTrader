@@ -1,6 +1,6 @@
-use ring::{digest, pbkdf2};
-use std::num::NonZeroU32;
 use std::io::Write;
+
+use crate::account::hash::hash;
 
 use crate::network::tls_client::TlsClient;
 use crate::network::cmd::client::req_server_salt::req_server_salt;
@@ -47,31 +47,21 @@ pub fn acc_auth_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     /*
      * hash the email
      */
-    let mut hashed_email = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        NonZeroU32::new(175_000).unwrap(),
-        &email_salt,
-        email.as_bytes(),
-        &mut hashed_email);
+    let hashed_email = hash(email, email_salt.to_vec(), 175_000);
 
     /*
      * hash the password
      */
-    let mut hashed_password = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        NonZeroU32::new(250_000).unwrap(),
-        &password_salt,
-        password.as_bytes(),
-        &mut hashed_password);
+    let hashed_password = hash(password, password_salt.to_vec(), 250_000);
 
     /* generate message to be sent to the server */
     let mut data = Vec::new();
     data.append(&mut bincode::serialize(&email_salt.to_vec()).unwrap());
+    data.append(&mut bincode::serialize(&hashed_email.to_vec()).unwrap());
     data.append(&mut bincode::serialize(&password_salt.to_vec()).unwrap());
+    data.append(&mut bincode::serialize(&hashed_password.to_vec()).unwrap());
     data.append(&mut bincode::serialize(&username.as_bytes()).unwrap());
-    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 3, 0, 0, data) {
+    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 5, 0, 0, data) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
 
