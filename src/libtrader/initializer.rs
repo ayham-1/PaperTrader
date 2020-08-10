@@ -125,6 +125,15 @@ pub fn libtrader_init_server() -> Result<GlobalState, String> {
     }
 }
 
+/// Client Initialization of the library.
+///
+/// Public function that initializes the library, and connects to a libtrader server
+/// This funciton should not return.
+///
+/// Example:
+/// ```rust
+///     libtrader_init_client()?;
+/// ```
 #[cfg(feature="client")]
 pub fn libtrader_init_client() -> Result<GlobalState, String> {
     use mio::net::TcpStream;
