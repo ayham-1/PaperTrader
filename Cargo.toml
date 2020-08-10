@@ -18,9 +18,8 @@ test = false
 bench = false
 
 [features]
-default = ["master_server"]
-master_server = []
-worker_server = []
+default = ["server"]
+server = []
 client = []
 tls_no_verify = ["rustls/dangerous_configuration"]
 

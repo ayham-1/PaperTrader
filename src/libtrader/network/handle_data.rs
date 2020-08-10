@@ -3,7 +3,7 @@ use either::*;
 use crate::network::tls_connection::TlsConnection;
 use crate::network::tls_client::TlsClient;
 
-#[cfg(feature="master_server")]
+#[cfg(feature="server")]
 pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> Result<(), String> {
     use ring::rand::SecureRandom;
     use ring::{digest, rand};
@@ -75,12 +75,6 @@ pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8])
         _ => {}
     };
         
-    Ok(())
-}
-
-#[cfg(feature="worker_server")]
-pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, _buf: &[u8]) -> Result<(), String> {
-    assert_eq!(conn.is_left(), true);
     Ok(())
 }
 

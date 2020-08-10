@@ -1,6 +1,6 @@
 use std::io;
 use std::net;
-use std::io::{Read};
+use std::io::Read;
 
 use mio;
 use mio::net::TcpStream;
