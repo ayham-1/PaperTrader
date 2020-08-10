@@ -1,8 +1,5 @@
-use std::io::Write;
-
 use mio;
 use mio::net::TcpStream;
-use data_encoding::HEXUPPER;
 
 use libtrader::network::tls_client::TlsClient;
 use libtrader::misc::gen_tls_client_config::gen_tls_client_config;

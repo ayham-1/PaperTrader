@@ -1,3 +1,4 @@
+#[cfg(not(feature="client"))]
 use crate::account::sessions::jwt_claim::JWTClaim;
 
 /// Encodes a JWT token.

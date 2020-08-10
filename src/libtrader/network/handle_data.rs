@@ -1,19 +1,18 @@
 use either::*;
-use ring::rand::SecureRandom;
-use ring::{digest, rand};
-
-use std::io::Write;
 
 use crate::network::tls_connection::TlsConnection;
 use crate::network::tls_client::TlsClient;
 
-use crate::parser::message_builder::message_builder;
-use crate::ds::message::message::Message;
-use crate::ds::message::message_type::MessageType;
-use crate::ds::message::inst::CommandInst;
-
 #[cfg(feature="master_server")]
 pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> Result<(), String> {
+    use ring::rand::SecureRandom;
+    use ring::{digest, rand};
+    use std::io::Write;
+    use crate::parser::message_builder::message_builder;
+    use crate::ds::message::message::Message;
+    use crate::ds::message::message_type::MessageType;
+    use crate::ds::message::inst::CommandInst;
+
     assert_eq!(conn.is_left(), true);
     let connection = conn.left().unwrap();
 
