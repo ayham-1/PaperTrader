@@ -1,16 +1,3 @@
-use std::io::Write;
-
-use crate::account::hash::hash;
-
-use crate::network::tls_client::TlsClient;
-use crate::network::cmd::client::req_server_salt::req_server_salt;
-use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
-
-use crate::parser::message_builder::message_builder;
-use crate::ds::message::message_type::MessageType;
-use crate::ds::message::message::Message;
-use crate::ds::message::inst::CommandInst;
-
 /// Client authentication procedure.
 ///
 /// Takes in the username, email and password. Data is hashed and then sent to the server for
@@ -25,8 +12,21 @@ use crate::ds::message::inst::CommandInst;
 /// password - The raw password to be used.
 ///
 /// Returns: nothing.
-pub fn acc_auth_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
+#[cfg(feature="client")]
+pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
                        username: &str, email: &str, password: &str) -> Result<(), String> {
+    use std::io::Write;
+
+    use crate::account::hash::hash;
+
+    use crate::network::tls_client::TlsClient;
+    use crate::network::cmd::client::req_server_salt::req_server_salt;
+    use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
+
+    use crate::parser::message_builder::message_builder;
+    use crate::ds::message::message_type::MessageType;
+    use crate::ds::message::message::Message;
+    use crate::ds::message::inst::CommandInst;
     /*
      * get email salt
      * */
@@ -89,4 +89,5 @@ pub fn acc_auth_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
 
 }
 
-pub fn acc_auth_server() -> Result<(), String> { Ok(()) }
+#[cfg(not(feature="client"))]
+pub fn acc_auth() -> Result<(), String> { Ok(()) }
