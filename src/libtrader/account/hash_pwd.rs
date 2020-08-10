@@ -1,6 +1,7 @@
 use ring::rand::SecureRandom;
-use ring::{digest, pbkdf2, rand};
-use std::num::NonZeroU32;
+use ring::{digest, rand};
+
+use crate::account::hash::hash;
 
 /// Generates a client password hash from a raw password.
 ///
@@ -23,8 +24,6 @@ use std::num::NonZeroU32;
 /// ```
 pub fn hash_pwd_client(pass: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) -> 
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()> { // client hash, client random bits
-    let client_iter: NonZeroU32 = NonZeroU32::new(250_000).unwrap();
-
     let rng = rand::SystemRandom::new();
 
     let mut client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
@@ -32,13 +31,7 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 
     let salt = [server_salt, client_salt].concat();
 
-    let mut hash = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        client_iter,
-        &salt,
-        pass.as_bytes(),
-        &mut hash);
+    let hash = hash(pass, salt, 250_000);
 
     Ok((hash, client_salt))
 }
@@ -62,21 +55,12 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 /// ```
 pub fn hash_pwd_server(hashed_pass: &str) -> 
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> { // sever hash, server salt
-    let client_iter: NonZeroU32 = NonZeroU32::new(500_000).unwrap();
-    
     let rng = rand::SystemRandom::new();
 
     let mut salt = [0u8; digest::SHA512_OUTPUT_LEN];
     rng.fill(&mut salt).unwrap();
 
-    let mut hash = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        client_iter,
-        &salt,
-        hashed_pass.as_bytes(),
-        &mut hash);
-
+    let hash = hash(hashed_pass, salt.to_vec(), 500_000);
     Ok((hash, salt))
 }
 
