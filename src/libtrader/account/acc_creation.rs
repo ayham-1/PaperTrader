@@ -1,7 +1,8 @@
 use ring::rand::SecureRandom;
-use ring::{digest, pbkdf2, rand};
-use std::num::NonZeroU32;
+use ring::{digest, rand};
 use std::io::Write;
+
+use crate::account::hash::hash;
 
 use crate::network::cmd::client::get_server_salt::get_server_salt;
 use crate::network::tls_client::TlsClient;
@@ -65,24 +66,10 @@ pub fn acc_create_client(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     let password_salt = [password_server_salt, password_client_salt].concat();
 
     /*
-     * generate three hashes for email, password
+     * generate hashes for email, password
      * */
-    let mut email_hash = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        NonZeroU32::new(175_000).unwrap(),
-        &email_salt,
-        email.as_bytes(),
-        &mut email_hash);
-    let mut password_hash = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        NonZeroU32::new(250_000).unwrap(),
-        &password_salt,
-        password.as_bytes(),
-        &mut password_hash);
-    
-    println!("generated");
+    let email_hash = hash(email, email_salt, 175_000);
+    let password_hash = hash(password, password_salt, 250_000);
 
     /* generate message to be sent to the server */
     let mut data = Vec::new();
