@@ -1,19 +1,3 @@
-use ring::rand::SecureRandom;
-use ring::{digest, rand};
-use std::io::Write;
-
-use crate::account::hash::hash;
-
-use crate::network::cmd::client::get_server_salt::get_server_salt;
-use crate::network::tls_client::TlsClient;
-
-use crate::parser::message_builder::message_builder;
-use crate::ds::message::message::Message;
-use crate::ds::message::message_type::MessageType;
-use crate::ds::message::inst::{CommandInst};
-
-use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
-
 /// Requests a TLS server to create an account.
 ///
 /// Gets three server salts, generates three new salts, cancatenates both salts, and use the
@@ -36,8 +20,25 @@ use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched
 ///         Err(err) => panic!("panik {}", err),
 ///     }
 /// ```
-pub fn acc_create_client(tls_client: &mut TlsClient, poll: &mut mio::Poll, 
+#[allow(unused_imports)]
+use crate::network::tls_client::TlsClient;
+#[cfg(feature="client")]
+pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll, 
                   username: &str, email: &str, password: &str) -> Result<(), String> {
+    use ring::rand::SecureRandom;
+    use ring::{digest, rand};
+    use std::io::Write;
+
+    use crate::account::hash::hash;
+
+    use crate::network::cmd::client::get_server_salt::get_server_salt;
+
+    use crate::parser::message_builder::message_builder;
+    use crate::ds::message::message::Message;
+    use crate::ds::message::message_type::MessageType;
+    use crate::ds::message::inst::{CommandInst};
+
+    use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
     /*
      * get three server salts for email, and password
      * */
