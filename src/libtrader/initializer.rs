@@ -125,6 +125,44 @@ pub fn libtrader_init_server() -> Result<GlobalState, String> {
     }
 }
 
+#[cfg(feature="client")]
+pub fn libtrader_init_client() -> Result<GlobalState, String> {
+    use mio;
+    use mio::net::TcpStream;
+
+    use crate::network::tls_client::TlsClient;
+    use crate::misc::gen_tls_client_config::gen_tls_client_config;
+    use crate::misc::lookup_ipv4::lookup_ipv4;
+
+    use crate::account::acc_auth::acc_auth;
+
+    let addr = lookup_ipv4("0.0.0.0", 4000);
+    let config = gen_tls_client_config();
+    
+    let sock = match TcpStream::connect(addr) {
+        Ok(socket) => socket,
+        Err(err) => {
+            error!("LIBTRADER_INIT_CLIENT_CONNECT_FAILED: {}", err);
+            return Err("could not connect to server!");
+        }
+    };
+    let dns_name = webpki::DNSNameRef::try_from_ascii_str().unwrap();
+    let mut tls_client = TlsClient::new(sock, dns_name, config);
+
+    let mut poll = mio::Poll::new().unwrap();
+    let mut events = mio::Events::with_capacity(32);
+    tls_client.register(poll.registry());
+
+    loop {
+        poll.poll(&mut events, None).unwrap();
+
+        for ev in &events {
+            tls_client.ready(&ev);
+            tls_client.reregister(poll.registry());
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::db::config::{DB_USER, DB_PASS};
