@@ -83,6 +83,15 @@ pub fn libtrader_init() -> Result<GlobalState, String> {
     Ok(state)
 }
 
+/// Server Initialization of the library.
+///
+/// Public function that initializes the library, and starts the libtrader server.
+/// This function should not return.
+///
+/// Example:
+/// ```rust
+///     libtrader_init_server()?;
+/// ```
 #[cfg(feature="server")]
 pub fn libtrader_init_server() -> Result<GlobalState, String> {
     use std::net;
