@@ -1,7 +1,7 @@
 use crate::db::config::{DB_USER, DB_PASS};
 use crate::db::initializer::db_connect;
-use crate::ds::server::global_state::GlobalState;
 use crate::ds::generic::company::Company;
+use crate::ds::generic::global_state::GlobalState;
 
 /// Returns a company from the postgres SQL database.
 ///

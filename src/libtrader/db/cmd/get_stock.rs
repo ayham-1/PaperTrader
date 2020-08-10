@@ -1,6 +1,6 @@
 use crate::db::config::{DB_USER, DB_PASS};
 use crate::db::initializer::db_connect;
-use crate::ds::server::global_state::GlobalState;
+use crate::ds::generic::global_state::GlobalState;
 use crate::ds::generic::stock_val::StockVal;
 
 /// Returns the whole stock data from the postgres SQL database.

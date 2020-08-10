@@ -2,7 +2,7 @@
 use crate::misc::gen_log::gen_log;
 use crate::misc::path_exists::path_exists;
 use crate::db::initializer::db_init;
-use crate::ds::server::global_state::GlobalState;
+use crate::ds::generic::global_state::GlobalState;
 
 /// Initializes global logger.
 ///
@@ -26,8 +26,7 @@ fn libtrader_init_log() -> Result<(), String> {
     #[cfg(not(debug_assertions))]
     gen_log();
 
-    #[cfg(debug_assertions)]
-    {
+    #[cfg(debug_assertions)] {
         use simplelog::*;
         use std::fs::File;
 
@@ -84,6 +83,10 @@ pub fn libtrader_init() -> Result<GlobalState, String> {
     Ok(state)
 }
 
+pub fn libtrader_init_server() -> Result<GlobalState, String> {
+    let mut state: GlobalState = libtrader_init()?;
+    Ok(state)
+}
 
 #[cfg(test)]
 mod test {
