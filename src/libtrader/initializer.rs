@@ -83,16 +83,44 @@ pub fn libtrader_init() -> Result<GlobalState, String> {
     Ok(state)
 }
 
+#[cfg(feature="server")]
 pub fn libtrader_init_server() -> Result<GlobalState, String> {
-    let mut state: GlobalState = libtrader_init()?;
-    Ok(state)
+    use std::net;
+    use mio::net::TcpListener;
+
+    use crate::network::tls_server::TlsServer;
+    use crate::misc::gen_tls_server_config::gen_tls_server_config;
+    let _state: GlobalState = libtrader_init()?;
+    
+    let addr: net::SocketAddr = "0.0.0.0:4000".parse().unwrap();
+    let config = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);
+
+    let mut listener = TcpListener::bind(addr).expect("LIBTRADER_INIT_SERVER_FAILED");
+    let mut poll = mio::Poll::new().unwrap();
+
+    poll.registry().register(&mut listener, mio::Token(0), mio::Interest::READABLE).unwrap();
+
+    let mut tls_server = TlsServer::new(listener, config);
+    let mut events = mio::Events::with_capacity(256);
+    loop {
+        poll.poll(&mut events, None).unwrap();
+
+        for event in &events {
+            match event.token() {
+                mio::Token(0) => {
+                    tls_server.accept(poll.registry()).expect("error accepting socket");
+                },
+                _ => tls_server.conn_event(poll.registry(), &event)
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
     use crate::db::config::{DB_USER, DB_PASS};
     use crate::db::initializer::{db_connect};
-    use crate::ds::server::global_state::GlobalState;
+    use crate::ds::generic::global_state::GlobalState;
     use crate::ds::generic::company::Company;
 
    use super::*;

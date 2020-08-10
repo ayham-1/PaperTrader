@@ -88,7 +88,8 @@ fn load_ocsp(filename: &Option<&str>) -> Vec<u8> {
 /// ```rust
 ///      let config = gen_tls_server_config("tests.crt", "priv.key", None);
 /// ```
-pub fn gen_tls_server_config(certs_file: &str, priv_key_file: &str, ocsp_key_file: Option<&str>) -> Arc<rustls::ServerConfig> {
+pub fn gen_tls_server_config(certs_file: &str, priv_key_file: &str, ocsp_key_file: Option<&str>) -> 
+Arc<rustls::ServerConfig> {
     let mut config = rustls::ServerConfig::new(NoClientAuth::new());
     config.key_log = Arc::new(rustls::KeyLogFile::new());
 

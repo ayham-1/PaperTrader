@@ -1,8 +1,8 @@
 extern crate log;
 extern crate simplelog;
 
-#[cfg(feature="server")]
-pub mod tls_server_sandbox;
+//#[cfg(feature="server")]
+//pub mod tls_server_sandbox;
 #[cfg(feature="client")]
 pub mod tls_client_sandbox;
 
@@ -23,7 +23,10 @@ fn main() {
     }
 
     #[cfg(feature="server")]
-    tls_server_sandbox::tls_main();
+    use libtrader::initializer::libtrader_init_server;
+    #[cfg(feature="server")]
+    libtrader_init_server().unwrap();
+
     #[cfg(feature="client")]
     tls_client_sandbox::tls_main();
 }
