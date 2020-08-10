@@ -1,6 +1,7 @@
 use ring::rand::SecureRandom;
-use ring::{digest, pbkdf2, rand};
-use std::num::NonZeroU32;
+use ring::{digest, rand};
+
+use crate::account::hash::hash;
 
 /// Generates a client email hash from a raw email.
 ///
@@ -12,7 +13,7 @@ use std::num::NonZeroU32;
 ///
 /// Arguments:
 /// email - The raw user email to be hashed.
-/// server_salt - The server's part sent of the salt.
+/// server_salt - The server's p&art sent of the salt.
 ///
 /// Returns: a tuple containing the client hash and client's random salt, nothing on failure.
 ///
@@ -24,8 +25,6 @@ use std::num::NonZeroU32;
 /// ```
 pub fn hash_email_client(email: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) ->
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()> { // client hash, client random bits
-    let client_iter: NonZeroU32 = NonZeroU32::new(175_000).unwrap();
-
     let rng = rand::SystemRandom::new();
 
     let mut client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
@@ -33,14 +32,7 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 
     let salt = [server_salt, client_salt].concat();
 
-    let mut hash = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        client_iter,
-        &salt,
-        email.as_bytes(),
-        &mut hash);
-
+    let hash = hash(email, salt, 175_000);
     Ok((hash, client_salt))
 }
 
@@ -63,21 +55,12 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 /// ```
 pub fn hash_email_server(hashed_email: &str) ->
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> {
-    let client_iter: NonZeroU32 = NonZeroU32::new(350_000).unwrap();
-
     let rng = rand::SystemRandom::new();
 
     let mut salt = [0u8; digest::SHA512_OUTPUT_LEN];
     rng.fill(&mut salt).unwrap();
 
-    let mut hash = [0u8; digest::SHA512_OUTPUT_LEN];
-    pbkdf2::derive(
-        pbkdf2::PBKDF2_HMAC_SHA512,
-        client_iter,
-        &salt,
-        hashed_email.as_bytes(),
-        &mut hash);
-
+    let hash = hash(hashed_email, salt.to_vec(), 350_000);
     Ok((hash, salt))
 }
 
