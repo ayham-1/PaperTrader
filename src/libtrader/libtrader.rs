@@ -1,6 +1,10 @@
 #[cfg(feature="client")] #[macro_use] extern crate log;
 #[cfg(feature="client")] #[macro_use] extern crate arrayref;
-//#[macro_use] extern crate lazy_static;
+
+#[cfg(feature="server")] #[macro_use] extern crate log;
+#[cfg(feature="server")] extern crate arrayref;
+
+#[cfg(featue="server")] #[macro_use] extern crate lazy_static;
 extern crate simplelog;
 extern crate os_type;
 extern crate bincode;

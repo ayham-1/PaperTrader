@@ -1,19 +1,11 @@
-use either::*;
+use crate::common::message::message::Message;
+use crate::common::message::inst::CommandInst;
 
-use crate::network::tls_connection::TlsConnection;
-use crate::network::tls_client::TlsClient;
+use crate::server::network::tls_connection::TlsConnection;
+use crate::server::network::cmd::register::register;
 
-pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> 
+pub fn handle_data(connection: &mut TlsConnection, buf: &[u8]) -> 
 Result<(), String> {
-    use crate::ds::message::message::Message;
-    use crate::ds::message::inst::CommandInst;
-    
-    use crate::network::cmd::server::register::register;
-
-    /* keep CocRust happy */
-    assert_eq!(conn.is_left(), true);
-    let connection = conn.left().unwrap();
-
     /* decode incoming message */
     let client_response: Message = match bincode::deserialize(&buf) {
         Ok(msg) => msg,

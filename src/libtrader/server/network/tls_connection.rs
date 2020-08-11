@@ -6,9 +6,8 @@ use mio;
 use mio::net::TcpStream;
 use rustls;
 use rustls::Session;
-use either::*;
 
-use crate::network::handle_data::handle_data;
+use crate::server::network::handle_data::handle_data;
 
 /// The TlsConnection struct that represents a tls connection.
 ///
@@ -141,7 +140,7 @@ impl TlsConnection {
     ///
     /// Dispatches decrypted TLS data to ```handle_data()```.
     fn incoming_plaintext(&mut self, buf: &[u8]) {
-        match handle_data(Either::Left(self), buf) {
+        match handle_data(self, buf) {
             Ok(()) => {},
             Err(err) => error!("Error processing TLS connection: {}", err)
         }

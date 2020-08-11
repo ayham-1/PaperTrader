@@ -1,8 +1,9 @@
-#[allow(unused_imports)]
-use crate::misc::gen_log::gen_log;
-use crate::misc::path_exists::path_exists;
-use crate::db::initializer::db_init;
-use crate::ds::generic::global_state::GlobalState;
+use std::net;
+use mio::net::TcpListener;
+
+use crate::common::misc::path_exists::path_exists;
+use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
+use crate::server::network::tls_server::TlsServer;
 
 /// Initializes global logger.
 ///
@@ -50,39 +51,6 @@ fn libtrader_init_log() -> Result<(), String> {
     Ok(())
 }
 
-/// Generic Initialization of the library.
-///
-/// Public function that globaly initializes the library. Initializes log, and database.
-///
-/// Returns: ``GlobalState``` on success, and a string containing the reason
-/// of failure.
-///
-/// Example:
-/// ```rust
-///     match libtrader_init() {
-///         Ok(state) => println!("here is the initialized state: {}", state),
-///         Err(err) => panic!("failed initializing libtrader, reason: {}", err)
-///     };
-/// ```
-pub fn libtrader_init() -> Result<GlobalState, String> {
-    let mut state: GlobalState = GlobalState::default();
-
-    // Initialize log.
-    #[cfg(not(test))]
-    match libtrader_init_log() {
-        Ok(()) => {},
-        Err(err) => panic!("This should not happen!\n{}", err),
-    };
-
-    // Initialize database.
-    match db_init(&mut state) {
-        Ok(()) => info!("Initialized database."),
-        Err(err) => return Err(format!("INIT_DB_FAILED: {}", err))
-    }
-
-    Ok(state)
-}
-
 /// Server Initialization of the library.
 ///
 /// Public function that initializes the library, and starts the libtrader server.
@@ -93,14 +61,13 @@ pub fn libtrader_init() -> Result<GlobalState, String> {
 ///     libtrader_init_server()?;
 /// ```
 #[cfg(feature="server")]
-pub fn libtrader_init_server() -> Result<GlobalState, String> {
-    use std::net;
-    use mio::net::TcpListener;
-
-    use crate::network::tls_server::TlsServer;
-    use crate::misc::gen_tls_server_config::gen_tls_server_config;
-    let _state: GlobalState = libtrader_init()?;
-    
+pub fn libtrader_init_server() -> Result<(), String> {
+    // Initialize log.
+    #[cfg(not(test))]
+    match libtrader_init_log() {
+        Ok(()) => {},
+        Err(err) => panic!("This should not happen!\n{}", err),
+    };
     let addr: net::SocketAddr = "0.0.0.0:4000".parse().unwrap();
     let config = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);
 

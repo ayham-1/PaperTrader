@@ -6,7 +6,7 @@ use mio;
 use mio::net::TcpListener;
 use rustls;
 
-use crate::network::tls_connection::TlsConnection;
+use crate::server::network::tls_connection::TlsConnection;
 
 /// The TlsServer struct that represents a working TLS Server
 ///

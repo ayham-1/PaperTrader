@@ -1,4 +1,6 @@
-#[cfg(not(feature="client"))]
+use jsonwebtoken::{encode, EncodingKey, decode, DecodingKey, Header, Algorithm, Validation};
+use crate::common::sessions::jwt_claim::JWTClaim;
+
 pub static JWT_SECRET: &'static str = "seecreet";
 
 /// Encodes a JWT token.
@@ -16,11 +18,7 @@ pub static JWT_SECRET: &'static str = "seecreet";
 /// ```rust
 ///     let token = create_jwt_token(auth_user_id, unix_expiry_epoch).unwrap();
 /// ```
-#[cfg(not(feature="client"))]
 pub fn create_jwt_token(user_id: usize, exp: usize) -> Result<String, String> {
-    use crate::account::sessions::jwt_claim::JWT_SECRET;
-    use jsonwebtoken::{encode, EncodingKey, Header, Algorithm};
-
     let mut header = Header::default();
     header.alg = Algorithm::HS512;
 
@@ -47,11 +45,7 @@ pub fn create_jwt_token(user_id: usize, exp: usize) -> Result<String, String> {
 /// ```rust
 ///     assert_eq!(verify_jwt_token(token).unwrap(), true);
 /// ```
-#[cfg(not(feature="client"))]
 pub fn verify_jwt_token(token: String) -> Result<JWTClaim, ()> {
-    use crate::account::sessions::jwt_claim::JWT_SECRET;
-    use jsonwebtoken::{decode, DecodingKey, Validation, Algorithm};
-
     let mut validation = Validation::new(Algorithm::HS512);
     validation.leeway = 25;
     match decode::<JWTClaim>(&token, &DecodingKey::from_secret(JWT_SECRET.as_bytes()), 

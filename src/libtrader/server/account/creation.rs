@@ -1,17 +1,13 @@
-use crate::network::tls_connection::TlsConnection;
-use crate::ds::message::message::Message;
-use crate::ds::generic::global_state::GLOBAL_STATE;
+use crate::common::message::message::Message;
+use crate::common::account::portfolio::Portfolio;
 
-pub fn acc_create(tls_connection: &mut TlsConnection, 
-                  message: &Message) -> Result<(), String> {
-    use crate::ds::account::portfolio::Portfolio;
-    use crate::ds::account::account::Account;
-    use crate::db::initializer::db_connect;
-    use crate::db::config::{DB_ACC_USER, DB_ACC_PASS};
+use crate::server::account::hash_email::hash_email;
+use crate::server::account::hash_pwd::hash_pwd;
+use crate::server::ds::account::Account;
+use crate::server::db::initializer::db_connect;
+use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
 
-    use crate::account::hash_email::hash_email;
-    use crate::account::hash_pwd::hash_pwd;
-
+pub fn acc_create(message: &Message) -> Result<(), String> {
     /*
      * Parse account data
      * */
@@ -45,10 +41,10 @@ pub fn acc_create(tls_connection: &mut TlsConnection,
      * check if username is available in the database 
      * */
     /* connect to database */
-    let mut client = db_connect(&mut GLOBAL_STATE.lock().unwrap(), DB_ACC_USER, DB_ACC_PASS)?;
+    let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
 
     /* search for an account with same name */
-    for row in &client.query(
+    for _ in &client.query(
         "SELECT username FROM accounts_schema.accounts WHERE username IS ($1)", &[&account.username]).unwrap() {
         return Err("ACC_CREATE_FAILED_USERNAME_EXISTS".to_string());
     }

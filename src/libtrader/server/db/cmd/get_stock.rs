@@ -1,33 +1,31 @@
-use crate::db::config::{DB_USER, DB_PASS};
-use crate::db::initializer::db_connect;
-use crate::ds::generic::global_state::GlobalState;
-use crate::ds::generic::stock_val::StockVal;
+use crate::server::db::config::{DB_USER, DB_PASS};
+use crate::server::db::initializer::db_connect;
+use crate::common::generic::stock_val::StockVal;
 
 /// Returns the whole stock data from the postgres SQL database.
 ///
 /// Takes in a stock symbol and returns the whole data entries of the searched stock.
 ///
 /// Arguments:
-/// state - The global state used.
 /// searched_symbol - The name of the stock table.
 ///
 /// Returns: a Vec<StockVal> on success, and a string containing the reason of failure on error.
 ///
 /// Example:
 /// ```rust
-///    match get_stock_from_db(&mut state, "AAPL".into()) {
+///    match get_stock_from_db("AAPL".into()) {
 ///         Ok(vals) => {
 ///             /* do something with the values */
 ///         },
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///   };
 /// ```
-pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Result<Vec<StockVal>, String> {
+pub fn get_stock_from_db(searched_symbol: String) -> Result<Vec<StockVal>, String> {
     /*
      * Returns all stock values from database.
      */
     // Connect to database.
-    let mut client = db_connect(state, DB_USER, DB_PASS)?;
+    let mut client = db_connect(DB_USER, DB_PASS)?;
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
@@ -54,7 +52,6 @@ pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Re
 /// Takes in a stock symbol and returns the data entries after a specified epoch of the searched stock.
 ///
 /// Arguments:
-/// state - The global state used.
 /// searched_symbol - The name of the stock table.
 /// time_epoch - The time from which the stock data retrieved. 
 ///
@@ -62,20 +59,19 @@ pub fn get_stock_from_db(state: &mut GlobalState, searched_symbol: String) -> Re
 ///
 /// Example:
 /// ```rust
-///     match get_stock_from_db_since_epoch(&mut state, "AAPL".into(), 123456) {
+///     match get_stock_from_db_since_epoch("AAPL".into(), 123456) {
 ///         Ok(vals) => {
 ///             /* do something with the filtered values */
 ///         },
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///     };
 /// ```
-pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: String, 
-                                     time_epoch: i64) -> Result<Vec<StockVal>, String> {
+pub fn get_stock_from_db_since_epoch(searched_symbol: String, time_epoch: i64) -> Result<Vec<StockVal>, String> {
     /*
      * Returns all stock values from database since a time epoch.
      */
     // Connect to database.
-    let mut client = db_connect(state, DB_USER, DB_PASS)?;
+    let mut client = db_connect(DB_USER, DB_PASS)?;
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
@@ -104,7 +100,6 @@ pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: S
 /// stock.
 ///
 /// Arguments:
-/// state - The global state used.
 /// searched_symbol - The name of the stock table.
 /// first_time_epoch - The time from which the stock data is first retrieved.
 /// second_time_epoch - The time from which the stock data ends.
@@ -113,20 +108,20 @@ pub fn get_stock_from_db_since_epoch(state: &mut GlobalState, searched_symbol: S
 ///
 /// Example:
 /// ```rust
-///    match get_stock_from_db_between_epochs(&mut state, "AAPL".into(), 123456, 123459) {
+///    match get_stock_from_db_between_epochs("AAPL".into(), 123456, 123459) {
 ///         Ok(vals) => {
 ///             /* do something with the filtered values */
 ///         },
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///   };
 /// ```
-pub fn get_stock_from_db_between_epochs(state: &mut GlobalState, searched_symbol: String, first_time_epoch: i64, 
+pub fn get_stock_from_db_between_epochs(searched_symbol: String, first_time_epoch: i64, 
                                         second_time_epoch: i64) -> Result<Vec<StockVal>, String> {
     /*
      * Returns all stock values from database between two time epochs.
      */
     // Connect to database.
-    let mut client = db_connect(state, DB_USER, DB_PASS)?;
+    let mut client = db_connect(DB_USER, DB_PASS)?;
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
@@ -156,18 +151,15 @@ mod test {
     
     #[test]
     fn test_cmd_get_stock_from_db() {
-        /* create global state */
-        let mut state: GlobalState = GlobalState::default();
-
         /* create stock to be tested */
-        create_stock(&mut state, "haha").unwrap();
+        create_stock("haha").unwrap();
 
         /* insert some data into the stock */
-        let mut client = db_connect(&mut state, DB_USER, DB_PASS).unwrap();
+        let mut client = db_connect(DB_USER, DB_PASS).unwrap();
         client.execute("INSERT INTO asset_schema.haha VALUES (1, 999, 4, 50, 50, 10)", &[]).unwrap();
 
         /* test get_stock_from_db() */
-        match get_stock_from_db(&mut state, "haha".into()) {
+        match get_stock_from_db("haha".into()) {
             Ok(vals) => {
                 /* confirm that the data is correct */
                 assert_eq!(vals.len(), 1);
@@ -184,14 +176,11 @@ mod test {
 
     #[test]
     fn test_cmd_get_stock_from_db_since_epoch() {
-        /* create global state */
-        let mut state: GlobalState = GlobalState::default();
-        
         /* create stock to be tested */
-        create_stock(&mut state, "baba").unwrap();
+        create_stock("baba").unwrap();
 
         /* insert some data into the stock */
-        let mut client = db_connect(&mut state, DB_USER, DB_PASS).unwrap();
+        let mut client = db_connect(DB_USER, DB_PASS).unwrap();
         client.execute("INSERT INTO asset_schema.baba VALUES (1, 999, 4, 50, 50, 10)", &[]).unwrap();
         client.execute("INSERT INTO asset_schema.baba VALUES (2, 999, 5, 50, 50, 10)", &[]).unwrap();
         client.execute("INSERT INTO asset_schema.baba VALUES (3, 999, 6, 50, 50, 10)", &[]).unwrap();
@@ -199,7 +188,7 @@ mod test {
         client.execute("INSERT INTO asset_schema.baba VALUES (5, 999, 8, 50, 50, 10)", &[]).unwrap();
 
         /* test get_stock_from_db_since_epoch() */
-        match get_stock_from_db_since_epoch(&mut state, "baba".into(), 6) {
+        match get_stock_from_db_since_epoch("baba".into(), 6) {
             Ok(vals) => {
                 /* confirm that the data is correct */
                 let mut counter = 6;
@@ -219,14 +208,11 @@ mod test {
     
     #[test]
     fn test_cmd_get_stock_from_db_between_epochs() {
-        /* create global state */
-        let mut state: GlobalState = GlobalState::default();
-
         /* create stock to be tested */
-        create_stock(&mut state, "vava").unwrap();
+        create_stock("vava").unwrap();
 
         /* insert some data into the stock */
-        let mut client = db_connect(&mut state, DB_USER, DB_PASS).unwrap();
+        let mut client = db_connect(DB_USER, DB_PASS).unwrap();
         client.execute("INSERT INTO asset_schema.vava VALUES (1, 999, 4, 50, 50, 10)", &[]).unwrap();
         client.execute("INSERT INTO asset_schema.vava VALUES (2, 999, 5, 50, 50, 10)", &[]).unwrap();
         client.execute("INSERT INTO asset_schema.vava VALUES (3, 999, 6, 50, 50, 10)", &[]).unwrap();
@@ -234,7 +220,7 @@ mod test {
         client.execute("INSERT INTO asset_schema.vava VALUES (5, 999, 8, 50, 50, 10)", &[]).unwrap();
 
         /* test get_stock_from_db_between_epochs() */
-        match get_stock_from_db_between_epochs(&mut state, "vava".into(), 5, 7) {
+        match get_stock_from_db_between_epochs("vava".into(), 5, 7) {
             Ok(vals) => {
                 /* confirm that the data is correct */
                 assert_eq!(vals[0].id, 2);

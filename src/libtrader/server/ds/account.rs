@@ -1,5 +1,5 @@
-use crate::ds::account::portfolio::Portfolio;
-use crate::ds::account::transaction::Transaction;
+use crate::common::account::portfolio::Portfolio;
+use crate::common::account::transaction::Transaction;
 
 #[derive(PartialEq, Debug)]
 pub struct Account {
