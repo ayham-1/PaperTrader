@@ -4,9 +4,12 @@ use crate::network::tls_connection::TlsConnection;
 use crate::network::tls_client::TlsClient;
 
 #[cfg(feature="server")]
-pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> Result<(), String> {
+pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> 
+Result<(), String> {
     use crate::ds::message::message::Message;
     use crate::ds::message::inst::CommandInst;
+    
+    use crate::network::cmd::server::register::register;
 
     /* keep CocRust happy */
     assert_eq!(conn.is_left(), true);
@@ -24,7 +27,8 @@ pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8])
 
     /* handle individual client instructions */
     match client_response.instruction {
-        _ if client_response.instruction == CommandInst::Register as i64 => {},
+        _ if client_response.instruction == CommandInst::Register as i64 => 
+            register(connection, &client_response),
         _ => {}
     };
         

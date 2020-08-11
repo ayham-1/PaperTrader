@@ -165,6 +165,14 @@ pub fn libtrader_init_client() -> Result<GlobalState, String> {
         for ev in &events {
             tls_client.ready(&ev);
             tls_client.reregister(poll.registry());
+
+            if ev.token() == mio::Token(0) && ev.is_writable() {
+                use crate::account::acc_creation::acc_create;
+                match acc_create(&mut tls_client, &mut  poll, "test", "test", "test") {
+                    Ok(()) => println!("server returned yes"),
+                    Err(err) => panic!("panik {}", err),
+                }
+            }
         }
     }
 }

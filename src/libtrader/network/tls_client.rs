@@ -112,6 +112,7 @@ impl TlsClient {
                 self.read_plaintext = plaintext;
                 return;
             }
+            #[cfg(feature="client")]
             match handle_data(Either::Right(self), &plaintext) {
                 Ok(()) => {},
                 Err(err) => error!("Error handling data: {}", err)

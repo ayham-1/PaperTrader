@@ -5,7 +5,7 @@ use crate::ds::account::transaction::Transaction;
 pub struct Account {
     pub username: String,
 
-    pub email: String,
+    pub email_hash: String,
     pub server_email_salt: String,
     pub client_email_salt: String,
 
@@ -20,7 +20,7 @@ pub struct Account {
 
 impl std::fmt::Display for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {:#?})", self.username, self.email, self.is_pass, self.pass_hash, 
+        write!(f, "({}, {}, {}, {}, {}, {:#?})", self.username, self.email_hash, self.is_pass, self.pass_hash, 
                self.portfolio, self.transactions)
     }
 }
