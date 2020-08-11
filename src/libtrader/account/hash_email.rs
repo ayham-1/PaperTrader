@@ -19,11 +19,12 @@ use crate::account::hash::hash;
 ///
 /// Example:
 /// ```rust
-///     let enc = hash_email_client("totallyrealemail@anemail.c0m", server_salt).unwrap();
+///     let enc = hash_email("totallyrealemail@anemail.c0m", server_salt).unwrap();
 ///     println!("Client Email Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Client Email Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_email_client(email: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) ->
+#[cfg(feature="client")]
+pub fn hash_email(email: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) ->
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()> { // client hash, client random bits
     let rng = rand::SystemRandom::new();
 
@@ -49,11 +50,12 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 ///
 /// Example:
 /// ```rust
-///     let enc = hash_email_server("THISISTOTALLYAHASHEDTHING...").unwrap();
+///     let enc = hash_email("THISISTOTALLYAHASHEDTHING...").unwrap();
 ///     println!("Server Email Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Server Email Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_email_server(hashed_email: &str) ->
+#[cfg(feature="server")]
+pub fn hash_email(hashed_email: &str) ->
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> {
     let rng = rand::SystemRandom::new();
 

@@ -18,11 +18,12 @@ use crate::account::hash::hash;
 ///
 /// Example:
 /// ```rust
-///     let enc = hash_pwd_client("this is my real password!", server_salt).unwrap();
+///     let enc = hash_pwd("this is my real password!", server_salt).unwrap();
 ///     println!("Client Pass Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Client Pass Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_pwd_client(pass: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) -> 
+#[cfg(feature="client")]
+pub fn hash_pwd(pass: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) -> 
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()> { // client hash, client random bits
     let rng = rand::SystemRandom::new();
 
@@ -49,11 +50,12 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 ///
 /// Example:
 /// ```rust
-///     let enc = hash_pwd_server("THISISTOTALLYAHASHEDTHING...").unwrap();
+///     let enc = hash_pwd("THISISTOTALLYAHASHEDTHING...").unwrap();
 ///     println!("Server Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Server Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_pwd_server(hashed_pass: &str) -> 
+#[cfg(feature="server")]
+pub fn hash_pwd(hashed_pass: &str) -> 
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> { // sever hash, server salt
     let rng = rand::SystemRandom::new();
 
