@@ -12,9 +12,7 @@
 /// password - The raw password to be used.
 ///
 /// Returns: nothing.
-#[allow(unused_imports)]
 use crate::network::tls_client::TlsClient;
-#[cfg(feature="client")]
 pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
                        username: &str, email: &str, password: &str) -> Result<(), String> {
     use std::io::Write;
@@ -89,6 +87,3 @@ pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
         }
 
 }
-
-#[cfg(not(feature="client"))]
-pub fn acc_auth() -> Result<(), String> { Ok(()) }

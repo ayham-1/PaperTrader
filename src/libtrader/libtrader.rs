@@ -7,10 +7,9 @@ extern crate os_type;
 extern crate bincode;
 extern crate crypto;
 
-pub mod ds;
-pub mod db;
-pub mod misc;
-pub mod initializer;
-pub mod account;
-pub mod parser;
-pub mod network;
+pub mod common;
+
+#[cfg(feature="server")]
+pub mod server;
+#[cfg(feature="client")]
+pub mod client;

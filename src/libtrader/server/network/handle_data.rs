@@ -3,7 +3,6 @@ use either::*;
 use crate::network::tls_connection::TlsConnection;
 use crate::network::tls_client::TlsClient;
 
-#[cfg(feature="server")]
 pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, buf: &[u8]) -> 
 Result<(), String> {
     use crate::ds::message::message::Message;
@@ -32,11 +31,5 @@ Result<(), String> {
         _ => {}
     };
         
-    Ok(())
-}
-
-#[cfg(feature="client")]
-pub fn handle_data(conn: Either<&mut TlsConnection, &mut TlsClient>, _buf: &[u8]) -> Result<(), String> {
-    assert_eq!(conn.is_right(), true);
     Ok(())
 }
