@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-use crate::ds::account::position::Position;
+use crate::common::account::position::Position;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Portfolio {

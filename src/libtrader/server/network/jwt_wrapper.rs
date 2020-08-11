@@ -1,5 +1,5 @@
 #[cfg(not(feature="client"))]
-use crate::account::sessions::jwt_claim::JWTClaim;
+pub static JWT_SECRET: &'static str = "seecreet";
 
 /// Encodes a JWT token.
 ///

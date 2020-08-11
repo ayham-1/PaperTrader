@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-use crate::ds::message::message_type::{MessageType};
+use crate::common::message::message_type::MessageType;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Message {

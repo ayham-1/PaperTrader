@@ -1,4 +1,4 @@
-use crate::ds::account::position::PositionType;
+use crate::common::account::position::PositionType;
 
 #[derive(PartialEq, Debug)]
 pub struct Order {

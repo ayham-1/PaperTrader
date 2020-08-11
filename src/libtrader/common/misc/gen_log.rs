@@ -1,4 +1,4 @@
-use crate::misc::path_exists::path_exists;
+use crate::common::misc::path_exists::path_exists;
 
 /// Generates the CombinedLogger for simplelog.rs
 ///

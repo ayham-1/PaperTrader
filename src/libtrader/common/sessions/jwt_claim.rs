@@ -1,8 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-#[cfg(not(feature="client"))]
-pub static JWT_SECRET: &'static str = "seecreet";
-
 /// JWT Claim representing an authorized user.
 ///
 /// Members:

@@ -1,9 +1,7 @@
 use serde::{Serialize, Deserialize};
 
-enum_from_primitive! {
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-    pub enum PositionType { Sell = 0, Buy = 1 }
-}
+pub enum PositionType { Sell = 0, Buy = 1 }
 impl std::fmt::Display for PositionType {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             write!(f, "{}", match self {PositionType::Sell=>"SELL", PositionType::Buy=>"BUY"})
