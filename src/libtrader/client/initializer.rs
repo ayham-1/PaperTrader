@@ -1,8 +1,10 @@
-#[allow(unused_imports)]
-use crate::misc::gen_log::gen_log;
-use crate::misc::path_exists::path_exists;
-use crate::db::initializer::db_init;
-use crate::ds::generic::global_state::GlobalState;
+use mio::net::TcpStream;
+
+use crate::common::misc::path_exists::path_exists;
+use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
+use crate::common::misc::lookup_ipv4::lookup_ipv4;
+
+use crate::client::network::tls_client::TlsClient;
 
 /// Initializes global logger.
 ///
@@ -50,39 +52,6 @@ fn libtrader_init_log() -> Result<(), String> {
     Ok(())
 }
 
-/// Generic Initialization of the library.
-///
-/// Public function that globaly initializes the library. Initializes log, and database.
-///
-/// Returns: ``GlobalState``` on success, and a string containing the reason
-/// of failure.
-///
-/// Example:
-/// ```rust
-///     match libtrader_init() {
-///         Ok(state) => println!("here is the initialized state: {}", state),
-///         Err(err) => panic!("failed initializing libtrader, reason: {}", err)
-///     };
-/// ```
-pub fn libtrader_init() -> Result<GlobalState, String> {
-    let mut state: GlobalState = GlobalState::default();
-
-    // Initialize log.
-    #[cfg(not(test))]
-    match libtrader_init_log() {
-        Ok(()) => {},
-        Err(err) => panic!("This should not happen!\n{}", err),
-    };
-
-    // Initialize database.
-    match db_init(&mut state) {
-        Ok(()) => info!("Initialized database."),
-        Err(err) => return Err(format!("INIT_DB_FAILED: {}", err))
-    }
-
-    Ok(state)
-}
-
 /// Client Initialization of the library.
 ///
 /// Public function that initializes the library, and connects to a libtrader server
@@ -92,12 +61,12 @@ pub fn libtrader_init() -> Result<GlobalState, String> {
 /// ```rust
 ///     libtrader_init_client()?;
 /// ```
-pub fn libtrader_init_client() -> Result<GlobalState, String> {
-    use mio::net::TcpStream;
-
-    use crate::network::tls_client::TlsClient;
-    use crate::misc::gen_tls_client_config::gen_tls_client_config;
-    use crate::misc::lookup_ipv4::lookup_ipv4;
+pub fn libtrader_init_client() -> Result<(), String> {
+    #[cfg(not(test))]
+    match libtrader_init_log() {
+        Ok(()) => {},
+        Err(err) => panic!("This should not happen!\n{}", err),
+    };
 
     let addr = lookup_ipv4("0.0.0.0", 4000);
     let config = gen_tls_client_config();
@@ -122,14 +91,6 @@ pub fn libtrader_init_client() -> Result<GlobalState, String> {
         for ev in &events {
             tls_client.ready(&ev);
             tls_client.reregister(poll.registry());
-
-            if ev.token() == mio::Token(0) && ev.is_writable() {
-                use crate::account::acc_creation::acc_create;
-                match acc_create(&mut tls_client, &mut  poll, "test", "test", "test") {
-                    Ok(()) => println!("server returned yes"),
-                    Err(err) => panic!("panik {}", err),
-                }
-            }
         }
     }
 }
@@ -138,7 +99,6 @@ pub fn libtrader_init_client() -> Result<GlobalState, String> {
 mod test {
     use crate::db::config::{DB_USER, DB_PASS};
     use crate::db::initializer::{db_connect};
-    use crate::ds::generic::global_state::GlobalState;
     use crate::ds::generic::company::Company;
 
    use super::*;
@@ -149,35 +109,5 @@ mod test {
             Ok(()) => {},
             Err(err) => panic!("TEST_INIT_LOG_FAILED: {}", err)
         };
-    }
-
-    #[test]
-    fn test_libtrader_init() {
-        /* connect to db */
-        let mut state: GlobalState = GlobalState::default();
-        let mut client = db_connect(&mut state, DB_USER, DB_PASS).unwrap();
-
-        /* add test compnay */
-        let mut company = Company::default();
-        company.id = 1234;
-        company.symbol = "CPP".to_string();
-        company.isin = "2".to_string();
-        company.company_name = "CPP".to_string();
-        company.primary_exchange = "NYSE".to_string();
-        company.sector = "Tech".to_string();
-        company.industry = "Tech".to_string();
-        company.primary_sic_code = "2".to_string();
-        company.employees = 1;
-        client.execute(
-            "INSERT INTO public.companies VALUES ($1,$2, $3, $4, $5, $6, $7, $8, $9)",
-            &[&company.id, &company.symbol, &company.isin, &company.company_name, 
-            &company.primary_exchange, &company.sector, &company.industry,
-            &company.primary_sic_code, &company.employees]).unwrap();
-
-        /* test libtrader_init */
-        match libtrader_init() {
-            Ok(state) => assert_eq!(state.companies.is_empty(), false),
-            Err(err) => panic!("TEST_INIT_FAILED: {}", err)
-        }
     }
 }

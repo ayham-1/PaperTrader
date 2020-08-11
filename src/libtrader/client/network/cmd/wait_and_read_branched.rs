@@ -1,7 +1,7 @@
 use std::{thread, time};
 
 use mio;
-use crate::network::tls_client::TlsClient;
+use crate::client::network::tls_client::TlsClient;
 
 /// Waits and issues a branched read when TLS client recieves data to be processed.
 ///

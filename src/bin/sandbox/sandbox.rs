@@ -2,9 +2,9 @@ extern crate log;
 extern crate simplelog;
 
 #[cfg(feature="server")]
-use libtrader::initializer::libtrader_init_server;
+use libtrader::server::initializer::libtrader_init_server;
 #[cfg(feature="client")]
-use libtrader::initializer::libtrader_init_client;
+use libtrader::client::initializer::libtrader_init_client;
 
 fn main() {
     #[cfg(feature="server")]

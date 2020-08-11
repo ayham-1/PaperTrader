@@ -1,7 +1,7 @@
 use ring::rand::SecureRandom;
 use ring::{digest, rand};
 
-use crate::account::hash::hash;
+use crate::common::account::hash::hash;
 
 /// Generates a client email hash from a raw email.
 ///

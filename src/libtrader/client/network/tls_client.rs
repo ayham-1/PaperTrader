@@ -7,9 +7,8 @@ use mio::net::TcpStream;
 use rustls;
 use rustls::Session;
 use webpki;
-use either::*;
 
-use crate::network::handle_data::handle_data;
+use crate::client::network::handle_data::handle_data;
 
 /// The TlsClient struct that represents a TLS client from the prespective of a client.
 ///
@@ -113,7 +112,7 @@ impl TlsClient {
                 return;
             }
             #[cfg(feature="client")]
-            match handle_data(Either::Right(self), &plaintext) {
+            match handle_data(self, &plaintext) {
                 Ok(()) => {},
                 Err(err) => error!("Error handling data: {}", err)
             };

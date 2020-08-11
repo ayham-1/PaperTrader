@@ -1,5 +1,5 @@
-//#[macro_use] extern crate log;
-//#[macro_use] extern crate arrayref;
+#[cfg(feature="client")] #[macro_use] extern crate log;
+#[cfg(feature="client")] #[macro_use] extern crate arrayref;
 //#[macro_use] extern crate lazy_static;
 extern crate simplelog;
 extern crate os_type;
@@ -10,5 +10,5 @@ pub mod common;
 
 #[cfg(feature="server")]
 pub mod server;
-#[cfg(feature="client")]
+#[cfg(feature="client")] 
 pub mod client;

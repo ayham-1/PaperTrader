@@ -1,5 +1,5 @@
-use crate::ds::account::portfolio::Portfolio;
-use crate::ds::account::transaction::Transaction;
+use crate::common::account::portfolio::Portfolio;
+use crate::common::account::transaction::Transaction;
 
 #[derive(PartialEq, Debug)]
 pub struct Account {
@@ -11,7 +11,6 @@ pub struct Account {
 
 impl std::fmt::Display for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {:#?})", self.username, self.email_hash, self.is_pass, self.pass_hash, 
-               self.portfolio, self.transactions)
+        write!(f, "({}, {}, {:#?})", self.username, self.portfolio, self.transactions)
     }
 }

@@ -1,14 +1,14 @@
 use ring::{digest};
 use std::io::Write;
 
-use crate::network::tls_client::TlsClient;
+use crate::client::network::tls_client::TlsClient;
 
-use crate::parser::message_builder::message_builder;
-use crate::ds::message::message::Message;
-use crate::ds::message::message_type::MessageType;
-use crate::ds::message::inst::CommandInst;
+use crate::common::message::message::Message;
+use crate::common::message::message_type::MessageType;
+use crate::common::message::inst::CommandInst;
+use crate::common::message::message_builder::message_builder;
 
-use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
+use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 
 /// Issues a command to the connected TLS server to obtain a stored salt for either email or
 /// password.

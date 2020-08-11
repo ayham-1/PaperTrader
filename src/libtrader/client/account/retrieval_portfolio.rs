@@ -1,14 +1,13 @@
 use std::io::Write;
 
-use crate::ds::account::portfolio::Portfolio;
-use crate::network::tls_client::TlsClient;
+use crate::common::account::portfolio::Portfolio;
+use crate::common::message::message::Message;
+use crate::common::message::message_type::MessageType;
+use crate::common::message::inst::DataTransferInst;
+use crate::common::message::message_builder::message_builder;
 
-use crate::network::cmd::generic::wait_and_read_branched::wait_and_read_branched;
-
-use crate::parser::message_builder::message_builder;
-use crate::ds::message::message::Message;
-use crate::ds::message::message_type::MessageType;
-use crate::ds::message::inst::{DataTransferInst};
+use crate::client::network::tls_client::TlsClient;
+use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 
 /// Retrieves from the connected TLS server an authorized portfolio.
 ///
