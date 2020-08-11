@@ -16,10 +16,10 @@ jobs:
     - name: Build Minimal
       run: cargo build --no-default-features
     - name: Build Client
-      run: cargo build --no-default-features "client"
+      run: cargo build --no-default-features --features "client"
     - name: Build Server
-      run: cargo build --no-default-features "server"
+      run: cargo build --no-default-features --features "server"
     - name: Build Hybrid
-      run: cargo build --no-default-features "server,client"
+      run: cargo build --no-default-features --features "server,client"
     - name: Run benches
       run: cargo bench
