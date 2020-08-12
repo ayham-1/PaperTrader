@@ -41,8 +41,6 @@ pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
         Err(err) => return Err(format!("ACC_AUTH_CLIENT_COULD_NOT_GET_SALT: {}", err))
     };
 
-    println!("khello we are here");
-
     /*
      * hash the email
      */
@@ -54,13 +52,13 @@ pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     let hashed_password = hash(password, password_salt.to_vec(), 250_000);
 
     /* generate message to be sent to the server */
-    let mut data = Vec::new();
-    data.append(&mut bincode::serialize(&email_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&hashed_email.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&password_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&hashed_password.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&username.as_bytes()).unwrap());
-    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 5, 0, 0, data) {
+    let mut data = object!{
+        hashed_email: HEXUPPER.encode(&hashed_email),
+        hashed_password: HEXUPPER.encode(&hashed_password),
+        username: username
+    };
+    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 3, 0, 0, 
+                          data.dump().as_bytes().to_vec()) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
 
