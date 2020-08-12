@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
@@ -6,11 +8,11 @@ use crate::server::network::tls_connection::TlsConnection;
 use crate::server::account::creation::acc_create;
 
 #[cfg(feature="server")]
-pub fn register(_tls_connection: &mut TlsConnection, message: &Message) {
+pub fn register(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */
-    if message.msgtype != MessageType::Command || message.argument_count != 6
+    if message.msgtype != MessageType::Command || message.argument_count != 5
         || message.data_message_number != 0 || message.data_message_max != 0
-        || message.data.len() != 0 {
+        || message.data.len() == 0 {
         warn!("REGISTER_INVALID_MESSAGE");
         return;
     }
@@ -19,7 +21,12 @@ pub fn register(_tls_connection: &mut TlsConnection, message: &Message) {
     match acc_create(message) {
         Ok(_) => {
             match message_builder(MessageType::ServerReturn, 1, 0, 0, 0, Vec::new()) {
-                Ok(_) => {},
+                Ok(msg) => {
+                    match tls_connection.tls_session.write(bincode::serialize(&msg).unwrap().as_slice()) {
+                        Ok(_) => return,
+                        Err(err) => warn!("REGISTER_FAILED_SENDING_RESPONSE: {}", err)
+                    }
+                },
                 Err(_) => {}
             }
         },

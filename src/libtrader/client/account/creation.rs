@@ -1,5 +1,6 @@
 use ring::rand::SecureRandom;
 use ring::{digest, rand};
+use data_encoding::HEXUPPER;
 use std::io::Write;
 
 use crate::common::account::hash::hash;
@@ -71,13 +72,14 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     let password_hash = hash(password, password_salt, 250_000);
 
     /* generate message to be sent to the server */
-    let mut data = Vec::new();
-    data.append(&mut bincode::serialize(&email_hash.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&email_client_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&password_hash.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&password_client_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&username.as_bytes()).unwrap());
-    match message_builder(MessageType::Command, CommandInst::Register as i64, 6, 0, 0, data) {
+    let data = object!{
+        email_hash: HEXUPPER.encode(&email_hash),
+        email_client_salt: HEXUPPER.encode(&email_client_salt),
+        password_hash: HEXUPPER.encode(&password_hash),
+        password_client_salt: HEXUPPER.encode(&password_client_salt),
+        username: username
+    };
+    match message_builder(MessageType::Command, CommandInst::Register as i64, 5, 0, 0, data.dump().as_bytes().to_vec()) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
         },
