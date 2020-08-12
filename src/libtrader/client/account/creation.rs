@@ -79,7 +79,8 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
         password_client_salt: HEXUPPER.encode(&password_client_salt),
         username: username
     };
-    match message_builder(MessageType::Command, CommandInst::Register as i64, 5, 0, 0, data.dump().as_bytes().to_vec()) {
+    match message_builder(MessageType::Command, CommandInst::Register as i64, 5, 0, 0, 
+                          data.dump().as_bytes().to_vec()) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
         },
