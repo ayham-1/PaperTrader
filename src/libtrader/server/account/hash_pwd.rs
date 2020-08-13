@@ -21,14 +21,14 @@ use crate::common::account::hash::hash;
 ///     println!("Server Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
 #[cfg(feature="server")]
-pub fn hash_pwd(hashed_pass: &str) -> 
+pub fn hash_pwd(hashed_pass: &Vec<u8>) -> 
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> { // sever hash, server salt
     let rng = rand::SystemRandom::new();
 
     let mut salt = [0u8; digest::SHA512_OUTPUT_LEN];
     rng.fill(&mut salt).unwrap();
 
-    let hash = hash(hashed_pass, salt.to_vec(), 500_000);
+    let hash = hash(hashed_pass, &salt.to_vec(), 500_000);
     Ok((hash, salt))
 }
 

@@ -147,7 +147,7 @@ impl TlsConnection {
     }
 
     /// Private TlsConnection function that flushes TLS packets and handles any errors.
-    fn do_tls_write_and_handle_error(&mut self) {
+    pub fn do_tls_write_and_handle_error(&mut self) {
         let rc = self.tls_session.write_tls(&mut self.socket);
         if rc.is_err() {
             error!("write failed: {:?}", rc);

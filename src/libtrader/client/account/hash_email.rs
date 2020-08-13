@@ -13,9 +13,9 @@ use crate::common::account::hash::hash;
 ///
 /// Arguments:
 /// email - The raw user email to be hashed.
-/// server_salt - The server's p&art sent of the salt.
+/// server_salt - The server's part sent of the salt.
 ///
-/// Returns: a tuple containing the client hash and client's random salt, nothing on failure.
+/// Returns: a tuple containing the client hash and full salt, nothing on failure.
 ///
 /// Example:
 /// ```rust
@@ -23,8 +23,8 @@ use crate::common::account::hash::hash;
 ///     println!("Client Email Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Client Email Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_email(email: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) ->
-Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()> { // client hash, client random bits
+pub fn hash_email(email: &Vec<u8>, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) ->
+([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]) { // client hash, full salt
     let rng = rand::SystemRandom::new();
 
     let mut client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
@@ -32,8 +32,8 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 
     let salt = [server_salt, client_salt].concat();
 
-    let hash = hash(email, salt, 175_000);
-    Ok((hash, client_salt))
+    let hash = hash(email, &salt, 175_000);
+    (hash, *array_ref!(salt, 0, digest::SHA512_OUTPUT_LEN))
 }
 
 #[cfg(test)]

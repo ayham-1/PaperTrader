@@ -17,10 +17,10 @@ pub fn acc_create(message: &Message) -> Result<(), String> {
     let stringified_data = std::str::from_utf8(&message.data).unwrap().to_string();
     let data = json::parse(&stringified_data).unwrap();
     /* get email, password salts and client hashes */
-    let email_hash = data["email_hash"].as_str().unwrap();
-    let email_client_salt = data["email_client_salt"].as_str().unwrap();
-    let password_hash = data["password_hash"].as_str().unwrap();
-    let password_client_salt = data["password_client_salt"].as_str().unwrap();
+    let email_hash = HEXUPPER.decode(data["email_hash"].as_str().unwrap().to_string().as_bytes()).unwrap();
+    let email_client_salt = HEXUPPER.decode(data["email_client_salt"].as_str().unwrap().to_string().as_bytes()).unwrap();
+    let password_hash = HEXUPPER.decode(data["password_hash"].as_str().unwrap().to_string().as_bytes()).unwrap();
+    let password_client_salt = HEXUPPER.decode(data["password_client_salt"].as_str().unwrap().to_string().as_bytes()).unwrap();
 
     /* get username */
     let username: String = data["username"].as_str().unwrap().to_string();
@@ -31,11 +31,11 @@ pub fn acc_create(message: &Message) -> Result<(), String> {
 
         email_hash: "".to_string(),
         server_email_salt: "".to_string(),
-        client_email_salt: email_client_salt.to_string(),
+        client_email_salt: HEXUPPER.encode(&email_client_salt),
 
         pass_hash: "".to_string(),
         server_pass_salt: "".to_string(),
-        client_pass_salt: password_client_salt.to_string(),
+        client_pass_salt: HEXUPPER.encode(&password_client_salt),
 
         is_pass: true,
         portfolio: Portfolio::default(),
@@ -58,11 +58,11 @@ pub fn acc_create(message: &Message) -> Result<(), String> {
      * Hash the email and password.
      * */
     /* hash the email */
-    let email_server_hash = hash_email(email_hash).unwrap();
+    let email_server_hash = hash_email(&email_hash).unwrap();
     account.email_hash = HEXUPPER.encode(&email_server_hash.0);
     account.server_email_salt = HEXUPPER.encode(&email_server_hash.1);
     /* hash the password */
-    let password_server_hash = hash_pwd(password_hash).unwrap();
+    let password_server_hash = hash_pwd(&password_hash).unwrap();
     account.pass_hash = HEXUPPER.encode(&password_server_hash.0);
     account.server_pass_salt = HEXUPPER.encode(&password_server_hash.1);
 

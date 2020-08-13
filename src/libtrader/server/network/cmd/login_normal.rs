@@ -20,6 +20,16 @@ pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
     /* call acc_auth() server version */
     match acc_auth(tls_connection, message) {
         Ok(_) => {},
-        Err(_) => {}
+        Err(err) => {
+            match message_builder(MessageType::ServerReturn, 0, 0, 0, 0, err.as_bytes().to_vec()) {
+                Ok(msg) => {
+                    match tls_connection.tls_session.write(bincode::serialize(&msg).unwrap().as_slice()) {
+                        Ok(_) => {tls_connection.do_tls_write_and_handle_error();return},
+                        Err(err) => warn!("LOGIN_NORMAL_FAILED_SENDING_RESPONSE: {}", err)
+                    }
+                },
+                Err(_) => {}
+            }
+        }
     };
 }

@@ -60,7 +60,6 @@ fn libtrader_init_log() -> Result<(), String> {
 /// ```rust
 ///     libtrader_init_server()?;
 /// ```
-#[cfg(feature="server")]
 pub fn libtrader_init_server() -> Result<(), String> {
     // Initialize log.
     #[cfg(not(test))]

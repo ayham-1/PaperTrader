@@ -28,21 +28,21 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     let stringified_data = std::str::from_utf8(&message.data).unwrap();
     let data = json::parse(&stringified_data).unwrap();
     /* get email, password, and username hashes */
-    let email_hash = data["hashed_email"].as_str().unwrap();
-    let password_hash = data["hashed_password"].as_str().unwrap();
+    let email_hash = HEXUPPER.decode(data["hashed_email"].as_str().unwrap().as_bytes()).unwrap();
+    let password_hash = HEXUPPER.decode(data["hashed_password"].as_str().unwrap().as_bytes()).unwrap();
     let username = data["username"].as_str().unwrap();
 
     /*
      * Get server salts
      * */
-    let email_salt = get_user_salt(username, true, true).unwrap().as_bytes().to_vec();
-    let password_salt = get_user_salt(username, false, true).unwrap().as_bytes().to_vec();
+    let email_salt = HEXUPPER.decode(get_user_salt(username, true, true).unwrap().as_bytes()).unwrap();
+    let password_salt = HEXUPPER.decode(get_user_salt(username, false, true).unwrap().as_bytes()).unwrap();
 
     /*
-     * Get hashes
+     * Get server hashes
      * */
-    let email_db = get_user_hash(username, true).unwrap().as_bytes().to_vec();
-    let password_db = get_user_hash(username, false).unwrap().as_bytes().to_vec();
+    let email_db = HEXUPPER.decode(get_user_hash(username, true).unwrap().as_bytes()).unwrap();
+    let password_db = HEXUPPER.decode(get_user_hash(username, false).unwrap().as_bytes()).unwrap();
 
     /*
      * Verify creds
@@ -51,18 +51,18 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
         pbkdf2::PBKDF2_HMAC_SHA512,
         NonZeroU32::new(350_000).unwrap(),
         &email_salt,
-        &email_db,
-        &email_hash.as_bytes());
+        &email_hash,
+        &email_db);
     match email_ret.is_ok() {
         true => {},
-        false => return Err("ACC_AUTH_SERVER_UNAUTHORIZED".to_string())
+        false => return Err("ACC_AUTH_SERVER_UNAUTHORIZED1".to_string())
     };
     let pass_ret = pbkdf2::verify(
         pbkdf2::PBKDF2_HMAC_SHA512,
         NonZeroU32::new(500_000).unwrap(),
         &password_salt,
-        &password_db,
-        &password_hash.as_bytes());
+        &password_hash,
+        &password_db);
     match pass_ret.is_ok() {
         true => {},
         false => return Err("ACC_AUTH_SERVER_UNAUTHORIZED".to_string())
@@ -74,7 +74,8 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     /* get user id*/
     let mut data = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
     let mut user_id: i64 = 0;
-    for row in data.query("SELECT id,username FROM accounts_schema WHERE username LIKe $1", &[&username]).unwrap() {
+    /* TODO: abstract to a funciton */
+    for row in data.query("SELECT id,username FROM accounts_schema.accounts WHERE username LIKE $1", &[&username]).unwrap() {
         user_id = row.get(0);
     }
     assert_eq!(user_id > 0, true);
@@ -91,7 +92,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     match message_builder(MessageType::ServerReturn, 1, 1, 0, 1, jwt_token.as_bytes().to_vec()) {
         Ok(message) => {
             match tls_connection.tls_session.write(bincode::serialize(&message).unwrap().as_slice()) {
-                Ok(_) => return Ok(()),
+                Ok(_) => {tls_connection.do_tls_write_and_handle_error();return Ok(());},
                 Err(err) => {warn!("ACC_AUTH_FAILED_SENDING_RESPONSE: {}", err); tls_connection.closing = true;}
             }
         },
