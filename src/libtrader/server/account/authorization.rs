@@ -17,6 +17,7 @@ use crate::server::db::initializer::db_connect;
 use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
 use crate::server::db::cmd::get_user_salt::get_user_salt;
 use crate::server::db::cmd::get_user_hash::get_user_hash;
+use crate::server::db::cmd::get_user_id::get_user_id;
 
 use crate::server::network::jwt_wrapper::create_jwt_token;
 
@@ -72,13 +73,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
      * Generate JWT token 
      * */
     /* get user id*/
-    let mut data = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
-    let mut user_id: i64 = 0;
-    /* TODO: abstract to a funciton */
-    for row in data.query("SELECT id,username FROM accounts_schema.accounts WHERE username LIKE $1", &[&username]).unwrap() {
-        user_id = row.get(0);
-    }
-    assert_eq!(user_id > 0, true);
+    let user_id = get_user_id(username)?;
 
     /* gen the actual token */
     use std::time::{SystemTime, UNIX_EPOCH, Duration};
