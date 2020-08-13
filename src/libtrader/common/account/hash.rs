@@ -16,7 +16,7 @@ use std::num::NonZeroU32;
 /// ```rust
 ///     let email_hash = hash("test@test.com", [0u8; 64], 124000);
 /// ```
-pub fn hash(val: &str, salt: Vec<u8>, iter: u32) -> [u8; digest::SHA512_OUTPUT_LEN] {
+pub fn hash(val: &Vec<u8>, salt: &Vec<u8>, iter: u32) -> [u8; digest::SHA512_OUTPUT_LEN] {
     let iterations: NonZeroU32 = NonZeroU32::new(iter).unwrap();
 
     let mut hash = [0u8; digest::SHA512_OUTPUT_LEN];
@@ -24,7 +24,7 @@ pub fn hash(val: &str, salt: Vec<u8>, iter: u32) -> [u8; digest::SHA512_OUTPUT_L
         pbkdf2::PBKDF2_HMAC_SHA512,
         iterations,
         &salt,
-        val.as_bytes(),
+        val,
         &mut hash);
     hash
 }

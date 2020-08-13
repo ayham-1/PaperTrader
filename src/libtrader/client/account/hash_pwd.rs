@@ -14,7 +14,7 @@ use crate::common::account::hash::hash;
 /// pass - The raw user password to be hashed.
 /// server_salt - The server's part sent of the salt.
 ///
-/// Returns: a tuple containing the client hash and client's random salt, nothing on failure.
+/// Returns: a tuple containing the client hash and full salt, nothing on failure.
 ///
 /// Example:
 /// ```rust
@@ -22,8 +22,8 @@ use crate::common::account::hash::hash;
 ///     println!("Client Pass Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Client Pass Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_pwd(pass: &str, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) -> 
-Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()> { // client hash, client random bits
+pub fn hash_pwd(pass: &Vec<u8>, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) -> 
+([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]) { // client hash, full salt
     let rng = rand::SystemRandom::new();
 
     let mut client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
@@ -31,9 +31,9 @@ Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN/2]), ()>
 
     let salt = [server_salt, client_salt].concat();
 
-    let hash = hash(pass, salt, 250_000);
+    let hash = hash(pass, &salt, 250_000);
 
-    Ok((hash, client_salt))
+    (hash, *array_ref!(salt, 0, digest::SHA512_OUTPUT_LEN))
 }
 
 #[cfg(test)]

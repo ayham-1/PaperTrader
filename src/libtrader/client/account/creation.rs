@@ -1,8 +1,9 @@
-use ring::rand::SecureRandom;
-use ring::{digest, rand};
+use ring::digest;
+use data_encoding::HEXUPPER;
 use std::io::Write;
 
-use crate::common::account::hash::hash;
+use crate::client::account::hash_email::hash_email;
+use crate::client::account::hash_pwd::hash_pwd;
 
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
@@ -50,34 +51,21 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     };
 
     /*
-     * generate client salts for email, password
-     * */
-    let rng = rand::SystemRandom::new();
-    let mut email_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
-    rng.fill(&mut email_client_salt).unwrap();
-    let mut password_client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
-    rng.fill(&mut password_client_salt).unwrap();
-
-    /*
-     * generate final salts for email, password
-     * */
-    let email_salt = [email_server_salt, email_client_salt].concat();
-    let password_salt = [password_server_salt, password_client_salt].concat();
-
-    /*
      * generate hashes for email, password
      * */
-    let email_hash = hash(email, email_salt, 175_000);
-    let password_hash = hash(password, password_salt, 250_000);
+    let email_hash = hash_email(&email.as_bytes().to_vec(), email_server_salt);
+    let password_hash = hash_pwd(&password.as_bytes().to_vec(), password_server_salt);
 
     /* generate message to be sent to the server */
-    let mut data = Vec::new();
-    data.append(&mut bincode::serialize(&email_hash.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&email_client_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&password_hash.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&password_client_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&username.as_bytes()).unwrap());
-    match message_builder(MessageType::Command, CommandInst::Register as i64, 6, 0, 0, data) {
+    let data = object!{
+        email_hash: HEXUPPER.encode(&email_hash.0),
+        email_client_salt: HEXUPPER.encode(&email_hash.1),
+        password_hash: HEXUPPER.encode(&password_hash.0),
+        password_client_salt: HEXUPPER.encode(&password_hash.1),
+        username: username
+    };
+    match message_builder(MessageType::Command, CommandInst::Register as i64, 5, 0, 0, 
+                          data.dump().as_bytes().to_vec()) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
         },

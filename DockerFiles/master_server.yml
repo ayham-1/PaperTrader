@@ -13,7 +13,7 @@ services:
             - 5432:5432
         volumes:
             - ./.db:/var/lib/postgresql/data
-            - ../src/libtrader/db/sql:/docker-entrypoint-initdb.d/
+            - ../src/libtrader/server/db/sql:/docker-entrypoint-initdb.d/
     adminer:
         container_name: pt_admin
         image: adminer

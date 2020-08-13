@@ -1,4 +1,6 @@
 use std::io::Write;
+use ring::digest;
+use data_encoding::HEXUPPER;
 
 use crate::common::account::hash::hash;
 use crate::common::message::message_type::MessageType;
@@ -29,38 +31,36 @@ pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     /*
      * get email salt
      * */
-    let email_salt = match req_server_salt(tls_client, poll, username, CommandInst::GetEmailSalt as i64) {
+    let email_salt: [u8; digest::SHA512_OUTPUT_LEN] = match req_server_salt(tls_client, poll, username, CommandInst::GetEmailSalt as i64) {
         Ok(salt) => salt,
         Err(err) => return Err(format!("ACC_AUTH_CLIENT_COULD_NOT_GET_SALT: {}", err))
     };
     /*
      * get password salt
      * */
-    let password_salt = match req_server_salt(tls_client, poll, username, CommandInst::GetPasswordSalt as i64) {
+    let password_salt: [u8; digest::SHA512_OUTPUT_LEN] = match req_server_salt(tls_client, poll, username, CommandInst::GetPasswordSalt as i64) {
         Ok(salt) => salt,
         Err(err) => return Err(format!("ACC_AUTH_CLIENT_COULD_NOT_GET_SALT: {}", err))
     };
 
-    println!("khello we are here");
-
     /*
      * hash the email
      */
-    let hashed_email = hash(email, email_salt.to_vec(), 175_000);
+    let hashed_email = hash(&email.as_bytes().to_vec(), &email_salt.to_vec(), 175_000);
 
     /*
      * hash the password
      */
-    let hashed_password = hash(password, password_salt.to_vec(), 250_000);
+    let hashed_password = hash(&password.as_bytes().to_vec(), &password_salt.to_vec(), 250_000);
 
     /* generate message to be sent to the server */
-    let mut data = Vec::new();
-    data.append(&mut bincode::serialize(&email_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&hashed_email.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&password_salt.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&hashed_password.to_vec()).unwrap());
-    data.append(&mut bincode::serialize(&username.as_bytes()).unwrap());
-    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 5, 0, 0, data) {
+    let data = object!{
+        hashed_email: HEXUPPER.encode(&hashed_email),
+        hashed_password: HEXUPPER.encode(&hashed_password),
+        username: username
+    };
+    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 3, 0, 0, 
+                          data.dump().as_bytes().to_vec()) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
 
@@ -83,7 +83,7 @@ pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
             };
             Ok(())
         } else {
-            Err("ACC_AUTH_CLIENT_UNAUTHORIZED".to_string())
+            Err(format!("ACC_AUTH_CLIENT_UNAUTHORIZED: {}", String::from_utf8(response.data).unwrap()))
         }
 
 }

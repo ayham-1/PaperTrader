@@ -20,14 +20,14 @@ use crate::common::account::hash::hash;
 ///     println!("Server Email Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Server Email Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_email(hashed_email: &str) ->
+pub fn hash_email(hashed_email: &Vec<u8>) ->
 Result<([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]), ()> {
     let rng = rand::SystemRandom::new();
 
     let mut salt = [0u8; digest::SHA512_OUTPUT_LEN];
     rng.fill(&mut salt).unwrap();
 
-    let hash = hash(hashed_email, salt.to_vec(), 350_000);
+    let hash = hash(hashed_email, &salt.to_vec(), 350_000);
     Ok((hash, salt))
 }
 
