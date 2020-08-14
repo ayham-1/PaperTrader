@@ -28,6 +28,7 @@ pub fn db_connect(user: &'static str, pass: &'static str) -> Result<postgres::Cl
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::server::db::config::{DB_USER, DB_PASS};
     #[test]
     fn test_db_connect() {
         match db_connect(DB_USER, DB_PASS) {

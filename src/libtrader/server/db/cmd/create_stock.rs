@@ -29,8 +29,8 @@ pub fn create_stock(stock_name: &str) -> Result<(), String> {
                         id                  BIGSERIAL PRIMARY KEY, \
                         isin                TEXT NOT NULL, \
                         time_epoch          BIGINT NOT NULL, \
-                        ask_price           BIGINT NOT NULL, \
-                        bid_price           BIGINT NOT NULL, \
+                        ask_price           DOUBLE PRECISION NOT NULL, \
+                        bid_price           DOUBLE PRECISION NOT NULL, \
                         volume              BIGINT NOT NULL \
                 )", stock_name).as_str(), &[]) {
         Ok(_rows) => Ok(()),

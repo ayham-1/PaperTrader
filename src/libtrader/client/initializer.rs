@@ -109,10 +109,6 @@ pub fn libtrader_init_client() -> Result<(), String> {
 
 #[cfg(test)]
 mod test {
-    use crate::db::config::{DB_USER, DB_PASS};
-    use crate::db::initializer::{db_connect};
-    use crate::ds::generic::company::Company;
-
    use super::*;
 
     #[test]

@@ -48,7 +48,7 @@ pub fn get_company_from_db(searched_symbol: String) -> Result<Company, String> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::db::cmd::create_company::create_company;
+    use crate::server::db::cmd::create_company::create_company;
 
     #[test]
     fn test_cmd_get_company_from_db() {
