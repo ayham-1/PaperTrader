@@ -20,14 +20,14 @@ use crate::common::generic::company::Company;
 /// ```
 pub fn create_company(company: Company) -> Result<Company, String> {
     /*
-     * Creates a comany entry in database in public.companies.
+     * Creates a company entry in database in public.companies.
      */
     // Connect to database.
     let mut client = db_connect(DB_USER, DB_PASS)?;
 
     // Insert argument company into public.companies database table.
     match client.execute(
-        "INSERT INTO public.companies VALUES ($1,$2, $3, $4, $5, $6, $7, $8, $9)",
+        "INSERT INTO public.companies VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
         &[&company.id, &company.symbol, &company.isin, &company.company_name, 
             &company.primary_exchange, &company.sector, &company.industry,
             &company.primary_sic_code, &company.employees]) {
@@ -39,7 +39,6 @@ pub fn create_company(company: Company) -> Result<Company, String> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::db::initializer::db_init;
 
     #[test]
     fn test_cmd_create_company() {

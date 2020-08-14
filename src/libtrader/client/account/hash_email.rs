@@ -51,19 +51,15 @@ mod test {
         rng.fill(&mut server_salt).unwrap();
 
         /* ensure that hash_email_client() works */
-        match hash_email_client(email, server_salt) {
-            Ok(output) => {
-                assert_ne!(output.0.len(), 0);
-                assert_ne!(output.1.len(), 0);
-            },
-            Err(()) => panic!("TEST_HASH_EMAIL_CLIENT_FAILED")
-        }
+        let output = hash_email(&email.as_bytes().to_vec(), server_salt);
+        assert_ne!(output.0.len(), 0);
+        assert_ne!(output.1.len(), 0);
 
         /* ensure that hash_email_client() doesn't generate same output 
          * with the same server salt.
          * */
-        let mut enc0 = hash_email(email, server_salt).unwrap();
-        let mut enc1 = hash_email(email, server_salt).unwrap();
+        let mut enc0 = hash_email(&email.as_bytes().to_vec(), server_salt);
+        let mut enc1 = hash_email(&email.as_bytes().to_vec(), server_salt);
         assert_ne!(HEXUPPER.encode(&enc0.0), HEXUPPER.encode(&enc1.0));
         assert_ne!(HEXUPPER.encode(&enc0.1), HEXUPPER.encode(&enc1.1));
 
@@ -74,8 +70,8 @@ mod test {
         let mut server_salt2 = [0u8; digest::SHA512_OUTPUT_LEN/2];
         rng.fill(&mut server_salt2).unwrap();
 
-        enc0 = hash_email(email, server_salt).unwrap();
-        enc1 = hash_email(email, server_salt).unwrap();
+        enc0 = hash_email(&email.as_bytes().to_vec(), server_salt);
+        enc1 = hash_email(&email.as_bytes().to_vec(), server_salt);
         assert_ne!(HEXUPPER.encode(&enc0.0), HEXUPPER.encode(&enc1.0));
         assert_ne!(HEXUPPER.encode(&enc0.1), HEXUPPER.encode(&enc1.1));
     }

@@ -1,12 +1,12 @@
 CREATE TYPE portfolio_pos AS (
-	is_buy				BOOLEAN,
 	stock_symbol		TEXT,
 	stock_open_amount	BIGINT,
-	stock_open_price	FLOAT8,
-	stock_open_cost		FLOAT8,
-	stock_close_amount	BIGINT,
-	stock_close_price	FLOAT8,
+	stock_open_price	MONEY,
+	stock_open_cost		MONEY,
+	stock_close_amount	MONEY,
+	stock_close_price	MONEY,
 	open_epoch			BIGINT,
 	close_epoch			BIGINT,
+	is_buy				BOOLEAN,
 	is_open				BOOLEAN
 )

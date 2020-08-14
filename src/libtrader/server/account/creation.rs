@@ -58,11 +58,11 @@ pub fn acc_create(message: &Message) -> Result<(), String> {
      * Hash the email and password.
      * */
     /* hash the email */
-    let email_server_hash = hash_email(&email_hash).unwrap();
+    let email_server_hash = hash_email(&email_hash);
     account.email_hash = HEXUPPER.encode(&email_server_hash.0);
     account.server_email_salt = HEXUPPER.encode(&email_server_hash.1);
     /* hash the password */
-    let password_server_hash = hash_pwd(&password_hash).unwrap();
+    let password_server_hash = hash_pwd(&password_hash);
     account.pass_hash = HEXUPPER.encode(&password_server_hash.0);
     account.server_pass_salt = HEXUPPER.encode(&password_server_hash.1);
 

@@ -147,7 +147,7 @@ pub fn get_stock_from_db_between_epochs(searched_symbol: String, first_time_epoc
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::db::cmd::create_stock::create_stock;
+    use crate::server::db::cmd::create_stock::create_stock;
     
     #[test]
     fn test_cmd_get_stock_from_db() {
@@ -156,7 +156,7 @@ mod test {
 
         /* insert some data into the stock */
         let mut client = db_connect(DB_USER, DB_PASS).unwrap();
-        client.execute("INSERT INTO asset_schema.haha VALUES (1, 999, 4, 50, 50, 10)", &[]).unwrap();
+        client.execute("INSERT INTO asset_schema.haha VALUES (1, 999, 4, 50.0, 50.0, 10)", &[]).unwrap();
 
         /* test get_stock_from_db() */
         match get_stock_from_db("haha".into()) {
@@ -166,8 +166,8 @@ mod test {
                 assert_eq!(vals[0].id, 1);
                 assert_eq!(vals[0].isin, "999".to_string());
                 assert_eq!(vals[0].time_epoch, 4);
-                assert_eq!(vals[0].ask_price, 50);
-                assert_eq!(vals[0].bid_price, 50);
+                assert_eq!(vals[0].ask_price, 50.0);
+                assert_eq!(vals[0].bid_price, 50.0);
                 assert_eq!(vals[0].volume, 10);
             },
             Err(err) => panic!("TEST_CMD_GET_STOCK_FAILED: {}", err) 
@@ -196,8 +196,8 @@ mod test {
                     assert_eq!(val.id, counter-3);
                     assert_eq!(val.isin, "999".to_string());
                     assert_eq!(val.time_epoch, counter);
-                    assert_eq!(val.ask_price, 50);
-                    assert_eq!(val.bid_price, 50);
+                    assert_eq!(val.ask_price, 50.0);
+                    assert_eq!(val.bid_price, 50.0);
                     assert_eq!(val.volume, 10);
                     counter += 1;
                 }
@@ -213,11 +213,11 @@ mod test {
 
         /* insert some data into the stock */
         let mut client = db_connect(DB_USER, DB_PASS).unwrap();
-        client.execute("INSERT INTO asset_schema.vava VALUES (1, 999, 4, 50, 50, 10)", &[]).unwrap();
-        client.execute("INSERT INTO asset_schema.vava VALUES (2, 999, 5, 50, 50, 10)", &[]).unwrap();
-        client.execute("INSERT INTO asset_schema.vava VALUES (3, 999, 6, 50, 50, 10)", &[]).unwrap();
-        client.execute("INSERT INTO asset_schema.vava VALUES (4, 999, 7, 50, 50, 10)", &[]).unwrap();
-        client.execute("INSERT INTO asset_schema.vava VALUES (5, 999, 8, 50, 50, 10)", &[]).unwrap();
+        client.execute("INSERT INTO asset_schema.vava VALUES (1, 999, 4, 50.0, 50.0, 10)", &[]).unwrap();
+        client.execute("INSERT INTO asset_schema.vava VALUES (2, 999, 5, 50.0, 50.0, 10)", &[]).unwrap();
+        client.execute("INSERT INTO asset_schema.vava VALUES (3, 999, 6, 50.0, 50.0, 10)", &[]).unwrap();
+        client.execute("INSERT INTO asset_schema.vava VALUES (4, 999, 7, 50.0, 50.0, 10)", &[]).unwrap();
+        client.execute("INSERT INTO asset_schema.vava VALUES (5, 999, 8, 50.0, 50.0, 10)", &[]).unwrap();
 
         /* test get_stock_from_db_between_epochs() */
         match get_stock_from_db_between_epochs("vava".into(), 5, 7) {
@@ -226,22 +226,22 @@ mod test {
                 assert_eq!(vals[0].id, 2);
                 assert_eq!(vals[0].isin, "999".to_string());
                 assert_eq!(vals[0].time_epoch, 5);
-                assert_eq!(vals[0].ask_price, 50);
-                assert_eq!(vals[0].bid_price, 50);
+                assert_eq!(vals[0].ask_price, 50.0);
+                assert_eq!(vals[0].bid_price, 50.0);
                 assert_eq!(vals[0].volume, 10);
 
                 assert_eq!(vals[1].id, 3);
                 assert_eq!(vals[1].isin, "999".to_string());
                 assert_eq!(vals[1].time_epoch, 6);
-                assert_eq!(vals[1].ask_price, 50);
-                assert_eq!(vals[1].bid_price, 50);
+                assert_eq!(vals[1].ask_price, 50.0);
+                assert_eq!(vals[1].bid_price, 50.0);
                 assert_eq!(vals[1].volume, 10);
 
                 assert_eq!(vals[2].id, 4);
                 assert_eq!(vals[2].isin, "999".to_string());
                 assert_eq!(vals[2].time_epoch, 7);
-                assert_eq!(vals[2].ask_price, 50);
-                assert_eq!(vals[2].bid_price, 50);
+                assert_eq!(vals[2].ask_price, 50.0);
+                assert_eq!(vals[2].bid_price, 50.0);
                 assert_eq!(vals[2].volume, 10);
             },
             Err(err) => panic!("TEST_CMD_GET_STOCK_BETWEEN_EPOCHS_FAILED: {}", err)
