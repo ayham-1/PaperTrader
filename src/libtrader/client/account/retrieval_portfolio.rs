@@ -31,7 +31,7 @@ pub fn acc_retrieve_portfolio(tls_client: &mut TlsClient, poll: &mut mio::Poll) 
     assert_eq!(tls_client.auth_jwt.is_empty(), false);
 
     /* build message request */
-    match message_builder(MessageType::DataTransfer, DataTransferInst::GetUserPortfolio as i64, 1, 0, 0, 
+    match message_builder(MessageType::Command, DataTransferInst::GetUserPortfolio as i64, 1, 0, 0, 
                           bincode::serialize(&tls_client.auth_jwt).unwrap()) {
         Ok(message) => {
             tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
