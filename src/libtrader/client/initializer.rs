@@ -87,20 +87,27 @@ pub fn libtrader_init_client() -> Result<(), String> {
 
     loop {
         poll.poll(&mut events, None).unwrap();
+        println!("KHELLO");
 
         for ev in &events {
             tls_client.ready(&ev);
             tls_client.reregister(poll.registry());
 
-            use crate::client::account::creation::acc_create;
-            match acc_create(&mut tls_client, &mut poll, "test", "email", "password") {
-                Ok(_) => println!("we created it"),
-                Err(err) => panic!("panik! {}", err),
-            }
+            //use crate::client::account::creation::acc_create;
+            //match acc_create(&mut tls_client, &mut poll, "test", "email", "password") {
+            //    Ok(_) => println!("we created it"),
+            //    Err(err) => panic!("panik! {}", err),
+            //}
 
             use crate::client::account::authorization::acc_auth;
             match acc_auth(&mut tls_client, &mut poll, "test", "email", "password") {
-                Ok(_) => println!("we accessed it"),
+                Ok(_) => println!("we accessed it, the token: {}", tls_client.auth_jwt),
+                Err(err) => panic!("panik! {}", err),
+            }
+
+            use crate::client::account::retrieval_portfolio::acc_retrieve_portfolio;
+            match acc_retrieve_portfolio(&mut tls_client, &mut poll) {
+                Ok(portfolio) => println!("we got portfolio {:#?}", portfolio),
                 Err(err) => panic!("panik! {}", err),
             }
         }

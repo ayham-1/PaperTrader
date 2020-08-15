@@ -72,8 +72,8 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     /* gen the actual token */
     use std::time::{SystemTime, UNIX_EPOCH, Duration};
     let beginning_of_time = SystemTime::now() + Duration::from_secs(4*60*60);
-    let jwt_token = create_jwt_token(user_id as usize, 
-                                     beginning_of_time.duration_since(UNIX_EPOCH).unwrap().as_secs() as usize)?;
+    let jwt_token = create_jwt_token(user_id, 
+                                     beginning_of_time.duration_since(UNIX_EPOCH).unwrap().as_secs())?;
 
     /* 
      * Send the JWT token 

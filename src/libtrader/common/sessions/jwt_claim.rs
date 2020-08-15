@@ -7,6 +7,6 @@ use serde::{Deserialize, Serialize};
 /// exp - The unix epoch at which this claim expires.
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct JWTClaim {
-    pub user_id: usize,
-    pub exp: usize,
+    pub user_id: i64,
+    pub exp: u64,
 }

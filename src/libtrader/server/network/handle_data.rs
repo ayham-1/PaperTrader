@@ -4,11 +4,12 @@ use data_encoding::HEXUPPER;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
-use crate::common::message::inst::CommandInst;
+use crate::common::message::inst::{CommandInst, DataTransferInst};
 
 use crate::server::network::tls_connection::TlsConnection;
 use crate::server::network::cmd::register::register;
 use crate::server::network::cmd::login_normal::login_normal;
+use crate::server::network::cmd::retrieve_portfolio::retrieve_portfolio;
 
 pub fn handle_data(connection: &mut TlsConnection, buf: &[u8]) -> 
 Result<(), String> {
@@ -90,6 +91,8 @@ Result<(), String> {
             register(connection, &client_msg),
         _ if client_msg.instruction == CommandInst::LoginMethod1 as i64 => 
             login_normal(connection, &client_msg),
+        _ if client_msg.instruction == DataTransferInst::GetUserPortfolio as i64 =>
+            retrieve_portfolio(connection, &client_msg),
         _ => {}
     };
         

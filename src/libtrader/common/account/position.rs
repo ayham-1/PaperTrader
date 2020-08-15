@@ -2,13 +2,18 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum PositionType { Sell = 0, Buy = 1 }
-impl std::fmt::Display for PositionType {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{}", match self {PositionType::Sell=>"SELL", PositionType::Buy=>"BUY"})
-        }
+impl Default for PositionType {
+    fn default() -> Self {
+        PositionType::Buy
     }
+}
+impl std::fmt::Display for PositionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {PositionType::Sell=>"SELL", PositionType::Buy=>"BUY"})
+    }
+}
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Position {
     pub action_type: PositionType,
     pub stock_symbol: String,
