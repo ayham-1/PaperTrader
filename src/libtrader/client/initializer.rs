@@ -85,6 +85,8 @@ pub fn libtrader_init_client() -> Result<(), String> {
     let mut events = mio::Events::with_capacity(32);
     tls_client.register(poll.registry());
 
+    use crate::client::account::authorization::acc_auth;
+    use crate::client::account::retrieval_portfolio::acc_retrieve_portfolio;
     loop {
         poll.poll(&mut events, None).unwrap();
         println!("KHELLO");
@@ -99,13 +101,11 @@ pub fn libtrader_init_client() -> Result<(), String> {
             //    Err(err) => panic!("panik! {}", err),
             //}
 
-            use crate::client::account::authorization::acc_auth;
             match acc_auth(&mut tls_client, &mut poll, "test", "email", "password") {
                 Ok(_) => println!("we accessed it, the token: {}", tls_client.auth_jwt),
                 Err(err) => panic!("panik! {}", err),
             }
 
-            use crate::client::account::retrieval_portfolio::acc_retrieve_portfolio;
             match acc_retrieve_portfolio(&mut tls_client, &mut poll) {
                 Ok(portfolio) => println!("we got portfolio {:#?}", portfolio),
                 Err(err) => panic!("panik! {}", err),
