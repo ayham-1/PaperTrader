@@ -28,7 +28,7 @@ pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
                         Err(err) => warn!("LOGIN_NORMAL_FAILED_SENDING_RESPONSE: {}", err)
                     }
                 },
-                Err(_) => {}
+                Err(_) => error!("LOGIN_NORMAL_MESSAGE_BUILD_FAILED"),
             }
         }
     };

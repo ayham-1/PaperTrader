@@ -12,4 +12,4 @@ pub static DB_ACC_USER: &'static str = "accounts_schema_usr";
 pub static DB_ACC_PASS: &'static str = "PASSWORD";
 
 pub static DB_PORTFOLIO_USER: &'static str = "portfolio_schema_usr";
-pub static DB_PORTFOLIO_PASS: &'static str = "PASSOWRD";
+pub static DB_PORTFOLIO_PASS: &'static str = "PASSWORD";

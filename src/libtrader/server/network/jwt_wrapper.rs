@@ -18,7 +18,7 @@ pub static JWT_SECRET: &'static str = "seecreet";
 /// ```rust
 ///     let token = create_jwt_token(auth_user_id, unix_expiry_epoch).unwrap();
 /// ```
-pub fn create_jwt_token(user_id: usize, exp: usize) -> Result<String, String> {
+pub fn create_jwt_token(user_id: i64, exp: u64) -> Result<String, String> {
     let mut header = Header::default();
     header.alg = Algorithm::HS512;
 
@@ -63,11 +63,11 @@ mod test {
     fn test_create_jwt_token() {
         use std::time::{SystemTime, UNIX_EPOCH, Duration};
         let start = SystemTime::now() + Duration::from_secs(4*60*60);
-        match create_jwt_token(1usize, start.duration_since(UNIX_EPOCH).unwrap().as_secs() as usize) {
+        match create_jwt_token(1i64, start.duration_since(UNIX_EPOCH).unwrap().as_secs()) {
             Ok(token) => {
                 let claims = verify_jwt_token(token).unwrap();
-                assert_eq!(claims.user_id, 1usize);
-                assert_eq!(claims.exp, start.duration_since(UNIX_EPOCH).unwrap().as_secs() as usize);
+                assert_eq!(claims.user_id, 1i64);
+                assert_eq!(claims.exp, start.duration_since(UNIX_EPOCH).unwrap().as_secs());
             },
             Err(_) => panic!("TEST_CREATE_JWT_TOKEN_FAILED")
         }
@@ -77,11 +77,11 @@ mod test {
     fn test_verify_jwt_token() {
         use std::time::{SystemTime, UNIX_EPOCH, Duration};
         let start = SystemTime::now() + Duration::from_secs(4*60*60);
-        let token = create_jwt_token(1usize, start.duration_since(UNIX_EPOCH).unwrap().as_secs() as usize).unwrap();
+        let token = create_jwt_token(1i64, start.duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
         match verify_jwt_token(token) {
             Ok(claims) => {
-                assert_eq!(claims.user_id, 1usize);
-                assert_eq!(claims.exp, start.duration_since(UNIX_EPOCH).unwrap().as_secs() as usize);
+                assert_eq!(claims.user_id, 1i64);
+                assert_eq!(claims.exp, start.duration_since(UNIX_EPOCH).unwrap().as_secs());
             },
             Err(_) => panic!("TEST_VERIFY_JWT_TOKEN_FAILED")
         }

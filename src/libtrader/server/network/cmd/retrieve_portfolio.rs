@@ -1,6 +1,5 @@
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
-use crate::common::message::message_builder::message_builder;
 
 use crate::server::network::tls_connection::TlsConnection;
 use crate::server::account::retrieval_portfolio::acc_retrieve_portfolio;
@@ -18,7 +17,6 @@ pub fn retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Message)
     /* call acc_retrieve_portfolio() server version */
     match acc_retrieve_portfolio(tls_connection, message) {
         Ok(_) => {},
-        Err(err) => warn!("REGISTER_FAILED: {}", err)
+        Err(err) => warn!("RETRIEVE_PORTFOLIO_FAILED: {}", err)
     };
-    tls_connection.closing = true;
 }
