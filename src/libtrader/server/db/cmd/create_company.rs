@@ -32,7 +32,7 @@ pub fn create_company(company: Company) -> Result<Company, String> {
             &company.primary_exchange, &company.sector, &company.industry,
             &company.primary_sic_code, &company.employees]) {
         Ok(_row) => Ok(company),
-        Err(error) => Err(format!("CMD_COMPANY_CREATE_FAILED: {}", error))
+        Err(error) => Err(format!("CMD_CREATE_COMPANY_FAILED: {}", error))
     }
 }
 

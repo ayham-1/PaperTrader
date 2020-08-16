@@ -5,6 +5,7 @@ pub mod create_stock;
 pub mod get_stock;
 
 pub mod create_portfolio;
+pub mod create_position;
 
 pub mod get_user_salt;
 pub mod get_user_hash;
