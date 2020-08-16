@@ -1,5 +1,6 @@
 CREATE TABLE portfolio_schema.positions (
 	id 					BIGSERIAL PRIMARY KEY,
+	user_id				BIGINT NOT NULL,
 	stock_symbol		TEXT NOT NULL,
 	stock_open_amount	BIGINT NOT NULL,
 	stock_open_price	DOUBLE PRECISION NOT NULL,

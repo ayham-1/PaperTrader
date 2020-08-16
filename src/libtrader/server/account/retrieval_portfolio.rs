@@ -25,51 +25,29 @@ pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Mess
     /* connect to database */
     let mut client = db_connect(DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS)?;
 
-    /* get userId's portfolio open positions length */
-    let mut pos_size = 0;
-    for row in client.query(
-        "SELECT array_length(open_positions, 1) FROM portfolio_schema.portfolios WHERE userid = $1",
-        &[&token.user_id]).unwrap() {
-        pos_size = match row.try_get(0) {
-            Ok(val) => val,
-            Err(_) => break
-        };
-    }
-
     /* get userId's portfolio positions */
     let mut portfolio: Portfolio = Portfolio::default();
-    // loop over the open positions
-    while pos_size > 0 {
-        // get open position table ID.
-        let mut pos_id: i64 = 0;
-        for row in client.query("SELECT open_positions[$1] FROM portfolio_schema.portfolios WHERE userid = $2",
-                                &[&pos_size, &token.user_id]).unwrap() {
-            pos_id = row.get(0);
-        }
-        // get position data from the portfolio_schema.positions table.
-        for row in client.query("SELECT * FROM portfolio_schema.positions WHERE id = $1", &[&pos_id]).unwrap() {
-            let mut pos: Position = Position::default();
-            pos.stock_symbol = row.get(1);
-            pos.stock_open_amount = row.get(2);
-            pos.stock_open_price = row.get(3);
-            pos.stock_open_cost = row.get(4);
-            pos.stock_close_amount = row.get(5);
-            pos.stock_close_price = row.get(6);
-            pos.open_epoch = row.get(7);
-            pos.is_open = row.get(9);
-            
-            let is_buy: bool = row.get(9);
-            if  is_buy == false {
-                pos.action_type = PositionType::Sell;
-            } else {
-                pos.action_type = PositionType::Buy;
-            }
+    // get position data from the portfolio_schema.positions table.
+    for row in client.query("SELECT * FROM portfolio_schema.positions WHERE user_id = $1", &[&token.user_id]).unwrap() {
+        let mut pos: Position = Position::default();
+        pos.stock_symbol = row.get(2);
+        pos.stock_open_amount = row.get(3);
+        pos.stock_open_price = row.get(4);
+        pos.stock_open_cost = row.get(5);
+        pos.stock_close_amount = row.get(6);
+        pos.stock_close_price = row.get(7);
+        pos.open_epoch = row.get(8);
+        pos.close_epoch = row.get(9);
+        pos.is_open = row.get(10);
 
-            portfolio.open_positions.push(pos);
+        let is_buy: bool = row.get(11);
+        if  is_buy == false {
+            pos.action_type = PositionType::Sell;
+        } else {
+            pos.action_type = PositionType::Buy;
         }
 
-        // to the next position 
-        pos_size = pos_size - 1;
+        portfolio.open_positions.push(pos);
     }
 
     /* build a message */
