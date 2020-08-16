@@ -30,7 +30,10 @@ pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Mess
     for row in client.query(
         "SELECT array_length(open_positions, 1) FROM portfolio_schema.portfolios WHERE userid = $1",
         &[&token.user_id]).unwrap() {
-        pos_size = row.get(0);
+        pos_size = match row.try_get(0) {
+            Ok(val) => val,
+            Err(_) => break
+        };
     }
 
     /* get userId's portfolio positions */

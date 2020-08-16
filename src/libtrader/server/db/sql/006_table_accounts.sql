@@ -8,7 +8,5 @@ CREATE TABLE accounts_schema.accounts (
 
 	pass_hash		  TEXT UNIQUE NOT NULL,
 	server_pass_salt  TEXT UNIQUE NOT NULL,
-	client_pass_salt  TEXT UNIQUE NOT NULL,
-
-	transactions	transaction[]
-);
+	client_pass_salt  TEXT UNIQUE NOT NULL
+)

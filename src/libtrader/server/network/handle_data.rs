@@ -10,6 +10,7 @@ use crate::server::network::tls_connection::TlsConnection;
 use crate::server::network::cmd::register::register;
 use crate::server::network::cmd::login_normal::login_normal;
 use crate::server::network::cmd::retrieve_portfolio::retrieve_portfolio;
+use crate::server::network::cmd::retrieve_transactions::retrieve_transactions;
 
 pub fn handle_data(connection: &mut TlsConnection, buf: &[u8]) -> 
 Result<(), String> {
@@ -93,6 +94,8 @@ Result<(), String> {
             login_normal(connection, &client_msg),
         _ if client_msg.instruction == DataTransferInst::GetUserPortfolio as i64 =>
             retrieve_portfolio(connection, &client_msg),
+        _ if client_msg.instruction == DataTransferInst::GetUserTransactionHist as i64 =>
+            retrieve_transactions(connection, &client_msg),
         _ => {}
     };
         
