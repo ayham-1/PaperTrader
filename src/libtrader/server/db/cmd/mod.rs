@@ -4,6 +4,8 @@ pub mod get_company;
 pub mod create_stock;
 pub mod get_stock;
 
+pub mod create_portfolio;
+
 pub mod get_user_salt;
 pub mod get_user_hash;
 pub mod get_user_id;
