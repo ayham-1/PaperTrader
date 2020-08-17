@@ -3,7 +3,6 @@ use std::io::Write;
 use crate::common::account::transaction::Transaction;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
-use crate::common::message::inst::DataTransferInst;
 use crate::common::message::message_builder::message_builder;
 
 use crate::server::network::tls_connection::TlsConnection;
