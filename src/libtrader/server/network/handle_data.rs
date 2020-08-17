@@ -11,6 +11,7 @@ use crate::server::network::cmd::register::register;
 use crate::server::network::cmd::login_normal::login_normal;
 use crate::server::network::cmd::retrieve_portfolio::retrieve_portfolio;
 use crate::server::network::cmd::retrieve_transactions::retrieve_transactions;
+use crate::server::network::cmd::get_asset_info::get_asset_info;
 
 pub fn handle_data(connection: &mut TlsConnection, buf: &[u8]) -> 
 Result<(), String> {
@@ -96,6 +97,8 @@ Result<(), String> {
             retrieve_portfolio(connection, &client_msg),
         _ if client_msg.instruction == DataTransferInst::GetUserTransactionHist as i64 =>
             retrieve_transactions(connection, &client_msg),
+        _ if client_msg.instruction == DataTransferInst::GetAssetInfo as i64 =>
+            get_asset_info(connection, &client_msg),
         _ => {}
     };
         

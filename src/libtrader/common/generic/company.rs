@@ -1,4 +1,6 @@
-#[derive(Default, Eq, PartialEq, Clone, Debug)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Default, Eq, PartialEq, Clone, Debug)]
 pub struct Company {
     pub id: i64,
     pub symbol: String,
