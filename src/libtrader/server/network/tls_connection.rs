@@ -1,5 +1,5 @@
-use std::io;
 use std::net;
+use std::io;
 use std::io::Read;
 
 use mio;
@@ -200,5 +200,17 @@ impl TlsConnection {
         } else {
             mio::Interest::READABLE
         }
+    }
+}
+
+impl io::Write for TlsConnection {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        let res = self.tls_session.write(bytes);
+        self.do_tls_write_and_handle_error();
+        res
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.tls_session.flush()
     }
 }

@@ -92,11 +92,11 @@ pub fn libtrader_init_client() -> Result<(), String> {
             tls_client.ready(&ev);
             tls_client.reregister(poll.registry());
 
-            //use crate::client::account::creation::acc_create;
-            //match acc_create(&mut tls_client, &mut poll, "test", "email", "password") {
-            //    Ok(_) => println!("we created it"),
-            //    Err(err) => panic!("panik! {}", err),
-            //}
+            use crate::client::account::creation::acc_create;
+            match acc_create(&mut tls_client, &mut poll, "test", "email", "password") {
+                Ok(_) => println!("we created it"),
+                Err(err) => panic!("panik! {}", err),
+            }
 
             use crate::client::account::authorization::acc_auth;
             match acc_auth(&mut tls_client, &mut poll, "test", "email", "password") {
