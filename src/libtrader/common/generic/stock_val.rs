@@ -1,6 +1,7 @@
 use postgres_types::{ToSql, FromSql};
+use serde::{Serialize, Deserialize};
 
-#[derive(Default, PartialEq, Debug, ToSql, FromSql)]
+#[derive(Default, PartialEq, Debug, ToSql, FromSql, Serialize, Deserialize)]
 pub struct StockVal {
     pub id: i64,
     pub isin: String,

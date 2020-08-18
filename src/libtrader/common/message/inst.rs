@@ -24,15 +24,11 @@ static INST_COMMAND_MAX_ID: isize = CommandInst::GetPasswordSalt as isize;
 #[derive(PartialEq, Debug)]
 pub enum DataTransferInst {
     GetAssetInfo = 6,
-    GetAssetValueCurrent = 7,
-    GetAssetValueDay = 8,
-    GetAssetValueWeek = 9,
-    GetAssetValueMonth = 10,
-    GetAssetValueYear = 11,
-    GetAssetValueAllTime = 12,
-    GetUserInfo = 13,
-    GetUserPortfolio = 14,
-    GetUserTransactionHist = 15,
+    GetAssetValue = 7,
+    GetAssetValueCurrent = 8,
+    GetUserInfo = 9,
+    GetUserPortfolio = 10,
+    GetUserTransactionHist = 11,
 }
 impl std::fmt::Display for DataTransferInst {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

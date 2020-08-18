@@ -20,7 +20,7 @@ use crate::common::generic::stock_val::StockVal;
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///   };
 /// ```
-pub fn get_stock_from_db(searched_symbol: String) -> Result<Vec<StockVal>, String> {
+pub fn get_stock_from_db(searched_symbol: &str) -> Result<Vec<StockVal>, String> {
     /*
      * Returns all stock values from database.
      */
@@ -66,7 +66,7 @@ pub fn get_stock_from_db(searched_symbol: String) -> Result<Vec<StockVal>, Strin
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///     };
 /// ```
-pub fn get_stock_from_db_since_epoch(searched_symbol: String, time_epoch: i64) -> Result<Vec<StockVal>, String> {
+pub fn get_stock_from_db_since_epoch(searched_symbol: &str, time_epoch: i64) -> Result<Vec<StockVal>, String> {
     /*
      * Returns all stock values from database since a time epoch.
      */
@@ -115,7 +115,7 @@ pub fn get_stock_from_db_since_epoch(searched_symbol: String, time_epoch: i64) -
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///   };
 /// ```
-pub fn get_stock_from_db_between_epochs(searched_symbol: String, first_time_epoch: i64, 
+pub fn get_stock_from_db_between_epochs(searched_symbol: &str, first_time_epoch: i64, 
                                         second_time_epoch: i64) -> Result<Vec<StockVal>, String> {
     /*
      * Returns all stock values from database between two time epochs.
