@@ -19,7 +19,7 @@ use crate::common::generic::company::Company;
 ///        Err(err) => error!("we must found the sacred company! err: {}", err),
 ///    }
 /// ```
-pub fn get_company_from_db(searched_symbol: String) -> Result<Company, String> {
+pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, String> {
     /*
      * Returns company entry from database
      */
