@@ -69,7 +69,7 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
 
     /* wait for response */
-    wait_and_read_branched(tls_client, poll, Some(15), Some(500))?;
+    wait_and_read_branched(tls_client, poll, None, None)?;
 
     /* decode response */
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
