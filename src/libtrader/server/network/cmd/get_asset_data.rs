@@ -36,8 +36,7 @@ pub fn get_asset_data(tls_connection: &mut TlsConnection, message: &Message) {
                 match message_builder(MessageType::DataTransfer, 1, counter, vals.len(), 0, 
                                       bincode::serialize(&val).unwrap()) {
                     Ok(msg) => {
-                        tls_connection.tls_session.write(&bincode::serialize(&msg).unwrap()).unwrap();
-                        tls_connection.do_tls_write_and_handle_error();
+                        let _ = tls_connection.write(&bincode::serialize(&msg).unwrap());
                     },
                     Err(_) => {
                         error!("GET_ASSET_DATA_FAILED_MESSAGE_BUILD");
@@ -49,8 +48,7 @@ pub fn get_asset_data(tls_connection: &mut TlsConnection, message: &Message) {
         Err(err) => { /* handle error */
             match message_builder(MessageType::ServerReturn, 0, 0, 0, 0, bincode::serialize(&err).unwrap()) {
                 Ok(msg) => {
-                    tls_connection.tls_session.write(&bincode::serialize(&msg).unwrap()).unwrap();
-                    tls_connection.do_tls_write_and_handle_error();
+                    let _ = tls_connection.write(&bincode::serialize(&msg).unwrap());
                 },
                 Err(_) => {
                     error!("GET_ASSET_DATA_FAILED_MESSAGE_BUILD");

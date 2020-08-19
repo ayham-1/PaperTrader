@@ -206,7 +206,11 @@ impl TlsConnection {
 impl io::Write for TlsConnection {
     fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
         let res = self.tls_session.write(bytes);
-        self.do_tls_write_and_handle_error();
+        if res.is_err() {
+            warn!("TLS_CONNECTION_WRITE_FAILED");
+        } else {
+            self.do_tls_write_and_handle_error();
+        }
         res
     }
 

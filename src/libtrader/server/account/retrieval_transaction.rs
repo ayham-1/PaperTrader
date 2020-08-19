@@ -13,7 +13,7 @@ use crate::server::db::initializer::db_connect;
 pub fn acc_retrieve_transaction(tls_connection: &mut TlsConnection, message: &Message) -> Result<(), String> {
     /* verify JWT token */
     let token = match verify_jwt_token(bincode::deserialize(&message.data).unwrap()) {
-        Ok(token) => token,
+    Ok(token) => token,
         Err(_) => {
             warn!("ACC_RETRIEVE_TRANSACTION_UNAUTH_TOKEN");
             tls_connection.closing = true;
@@ -40,10 +40,7 @@ pub fn acc_retrieve_transaction(tls_connection: &mut TlsConnection, message: &Me
     /* build message to be send */
     match message_builder(MessageType::ServerReturn, 1, 1, 0, 0, bincode::serialize(&transactions).unwrap()) {
         Ok(message) => {
-            match tls_connection.tls_session.write(&bincode::serialize(&message).unwrap()) {
-                Ok(_) => tls_connection.do_tls_write_and_handle_error(),
-                Err(err) => return Err(format!("ACC_RETRIEVE_TRANSACTION_FAILED_SENDING_MESSAGE: {}", err)),
-            }
+            let _ =  tls_connection.write(&bincode::serialize(&message).unwrap());
         },
         Err(_) => return Err("ACC_RETRIEVE_TRANSACTION_MESSAGE_BUILD_FAILED".to_string())
     }

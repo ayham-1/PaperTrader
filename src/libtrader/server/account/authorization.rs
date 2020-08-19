@@ -80,10 +80,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
      * */
     match message_builder(MessageType::ServerReturn, 1, 1, 0, 1, jwt_token.as_bytes().to_vec()) {
         Ok(message) => {
-            match tls_connection.tls_session.write(bincode::serialize(&message).unwrap().as_slice()) {
-                Ok(_) => {tls_connection.do_tls_write_and_handle_error();return Ok(());},
-                Err(err) => {warn!("ACC_AUTH_FAILED_SENDING_RESPONSE: {}", err); tls_connection.closing = true;}
-            }
+            let _ = tls_connection.write(bincode::serialize(&message).unwrap().as_slice());
         },
         Err(_) => return Err("ACC_AUTH_SERVER_COULD_NOT_BUILD_MESSAGE".to_string())
     };

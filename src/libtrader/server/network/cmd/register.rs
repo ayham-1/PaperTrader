@@ -22,15 +22,11 @@ pub fn register(tls_connection: &mut TlsConnection, message: &Message) {
         Ok(_) => {
             match message_builder(MessageType::ServerReturn, 1, 0, 0, 0, Vec::new()) {
                 Ok(msg) => {
-                    match tls_connection.tls_session.write(bincode::serialize(&msg).unwrap().as_slice()) {
-                        Ok(_) => return,
-                        Err(err) => warn!("REGISTER_FAILED_SENDING_RESPONSE: {}", err)
-                    }
+                    let _ = tls_connection.write(bincode::serialize(&msg).unwrap().as_slice());
                 },
                 Err(_) => {}
             }
         },
         Err(err) => warn!("REGISTER_FAILED: {}", err)
     };
-    tls_connection.closing = true;
 }
