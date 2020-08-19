@@ -31,8 +31,7 @@ pub fn create_position(user_id: i64, position: Position) -> Result<(), String> {
                          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)", 
                          &[&user_id, &position.stock_symbol, &position.stock_open_amount, &position.stock_open_price, 
                          &position.stock_open_cost, &position.stock_close_amount, &position.stock_close_price, 
-                         &position.open_epoch, &position.close_epoch, &(position.action_type as i64 != 0), 
-                         &position.is_open]) {
+                         &position.open_epoch, &position.close_epoch, &position.is_buy, &position.is_open]) {
         Ok(_rows) => Ok(()),
         Err(err) => Err(format!("CMD_CREATE_POSITION_FAILED: {}", err)),
     }

@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use crate::common::account::portfolio::Portfolio;
-use crate::common::account::position::{Position, PositionType};
+use crate::common::account::position::Position;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
@@ -40,13 +40,7 @@ pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Mess
         pos.close_epoch = row.get(9);
         pos.is_open = row.get(10);
 
-        let is_buy: bool = row.get(11);
-        if  is_buy == false {
-            pos.action_type = PositionType::Sell;
-        } else {
-            pos.action_type = PositionType::Buy;
-        }
-
+        pos.is_buy = row.get(11);
         portfolio.open_positions.push(pos);
     }
 

@@ -1,8 +1,6 @@
-use crate::common::account::position::PositionType;
-
 #[derive(PartialEq, Debug)]
 pub struct Order {
-    pub action_type: PositionType,
+    pub is_buy: bool,
     pub stock_symbol: String,
     pub stock_price: f64,
     pub stock_amount: isize,
@@ -11,7 +9,7 @@ pub struct Order {
 }
 impl std::fmt::Display for Order {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {}, {})", self.action_type, self.stock_symbol, self.stock_price, 
+        write!(f, "({}, {}, {}, {}, {}, {}, {})", self.is_buy, self.stock_symbol, self.stock_price, 
                self.stock_amount, self.stock_amount, self.stock_filled, self.is_filled)
     }
 }
