@@ -21,25 +21,13 @@ pub fn get_asset_info(tls_connection: &mut TlsConnection, message: &Message) {
     /* call get_company_from_db() */
     match get_company_from_db(bincode::deserialize(&message.data).unwrap()) {
         Ok(company) => {
-            match message_builder(MessageType::ServerReturn, DataTransferInst::GetAssetInfo as i64, 0, 0, 1, 
-                                  bincode::serialize(&company).unwrap()) {
-                Ok(msg) => {
-                    let _ = tls_connection.write(&bincode::serialize(&msg).unwrap());
-                },
-                Err(_) => {
-                    error!("GET_ASSET_INFO_FAILED_MESSAGE_BUILD");
-                },
-            }
+            let message = message_builder(MessageType::ServerReturn, DataTransferInst::GetAssetInfo as i64, 0, 0, 1, 
+                                          bincode::serialize(&company).unwrap());
+            let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
         },
         Err(err) => {
-            match message_builder(MessageType::ServerReturn, 0, 0, 0, 0, bincode::serialize(&err).unwrap()) {
-                Ok(msg) => {
-                    let _ = tls_connection.write(&bincode::serialize(&msg).unwrap());
-                },
-                Err(_) => {
-                    error!("GET_ASSET_INFO_FAILED_MESSAGE_BUILD");
-                },
-            }
+            let message = message_builder(MessageType::ServerReturn, 0, 0, 0, 0, bincode::serialize(&err).unwrap());
+            let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
         }
     }
 }

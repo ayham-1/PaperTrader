@@ -33,20 +33,16 @@ Result<[u8; digest::SHA512_OUTPUT_LEN/2], String> {
     /*
      * request to generate a salt from the server.
      * */
-    match message_builder(MessageType::Command, CommandInst::GenHashSalt as i64, 0, 0, 0, vec!()) {
-        Ok(message) => {
-            tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
+    let message = message_builder(MessageType::Command, CommandInst::GenHashSalt as i64, 0, 0, 0, Vec::new());
+    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
 
-            wait_and_read_branched(tls_client, poll, None, None)?;
-            let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-            assert_eq!(ret_msg.msgtype, MessageType::DataTransfer);
-            assert_eq!(ret_msg.instruction, CommandInst::GenHashSalt as i64);
-            assert_eq!(ret_msg.argument_count, 1);
-            assert_eq!(ret_msg.data_message_number, 0);
-            assert_eq!(ret_msg.data_message_max, 1);
-            assert_eq!(ret_msg.data.len(), digest::SHA512_OUTPUT_LEN/2);
-            Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN/2))
-        },
-        Err(_) => Err("AUTH_SALT_RETRIEVAL_MESSAGE_FAILED".to_string())
-    }
+    wait_and_read_branched(tls_client, poll, None, None)?;
+    let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
+    assert_eq!(ret_msg.msgtype, MessageType::DataTransfer);
+    assert_eq!(ret_msg.instruction, CommandInst::GenHashSalt as i64);
+    assert_eq!(ret_msg.argument_count, 1);
+    assert_eq!(ret_msg.data_message_number, 0);
+    assert_eq!(ret_msg.data_message_max, 1);
+    assert_eq!(ret_msg.data.len(), digest::SHA512_OUTPUT_LEN/2);
+    Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN/2))
 }

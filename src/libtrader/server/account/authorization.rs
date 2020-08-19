@@ -78,12 +78,8 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     /* 
      * Send the JWT token 
      * */
-    match message_builder(MessageType::ServerReturn, 1, 1, 0, 1, jwt_token.as_bytes().to_vec()) {
-        Ok(message) => {
-            let _ = tls_connection.write(bincode::serialize(&message).unwrap().as_slice());
-        },
-        Err(_) => return Err("ACC_AUTH_SERVER_COULD_NOT_BUILD_MESSAGE".to_string())
-    };
+    let message = message_builder(MessageType::ServerReturn, 1, 1, 0, 1, jwt_token.as_bytes().to_vec());
+    let _ = tls_connection.write(bincode::serialize(&message).unwrap().as_slice());
     
     Ok(()) 
 }

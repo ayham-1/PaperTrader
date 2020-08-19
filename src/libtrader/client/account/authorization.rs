@@ -59,16 +59,12 @@ pub fn acc_auth(tls_client: &mut TlsClient, poll: &mut mio::Poll,
         hashed_password: HEXUPPER.encode(&hashed_password),
         username: username
     };
-    match message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 3, 0, 0, 
-                          data.dump().as_bytes().to_vec()) {
-        Ok(message) => {
-            tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
+    let message = message_builder(MessageType::Command, CommandInst::LoginMethod1 as i64, 3, 0, 0, 
+                                  data.dump().as_bytes().to_vec());
+    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
 
-            /* wait for a response */
-            wait_and_read_branched(tls_client, poll, Some(15), Some(500))?;
-        },
-        Err(_) => return Err("ACC_AUTH_CLIENT_COULD_NOT_BUILD_MESSAGE".to_string())
-    };
+    /* wait for a response */
+    wait_and_read_branched(tls_client, poll, Some(15), Some(500))?;
 
     /* decode response */
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();

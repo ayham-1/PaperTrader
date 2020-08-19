@@ -38,33 +38,29 @@ Result<[u8; digest::SHA512_OUTPUT_LEN], String> {
     assert_eq!(salt_type <= CommandInst::GetPasswordSalt as i64, true);
 
     /* generate message to send */
-    match message_builder(MessageType::Command, salt_type, 1, 0, 0, 
-                          username.as_bytes().to_vec()) {
-        Ok(message) => {
-            tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
-            wait_and_read_branched(tls_client, poll, None, None)?;
-            let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-            match ret_msg.msgtype {
-                MessageType::Command => {
-                    Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string())
-                },
-                MessageType::DataTransfer => {
-                    if ret_msg.data.len() != digest::SHA512_OUTPUT_LEN {
-                        Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN_SIZE".to_string())
-                    } else if ret_msg.instruction == salt_type {
-                        Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN))
-                    } else {
-                        Err("REQ_SERVER_SALT_INVALID_SERVER_INSTRUCTION_RETURN".to_string())
-                    }
-                },
-                MessageType::ServerReturn => {
-                    match ret_msg.instruction {
-                        0 => Err("REQ_SERVER_SALT_REJECTED".to_string()),
-                        _ => Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string()),
-                    }
-                }
+    let message = message_builder(MessageType::Command, salt_type, 1, 0, 0, 
+                                  username.as_bytes().to_vec());
+    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
+    wait_and_read_branched(tls_client, poll, None, None)?;
+    let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
+    match ret_msg.msgtype {
+        MessageType::Command => {
+            Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string())
+        },
+        MessageType::DataTransfer => {
+            if ret_msg.data.len() != digest::SHA512_OUTPUT_LEN {
+                Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN_SIZE".to_string())
+            } else if ret_msg.instruction == salt_type {
+                Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN))
+            } else {
+                Err("REQ_SERVER_SALT_INVALID_SERVER_INSTRUCTION_RETURN".to_string())
             }
         },
-        Err(_) => Err("REQ_SERVER_SALT_FAILED".to_string())
+        MessageType::ServerReturn => {
+            match ret_msg.instruction {
+                0 => Err("REQ_SERVER_SALT_REJECTED".to_string()),
+                _ => Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string()),
+            }
+        }
     }
 }

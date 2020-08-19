@@ -64,13 +64,9 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
         password_client_salt: HEXUPPER.encode(&password_hash.1),
         username: username
     };
-    match message_builder(MessageType::Command, CommandInst::Register as i64, 5, 0, 0, 
-                          data.dump().as_bytes().to_vec()) {
-        Ok(message) => {
-            tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
-        },
-        Err(_) => return Err("ACC_CREATE_MESSAGE_BUILD_FAILED".to_string())
-    };
+    let message = message_builder(MessageType::Command, CommandInst::Register as i64, 5, 0, 0, 
+                                  data.dump().as_bytes().to_vec());
+    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
 
     /* wait for response */
     wait_and_read_branched(tls_client, poll, Some(15), Some(500))?;

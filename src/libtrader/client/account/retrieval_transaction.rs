@@ -31,13 +31,9 @@ pub fn acc_retrieve_transaction(tls_client: &mut TlsClient, poll: &mut mio::Poll
     assert_eq!(tls_client.auth_jwt.is_empty(), false);
 
     /* build message request */
-    match message_builder(MessageType::DataTransfer, DataTransferInst::GetUserTransactionHist as i64, 1, 0, 0,
-                          bincode::serialize(&tls_client.auth_jwt).unwrap()) {
-        Ok(message) => {
-            tls_client.write(bincode::serialize(&message).unwrap().as_slice()).unwrap();
-        },
-        Err(_) => return Err("ACC_RETRIEVE_TRANSACTION_FAILED_MESSAGE".to_string()),
-    };
+    let message = message_builder(MessageType::DataTransfer, DataTransferInst::GetUserTransactionHist as i64, 1, 0, 0,
+                                  bincode::serialize(&tls_client.auth_jwt).unwrap());
+    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
 
     /* wait for response */
     wait_and_read_branched(tls_client, poll, Some(20), Some(500))?;

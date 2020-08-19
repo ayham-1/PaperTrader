@@ -51,12 +51,8 @@ pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Mess
     }
 
     /* build a message */
-    match message_builder(MessageType::DataTransfer, 1, 1, 0, 0, bincode::serialize(&portfolio).unwrap()) {
-        Ok(message) => {
-            let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
-        },
-        Err(_) => return Err("ACC_RETRIEVE_PORTFOLIO_MESSAGE_BUILD_FAILED".to_string())
-    }
+    let message = message_builder(MessageType::DataTransfer, 1, 1, 0, 0, bincode::serialize(&portfolio).unwrap());
+    let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
 
     Ok(())
 }

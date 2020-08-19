@@ -36,12 +36,9 @@ Result<(), String> {
             let mut salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
             rng.fill(&mut salt).unwrap();
 
-            let server_response: Message = match message_builder(MessageType::DataTransfer, 
-                                                                 CommandInst::GenHashSalt as i64, 1, 0, 1, 
-                                                                 salt.to_vec()) {
-                Ok(message) => message,
-                Err(_) => panic!("PANIK NO SALT")
-            };
+            let server_response: Message = message_builder(MessageType::DataTransfer, 
+                                                           CommandInst::GenHashSalt as i64, 1, 0, 1, 
+                                                           salt.to_vec());
             connection.tls_session.write(bincode::serialize(&server_response).unwrap().as_slice()).unwrap();
             connection.do_tls_write_and_handle_error();
         },
@@ -50,21 +47,15 @@ Result<(), String> {
             let salt = match get_user_salt(String::from_utf8(client_msg.data).unwrap().as_str(), true, false) {
                 Ok(salt) => salt,
                 Err(_) => {
-                    let msg = match message_builder(MessageType::ServerReturn, 0, 0, 0, 0, Vec::new()) {
-                        Ok(message) => message,
-                        Err(_) => {error!("HANDLE_DATA_SERVER_COULD_NOT_BUILD_MESSAGE"); return Ok(())},
-                    };
+                    let msg = message_builder(MessageType::ServerReturn, 0, 0, 0, 0, Vec::new());
                     connection.tls_session.write(&bincode::serialize(&msg).unwrap()).unwrap();
                     connection.do_tls_write_and_handle_error();
                     return Ok(());
                 }
             };
-            let server_response: Message = match message_builder(MessageType::DataTransfer, 
-                                                                 CommandInst::GetEmailSalt as i64, 1, 0, 1, 
-                                                                 HEXUPPER.decode(salt.as_bytes()).unwrap()) {
-                Ok(message) => message,
-                Err(_) => panic!("PANIK NO SALT")
-            };
+            let server_response: Message = message_builder(MessageType::DataTransfer, 
+                                                           CommandInst::GetEmailSalt as i64, 1, 0, 1, 
+                                                           HEXUPPER.decode(salt.as_bytes()).unwrap());
             connection.tls_session.write(bincode::serialize(&server_response).unwrap().as_slice()).unwrap();
             connection.do_tls_write_and_handle_error();
         },
@@ -73,21 +64,15 @@ Result<(), String> {
             let salt = match get_user_salt(String::from_utf8(client_msg.data).unwrap().as_str(), false, false) {
                 Ok(salt) => salt,
                 Err(_) => {
-                    let msg = match message_builder(MessageType::ServerReturn, 0, 0, 0, 0, Vec::new()) {
-                        Ok(message) => message,
-                        Err(_) => {error!("HANDLE_DATA_SERVER_COULD_NOT_BUILD_MESSAGE"); return Ok(())},
-                    };
-                    connection.tls_session.write(&bincode::serialize(&msg).unwrap()).unwrap();
+                    let message = message_builder(MessageType::ServerReturn, 0, 0, 0, 0, Vec::new());
+                    connection.tls_session.write(&bincode::serialize(&message).unwrap()).unwrap();
                     connection.do_tls_write_and_handle_error();
                     return Ok(());
                 }
             };
-            let server_response: Message = match message_builder(MessageType::DataTransfer, 
-                                                                 CommandInst::GetPasswordSalt as i64, 1, 0, 1, 
-                                                                 HEXUPPER.decode(salt.as_bytes()).unwrap()) {
-                Ok(message) => message,
-                Err(_) => panic!("PANIK NO SALT")
-            };
+            let server_response: Message = message_builder(MessageType::DataTransfer, 
+                                                           CommandInst::GetPasswordSalt as i64, 1, 0, 1,
+                                                           HEXUPPER.decode(salt.as_bytes()).unwrap());
             connection.tls_session.write(bincode::serialize(&server_response).unwrap().as_slice()).unwrap();
             connection.do_tls_write_and_handle_error();
         },

@@ -38,12 +38,8 @@ pub fn acc_retrieve_transaction(tls_connection: &mut TlsConnection, message: &Me
     }
 
     /* build message to be send */
-    match message_builder(MessageType::ServerReturn, 1, 1, 0, 0, bincode::serialize(&transactions).unwrap()) {
-        Ok(message) => {
-            let _ =  tls_connection.write(&bincode::serialize(&message).unwrap());
-        },
-        Err(_) => return Err("ACC_RETRIEVE_TRANSACTION_MESSAGE_BUILD_FAILED".to_string())
-    }
+    let message = message_builder(MessageType::ServerReturn, 1, 1, 0, 0, bincode::serialize(&transactions).unwrap());
+    let _ =  tls_connection.write(&bincode::serialize(&message).unwrap());
 
     Ok(())
 }
