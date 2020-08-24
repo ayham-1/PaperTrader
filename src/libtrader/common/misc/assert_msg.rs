@@ -19,7 +19,6 @@ pub fn assert_msg(message: &Message, msg_type: MessageType, arg_cnt: usize, msg_
     if message.msgtype != msg_type || message.argument_count != arg_cnt
         || message.data_message_number != msg_dnum || message.data_message_max != msg_dmax
             || message.data.len() == data_len {
-                warn!("ASSERT_MSG_FAILED");
                 return false;
             }
 
