@@ -1,5 +1,6 @@
 use std::io::Write;
 
+use crate::common::misc::assert_msg::assert_msg;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
@@ -9,13 +10,11 @@ use crate::server::db::cmd::get_stock::get_stock_from_db_between_epochs;
 
 pub fn get_asset_data(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */
-    if message.msgtype != MessageType::DataTransfer || message.argument_count != 3
-        || message.data_message_number != 0 || message.data_message_max != 0
-            || message.data.len() == 0 {
-                warn!("GET_ASSET_DATA_INVALID_MESSAGE");
-                tls_connection.closing = true;
-                return;
-        }
+    if assert_msg(message, MessageType::DataTransfer, 3, 0, 0, 0) {
+        tls_connection.closing = true;
+        warn!("GET_ASSET_DATA_MSG_ASSERT_FAILED");
+        return;
+    }
 
     /*
      * Parse arguments
