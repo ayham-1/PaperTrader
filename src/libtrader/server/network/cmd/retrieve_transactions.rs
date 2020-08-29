@@ -1,17 +1,16 @@
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::assert_msg::assert_msg;
 
 use crate::server::network::tls_connection::TlsConnection;
 use crate::server::account::retrieval_transaction::acc_retrieve_transaction;
 
 pub fn retrieve_transactions(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */
-    if message.msgtype != MessageType::DataTransfer || message.argument_count != 1
-        || message.data_message_number != 0 || message.data_message_max != 0
-            || message.data.len() == 0 {
-                warn!("RETRIEVE_TRANSACTION_INVALID_MESSAGE");
-                tls_connection.closing = true;
-                return;
+    if assert_msg(message, MessageType::DataTransfer, 1, 0, 0, 0) {
+        tls_connection.closing = true;
+        warn!("RETRIEVE_TRANSACTION_INVALID_MESSAGE");
+        return;
     }
 
     /* call acc_retrieve_transaction() server version */
