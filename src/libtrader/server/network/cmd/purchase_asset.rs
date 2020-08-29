@@ -4,6 +4,7 @@ use crate::server::network::tls_connection::TlsConnection;
 
 pub fn purchase_asset(_tls_connection: &mut TlsConnection, _message: &Message) {
     /* assert recieved message */
+    // TODO: INVALID MESSAGE CHECKING SYSTEM
     //if message.msgtype != MessageType::Command || message.argument_count != 4
     //    || message.data_message_number != 0 || message.data_message_max != 0
     //        || message.data.len() == 0 {
