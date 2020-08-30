@@ -1,4 +1,5 @@
 #[cfg(any(feature="server", feature="client"))] #[macro_use] extern crate log;
+#[cfg(any(feature="server", feature="client"))] #[macro_use] extern crate bitflags;
 
 #[cfg(all(feature="server", not(feature="client")))] extern crate arrayref;
 #[cfg(all(feature="server", not(feature="client")))] extern crate json;
