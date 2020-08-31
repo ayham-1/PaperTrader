@@ -3,6 +3,7 @@ use mio::net::TcpStream;
 use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
 use crate::common::misc::lookup_ipv4::lookup_ipv4;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::tls_client::TlsClient;
 
@@ -23,7 +24,7 @@ use crate::client::network::tls_client::TlsClient;
 ///     };
 /// ```
 ///
-fn libtrader_init_log() -> Result<(), String> {
+fn libtrader_init_log() -> Result<(), ReturnFlags> {
     info!("Started Logger.");
     #[cfg(not(debug_assertions))]
     gen_log();
@@ -35,7 +36,7 @@ fn libtrader_init_log() -> Result<(), String> {
         if !path_exists("log") {
             match std::fs::create_dir("log") {
                 Ok(()) => {},
-                Err(err) => panic!("GEN_LOG_FAILED_DIR_CREATION: {}", err)
+                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED)
             };
         }
         CombinedLogger::init(vec![
@@ -61,11 +62,11 @@ fn libtrader_init_log() -> Result<(), String> {
 /// ```rust
 ///     libtrader_init_client()?;
 /// ```
-pub fn libtrader_init_client() -> Result<(), String> {
+pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
     #[cfg(not(test))]
     match libtrader_init_log() {
         Ok(()) => {},
-        Err(err) => panic!("This should not happen!\n{}", err),
+        Err(err) => return Err(ReturnFlags::LIBTRADER_INIT_FAILED | err),
     };
 
     let addr = lookup_ipv4("0.0.0.0", 4000);
@@ -75,7 +76,7 @@ pub fn libtrader_init_client() -> Result<(), String> {
         Ok(socket) => socket,
         Err(err) => {
             error!("LIBTRADER_INIT_CLIENT_CONNECT_FAILED: {}", err);
-            return Err("could not connect to server!".to_string());
+            return Err(ReturnFlags::LIBTRADER_INIT_CLIENT_CONNECT);
         }
     };
     let dns_name = webpki::DNSNameRef::try_from_ascii_str("localhost").unwrap();
