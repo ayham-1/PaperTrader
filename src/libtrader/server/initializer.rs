@@ -3,6 +3,8 @@ use mio::net::TcpListener;
 
 use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
+use crate::common::misc::return_flags::ReturnFlags;
+
 use crate::server::network::tls_server::TlsServer;
 
 /// Initializes global logger.
@@ -22,7 +24,7 @@ use crate::server::network::tls_server::TlsServer;
 ///     };
 /// ```
 ///
-fn libtrader_init_log() -> Result<(), String> {
+fn libtrader_init_log() -> Result<(), ReturnFlags> {
     info!("Started Logger.");
     #[cfg(not(debug_assertions))]
     gen_log();
@@ -34,7 +36,7 @@ fn libtrader_init_log() -> Result<(), String> {
         if !path_exists("log") {
             match std::fs::create_dir("log") {
                 Ok(()) => {},
-                Err(err) => panic!("GEN_LOG_FAILED_DIR_CREATION: {}", err)
+                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED)
             };
         }
         CombinedLogger::init(vec![
@@ -60,12 +62,12 @@ fn libtrader_init_log() -> Result<(), String> {
 /// ```rust
 ///     libtrader_init_server()?;
 /// ```
-pub fn libtrader_init_server() -> Result<(), String> {
+pub fn libtrader_init_server() -> Result<(), ReturnFlags> {
     // Initialize log.
     #[cfg(not(test))]
     match libtrader_init_log() {
         Ok(()) => {},
-        Err(err) => panic!("This should not happen!\n{}", err),
+        Err(err) => return Err(ReturnFlags::LIBTRADER_INIT_LOG_FAILED | err),
     };
     let addr: net::SocketAddr = "0.0.0.0:4000".parse().unwrap();
     let config = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);
