@@ -5,3 +5,4 @@ pub mod path_exists;
 pub mod lookup_ipv4;
 pub mod servers_pool;
 pub mod assert_msg;
+pub mod return_flags;
