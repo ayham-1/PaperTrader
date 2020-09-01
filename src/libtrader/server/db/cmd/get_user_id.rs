@@ -3,7 +3,9 @@ use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
 
 use crate::server::db::cmd::user_exists::user_exists;
 
-pub fn get_user_id(username: &str) -> Result<i64, String> {
+use crate::common::misc::return_flags::ReturnFlags;
+
+pub fn get_user_id(username: &str) -> Result<i64, ReturnFlags> {
     /* check that user exists */
     if user_exists(username) {
         let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
@@ -11,5 +13,5 @@ pub fn get_user_id(username: &str) -> Result<i64, String> {
             return Ok(row.get(0));
         }
     }
-    return Err("GET_USER_ID_FAILED".to_string());
+    Err(ReturnFlags::SERVER_GET_USER_ID_NOT_FOUND)
 }

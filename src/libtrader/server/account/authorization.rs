@@ -7,6 +7,7 @@ use std::num::NonZeroU32;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::network::tls_connection::TlsConnection;
 use crate::server::db::cmd::get_user_salt::get_user_salt;
@@ -15,7 +16,7 @@ use crate::server::db::cmd::get_user_id::get_user_id;
 
 use crate::server::network::jwt_wrapper::create_jwt_token;
 
-pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result<(), String> { 
+pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result<(), ReturnFlags> {
     /*
      * Parse account data.
      * */
@@ -61,6 +62,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     match pass_ret.is_ok() {
         true => {},
         false => return Err("ACC_AUTH_SERVER_UNAUTHORIZED".to_string())
+            return Err(ReturnFlags::SERVER_ACC_AUTH)
     };
 
     /* 

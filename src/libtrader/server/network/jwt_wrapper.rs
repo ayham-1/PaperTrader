@@ -1,5 +1,6 @@
 use jsonwebtoken::{encode, EncodingKey, decode, DecodingKey, Header, Algorithm, Validation};
 use crate::common::sessions::jwt_claim::JWTClaim;
+use crate::common::misc::return_flags::ReturnFlags;
 
 pub static JWT_SECRET: &'static str = "seecreet";
 
@@ -18,7 +19,7 @@ pub static JWT_SECRET: &'static str = "seecreet";
 /// ```rust
 ///     let token = create_jwt_token(auth_user_id, unix_expiry_epoch).unwrap();
 /// ```
-pub fn create_jwt_token(user_id: i64, exp: u64) -> Result<String, String> {
+pub fn create_jwt_token(user_id: i64, exp: u64) -> Result<String, ReturnFlags> {
     let mut header = Header::default();
     header.alg = Algorithm::HS512;
 
@@ -28,7 +29,7 @@ pub fn create_jwt_token(user_id: i64, exp: u64) -> Result<String, String> {
     };
     match encode(&header, &claim, &EncodingKey::from_secret(JWT_SECRET.as_bytes())) {
         Ok(token) => Ok(token),
-        Err(_) => Err("CREATE_JWT_TOKEN_FAILED".to_string())
+        Err(_) => Err(ReturnFlags::SERVER_CREATE_JWT_TOKEN_FAILED)
     }
 }
 
