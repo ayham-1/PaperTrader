@@ -1,4 +1,8 @@
+use serde::{Serialize, Deserialize};
+
 bitflags! {
+    // TODO: FIX NUMBERING
+    #[derive(Serialize, Deserialize)]
     pub struct ReturnFlags: u64 {
         const LIBTRADER_INIT_CLIENT_CONNECT = 0x001;
         const LIBTRADER_INIT_LOG_FAILED = 0x002;
@@ -9,6 +13,8 @@ bitflags! {
         const COMMON_GET_COMPANY_FAILED = 0x006;
         const COMMON_GET_STOCK_FAILED = 0x007;
 
+        const SERVER_DB_CONNECT_FAILED = 0x008;
+
         const SERVER_REGISTER_INV_MSG = 0x008;
         const SERVER_LOGIN_INV_MSG = 0x009;
 
@@ -16,6 +22,7 @@ bitflags! {
 
         const SERVER_ACC_RETRIEVE_TRANSACTION_UNAUTH_TOKEN = 0x00B;
         const SERVER_ACC_RETRIEVE_PORTFOLIO_UNAUTH_TOKEN = 0x00C;
+        const SERVER_ACC_UNAUTHORIZED = 0x00D;
 
         const SERVER_GET_ASSET_DATA_INV_MSG = 0x00D;
         const SERVER_GET_ASSET_INFO_INV_MSG = 0x00E;

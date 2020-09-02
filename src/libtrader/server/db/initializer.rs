@@ -1,4 +1,5 @@
 use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
+use crate::common::misc::return_flags::ReturnFlags;
 
 /// Establishes a postgresql connection to the SQL database.
 ///
@@ -15,13 +16,13 @@ use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
 /// ```rust
 /// let mut client = db_connect(DB_USER, DB_PASS)?;
 /// ```
-pub fn db_connect(user: &'static str, pass: &'static str) -> Result<postgres::Client, String> {
+pub fn db_connect(user: &'static str, pass: &'static str) -> Result<postgres::Client, ReturnFlags> {
     /* Generate the requested string */
     let db_connect_str = format!("host={} port={} dbname={} user={} password={}",
                                  DB_HOST, DB_HOST_PORT, DB_NAME, user, pass);
     match postgres::Client::connect(db_connect_str.as_str(), postgres::NoTls) {
         Ok(client) => return Ok(client),
-        Err(error) => return Err(format!("DB_FAILED_INIT: {}", error))
+        Err(error) => return Err(ReturnFlags::SERVER_DB_CONNECT_FAILED)
     }
 }
 

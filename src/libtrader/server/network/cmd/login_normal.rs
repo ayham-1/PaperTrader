@@ -20,7 +20,8 @@ pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
     match acc_auth(tls_connection, message) {
         Ok(_) => {},
         Err(err) => {
-            let message = message_builder(MessageType::ServerReturn, 0, 0, 0, 0, err.as_bytes().to_vec());
+            let message = message_builder(MessageType::ServerReturn, 0, 0, 0, 0, 
+                                          bincode::serialize(&err).unwrap());
             let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
         }
     }

@@ -51,7 +51,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
         &email_db);
     match email_ret.is_ok() {
         true => {},
-        false => return Err("ACC_AUTH_SERVER_UNAUTHORIZED1".to_string())
+        false => return Err(ReturnFlags::SERVER_ACC_UNAUTHORIZED)
     };
     let pass_ret = pbkdf2::verify(
         pbkdf2::PBKDF2_HMAC_SHA512,
@@ -61,8 +61,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
         &password_db);
     match pass_ret.is_ok() {
         true => {},
-        false => return Err("ACC_AUTH_SERVER_UNAUTHORIZED".to_string())
-            return Err(ReturnFlags::SERVER_ACC_AUTH)
+        false => return Err(ReturnFlags::SERVER_ACC_UNAUTHORIZED)
     };
 
     /* 
