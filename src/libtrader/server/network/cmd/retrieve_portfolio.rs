@@ -16,6 +16,6 @@ pub fn retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Message)
     /* call acc_retrieve_portfolio() server version */
     match acc_retrieve_portfolio(tls_connection, message) {
         Ok(_) => {},
-        Err(err) => warn!("RETRIEVE_PORTFOLIO_FAILED: {}", err)
+        Err(err) => warn!("RETRIEVE_PORTFOLIO_FAILED: " /*{}", err*/) // TODO: OUTPUT ERRORS
     };
 }

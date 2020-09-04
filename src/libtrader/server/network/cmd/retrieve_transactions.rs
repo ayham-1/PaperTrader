@@ -16,6 +16,6 @@ pub fn retrieve_transactions(tls_connection: &mut TlsConnection, message: &Messa
     /* call acc_retrieve_transaction() server version */
     match acc_retrieve_transaction(tls_connection, message) {
         Ok(_) => {},
-        Err(err) => warn!("RETRIEVE_TRANSACTION_FAILED: {}", err)
+        Err(err) => warn!("RETRIEVE_TRANSACTION_FAILED: " /*{}", err*/) // TODO: OUTPUT ERRORS
     };
 }

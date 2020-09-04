@@ -2,6 +2,7 @@ use data_encoding::HEXUPPER;
 
 use crate::common::message::message::Message;
 use crate::common::account::portfolio::Portfolio;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::account::hash_email::hash_email;
 use crate::server::account::hash_pwd::hash_pwd;
@@ -9,7 +10,7 @@ use crate::server::ds::account::Account;
 use crate::server::db::initializer::db_connect;
 use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
 
-pub fn acc_create(message: &Message) -> Result<(), String> {
+pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
     /*
      * Parse account data
      * */
@@ -51,7 +52,7 @@ pub fn acc_create(message: &Message) -> Result<(), String> {
     /* search for an account with same name */
     for _ in &client.query(
         "SELECT username FROM accounts_schema.accounts WHERE username LIKE $1", &[&account.username]).unwrap() {
-        return Err("ACC_CREATE_FAILED_USERNAME_EXISTS".to_string());
+        return Err(ReturnFlags::SERVER_ACC_USER_EXISTS);
     }
 
     /*
@@ -77,6 +78,6 @@ pub fn acc_create(message: &Message) -> Result<(), String> {
         &account.email_hash, &account.server_email_salt, &account.client_email_salt, 
         &account.pass_hash, &account.server_pass_salt, &account.client_pass_salt]) {
             Ok(_) => return Ok(()),
-            Err(err) => return Err(format!("ACC_CREATE_FAILED_SAVING: {}", err)),
+            Err(err) => return Err(ReturnFlags::SERVER_DB_WRITE_FAILED),
     }
 }

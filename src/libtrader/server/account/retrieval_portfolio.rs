@@ -5,20 +5,21 @@ use crate::common::account::position::Position;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::network::tls_connection::TlsConnection;
 use crate::server::network::jwt_wrapper::verify_jwt_token;
 use crate::server::db::config::{DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS};
 use crate::server::db::initializer::db_connect;
 
-pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Message) -> Result<(), String> {
+pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Message) -> Result<(), ReturnFlags> {
     /* verify JWT token */
     let token = match verify_jwt_token(bincode::deserialize(&message.data).unwrap()) {
         Ok(token) => token,
         Err(_) => {
             warn!("ACC_RETRIEVE_PORTFOLIO_UNAUTH_TOKEN");
             tls_connection.closing = true;
-            return Err("ACC_REETRIEVE_PORTFOLIO_REJECTED".to_string());
+            return Err(ReturnFlags::SERVER_ACC_UNAUTHORIZED);
         }
     };
 
