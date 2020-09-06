@@ -1,6 +1,7 @@
 use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
 use crate::server::db::initializer::db_connect;
 use crate::common::account::transaction::Transaction;
+use crate::common::misc::return_flags::ReturnFlags;
 
 /// Creates a trasnaction on the postgre SQL database
 ///
@@ -17,7 +18,7 @@ use crate::common::account::transaction::Transaction;
 ///         Err(err) => panic!("TEST_CMD_CREATE_TRANSACTION_FAILED: {}", err)
 ///     }
 /// ```
-pub fn create_transaction(user_id: i64, transaction: &Transaction) -> Result<(), String> {
+pub fn create_transaction(user_id: i64, transaction: &Transaction) -> Result<(), ReturnFlags> {
     /*
      * Creates a transaction entry in database in accounts_schema.transactions.
      * */
@@ -31,7 +32,7 @@ pub fn create_transaction(user_id: i64, transaction: &Transaction) -> Result<(),
                          &[&user_id, &transaction.stock_symbol, &transaction.shares_size, &transaction.shares_cost,
                          &transaction.is_buy]) {
         Ok(_rows) => Ok(()),
-        Err(err) => Err(format!("CMD_CREATE_TRANSACTION_FAILED: {}", err)),
+        Err(err) => Err(ReturnFlags::SERVER_DB_CREATE_TRANSACTION_FAILED),
     }
 }
 

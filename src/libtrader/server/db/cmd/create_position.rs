@@ -1,6 +1,7 @@
 use crate::server::db::config::{DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS};
 use crate::server::db::initializer::db_connect;
 use crate::common::account::position::Position;
+use crate::common::misc::return_flags::ReturnFlags;
 
 /// Creates a position on the postgre SQL database
 ///
@@ -17,7 +18,7 @@ use crate::common::account::position::Position;
 ///         Err(err) => panic!("TEST_CMD_CREATE_PORTFOLIO_FAILED: {}", err)
 ///     }
 /// ```
-pub fn create_position(user_id: i64, position: Position) -> Result<(), String> {
+pub fn create_position(user_id: i64, position: Position) -> Result<(), ReturnFlags> {
     /*
      * Creates a position entry in database in portfolio_schema.positions.
      * */
@@ -33,7 +34,7 @@ pub fn create_position(user_id: i64, position: Position) -> Result<(), String> {
                          &position.stock_open_cost, &position.stock_close_amount, &position.stock_close_price, 
                          &position.open_epoch, &position.close_epoch, &position.is_buy, &position.is_open]) {
         Ok(_rows) => Ok(()),
-        Err(err) => Err(format!("CMD_CREATE_POSITION_FAILED: {}", err)),
+        Err(err) => Err(ReturnFlags::SERVER_DB_CREATE_POSITION_FAILED),
     }
 }
 

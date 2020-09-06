@@ -1,6 +1,8 @@
 use crate::server::db::config::{DB_USER, DB_PASS};
 use crate::server::db::initializer::db_connect;
 
+use crate::common::misc::return_flags::ReturnFlags;
+
 /// Creates a stock on the postgres SQL database.
 /// 
 /// Takes in a stock name and creates a table in the ```asset_schema``` schema
@@ -17,7 +19,7 @@ use crate::server::db::initializer::db_connect;
 ///        Err(err) => error!("failed to create stock table {}", err),
 ///    }
 /// ```
-pub fn create_stock(stock_name: &str) -> Result<(), String> {
+pub fn create_stock(stock_name: &str) -> Result<(), ReturnFlags> {
     /*
      * Creates a stock table in database in assets schema.
      */
@@ -34,7 +36,7 @@ pub fn create_stock(stock_name: &str) -> Result<(), String> {
                         volume              BIGINT NOT NULL \
                 )", stock_name).as_str(), &[]) {
         Ok(_rows) => Ok(()),
-        Err(err) => Err(format!("DB_FAILED_TO_CREATE_STOCK_TABLE: {}", err)),
+        Err(err) => Err(ReturnFlags::SERVER_DB_CREATE_STOCK_FAILED),
     }
 }
 #[cfg(test)]

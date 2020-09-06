@@ -1,9 +1,10 @@
+use crate::common::misc::return_flags::ReturnFlags;
 use crate::server::db::initializer::db_connect;
 use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
 
 use crate::server::db::cmd::user_exists::user_exists;
 
-pub fn get_user_salt(username: &str, is_email: bool, is_server: bool) -> Result<String, String> {
+pub fn get_user_salt(username: &str, is_email: bool, is_server: bool) -> Result<String, ReturnFlags> {
     /* check that user exists*/
     if user_exists(username) {
         let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
@@ -38,5 +39,5 @@ pub fn get_user_salt(username: &str, is_email: bool, is_server: bool) -> Result<
         }
     }
 
-    Err("GET_USER_SALT_NOT_FOUND".to_string())
+    Err(ReturnFlags::SERVER_DB_USER_SALT_NOT_FOUND)
 }

@@ -1,6 +1,7 @@
 use crate::server::db::config::{DB_USER, DB_PASS};
 use crate::server::db::initializer::db_connect;
 use crate::common::generic::company::Company;
+use crate::common::misc::return_flags::ReturnFlags;
 
 /// Returns a company from the postgres SQL database.
 ///
@@ -19,7 +20,7 @@ use crate::common::generic::company::Company;
 ///        Err(err) => error!("we must found the sacred company! err: {}", err),
 ///    }
 /// ```
-pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, String> {
+pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, ReturnFlags> {
     /*
      * Returns company entry from database
      */
@@ -41,7 +42,7 @@ pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, String> {
 
             return Ok(found_company);
         },
-        Err(err) => Err(format!("DB_SEARCH_COMPANY_NOT_FOUND: {}", err)),
+        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_COMOPANY_NOT_FOUND),
     }
 }
 

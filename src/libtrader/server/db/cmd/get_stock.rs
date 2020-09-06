@@ -1,6 +1,7 @@
 use crate::server::db::config::{DB_USER, DB_PASS};
 use crate::server::db::initializer::db_connect;
 use crate::common::generic::stock_val::StockVal;
+use crate::common::misc::return_flags::ReturnFlags;
 
 /// Returns the whole stock data from the postgres SQL database.
 ///
@@ -20,7 +21,7 @@ use crate::common::generic::stock_val::StockVal;
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///   };
 /// ```
-pub fn get_stock_from_db(searched_symbol: &str) -> Result<Vec<StockVal>, String> {
+pub fn get_stock_from_db(searched_symbol: &str) -> Result<Vec<StockVal>, ReturnFlags> {
     /*
      * Returns all stock values from database.
      */
@@ -43,7 +44,7 @@ pub fn get_stock_from_db(searched_symbol: &str) -> Result<Vec<StockVal>, String>
             }
             Ok(stocks)
         },
-        Err(err) => Err(format!("DB_SEARCH_STOCK_NOT_FOUND: {}", err))
+        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
     }
 }
 
@@ -66,7 +67,7 @@ pub fn get_stock_from_db(searched_symbol: &str) -> Result<Vec<StockVal>, String>
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err) 
 ///     };
 /// ```
-pub fn get_stock_from_db_since_epoch(searched_symbol: &str, time_epoch: i64) -> Result<Vec<StockVal>, String> {
+pub fn get_stock_from_db_since_epoch(searched_symbol: &str, time_epoch: i64) -> Result<Vec<StockVal>, ReturnFlags> {
     /*
      * Returns all stock values from database since a time epoch.
      */
@@ -90,7 +91,7 @@ pub fn get_stock_from_db_since_epoch(searched_symbol: &str, time_epoch: i64) -> 
             }
             Ok(stocks)
         },
-        Err(err) => Err(format!("DB_SEARCH_STOCK_NOT_FOUND: {}", err))
+        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
     }
 }
 
@@ -116,7 +117,7 @@ pub fn get_stock_from_db_since_epoch(searched_symbol: &str, time_epoch: i64) -> 
 ///   };
 /// ```
 pub fn get_stock_from_db_between_epochs(searched_symbol: &str, first_time_epoch: i64, 
-                                        second_time_epoch: i64) -> Result<Vec<StockVal>, String> {
+                                        second_time_epoch: i64) -> Result<Vec<StockVal>, ReturnFlags> {
     /*
      * Returns all stock values from database between two time epochs.
      */
@@ -140,7 +141,7 @@ pub fn get_stock_from_db_between_epochs(searched_symbol: &str, first_time_epoch:
             }
             Ok(stocks)
         },
-        Err(err) => Err(format!("DB_SEARCH_STOCK_NOT_FOUND: {}", err))
+        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
     }
 }
 
