@@ -42,7 +42,7 @@ pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, ReturnFlags
 
             return Ok(found_company);
         },
-        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_COMOPANY_NOT_FOUND),
+        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_COMPANY_NOT_FOUND),
     }
 }
 

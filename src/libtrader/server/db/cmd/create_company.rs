@@ -1,6 +1,7 @@
 use crate::server::db::config::{DB_USER, DB_PASS};
 use crate::server::db::initializer::db_connect;
 use crate::common::generic::company::Company;
+use crate::common::misc::return_flags::ReturnFlags;
 
 /// Creates a company on the postgres SQL database.
 /// 
@@ -18,7 +19,7 @@ use crate::common::generic::company::Company;
 ///        Err(err) => error!("Failed to create company with error: {}", err),
 ///    }
 /// ```
-pub fn create_company(company: Company) -> Result<Company, String> {
+pub fn create_company(company: Company) -> Result<Company, ReturnFlags> {
     /*
      * Creates a company entry in database in public.companies.
      */
@@ -32,7 +33,7 @@ pub fn create_company(company: Company) -> Result<Company, String> {
             &company.primary_exchange, &company.sector, &company.industry,
             &company.primary_sic_code, &company.employees]) {
         Ok(_row) => Ok(company),
-        Err(error) => Err(format!("CMD_CREATE_COMPANY_FAILED: {}", error))
+        Err(error) => Err(ReturnFlags::SERVER_DB_CREATE_COMPANY_FAILED)
     }
 }
 
