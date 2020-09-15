@@ -7,6 +7,9 @@ use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::network::tls_server::TlsServer;
 
+#[cfg(not(debug_assertions))]
+use crate::common::misc::gen_log::gen_log;
+
 /// Initializes global logger.
 ///
 /// Private function used by libtrader_init() to initialize the logger. Log destinations are
