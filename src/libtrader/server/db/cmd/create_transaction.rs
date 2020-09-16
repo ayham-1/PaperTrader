@@ -32,7 +32,7 @@ pub fn create_transaction(user_id: i64, transaction: &Transaction) -> Result<(),
                          &[&user_id, &transaction.stock_symbol, &transaction.shares_size, &transaction.shares_cost,
                          &transaction.is_buy]) {
         Ok(_rows) => Ok(()),
-        Err(err) => Err(ReturnFlags::SERVER_DB_CREATE_TRANSACTION_FAILED),
+        Err(_) => Err(ReturnFlags::SERVER_DB_CREATE_TRANSACTION_FAILED),
     }
 }
 
