@@ -4,13 +4,30 @@ The opensource cross-platform paper trader for learning to trade assets.
 # Getting Started
 
 ## Developers
-Make Sure you `Cargo`. To get a copy of the source code for development:
+Make Sure you have `Cargo`. 
+To get a copy of the source code for development:
 ```shell
 $ git clone https://github.com/realaltffour/PaperTrader.git
 ```
-Compiling code:
+
+Build command, Server:
 ```shell
-$ cargo run
+$ cargo build --features "server"
+```
+
+Build command, Client:
+```shell
+$ cargo build --features "client"
+```
+
+Build command, Hybrid:
+```shell
+$ cargo build --features "server,client"
+```
+
+Running server/client (depends on your build command):
+```shell
+$ ./target/debug/sandbox
 ```
 
 ## Built With
