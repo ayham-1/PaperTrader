@@ -1,14 +1,14 @@
 use data_encoding::HEXUPPER;
 
-use crate::common::message::message::Message;
 use crate::common::account::portfolio::Portfolio;
+use crate::common::message::message::Message;
 use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::account::hash_email::hash_email;
 use crate::server::account::hash_pwd::hash_pwd;
-use crate::server::ds::account::Account;
+use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
 use crate::server::db::initializer::db_connect;
-use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
+use crate::server::ds::account::Account;
 
 pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
     /*
@@ -18,10 +18,36 @@ pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
     let stringified_data = std::str::from_utf8(&message.data).unwrap().to_string();
     let data = json::parse(&stringified_data).unwrap();
     /* get email, password salts and client hashes */
-    let email_hash = HEXUPPER.decode(data["email_hash"].as_str().unwrap().to_string().as_bytes()).unwrap();
-    let email_client_salt = HEXUPPER.decode(data["email_client_salt"].as_str().unwrap().to_string().as_bytes()).unwrap();
-    let password_hash = HEXUPPER.decode(data["password_hash"].as_str().unwrap().to_string().as_bytes()).unwrap();
-    let password_client_salt = HEXUPPER.decode(data["password_client_salt"].as_str().unwrap().to_string().as_bytes()).unwrap();
+    let email_hash = HEXUPPER
+        .decode(data["email_hash"].as_str().unwrap().to_string().as_bytes())
+        .unwrap();
+    let email_client_salt = HEXUPPER
+        .decode(
+            data["email_client_salt"]
+                .as_str()
+                .unwrap()
+                .to_string()
+                .as_bytes(),
+        )
+        .unwrap();
+    let password_hash = HEXUPPER
+        .decode(
+            data["password_hash"]
+                .as_str()
+                .unwrap()
+                .to_string()
+                .as_bytes(),
+        )
+        .unwrap();
+    let password_client_salt = HEXUPPER
+        .decode(
+            data["password_client_salt"]
+                .as_str()
+                .unwrap()
+                .to_string()
+                .as_bytes(),
+        )
+        .unwrap();
 
     /* get username */
     let username: String = data["username"].as_str().unwrap().to_string();
@@ -43,15 +69,20 @@ pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
         transactions: Vec::new(),
     };
 
-    /* 
-     * check if username is available in the database 
+    /*
+     * check if username is available in the database
      * */
     /* connect to database */
     let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
 
     /* search for an account with same name */
-    for _ in &client.query(
-        "SELECT username FROM accounts_schema.accounts WHERE username LIKE $1", &[&account.username]).unwrap() {
+    for _ in &client
+        .query(
+            "SELECT username FROM accounts_schema.accounts WHERE username LIKE $1",
+            &[&account.username],
+        )
+        .unwrap()
+    {
         return Err(ReturnFlags::SERVER_ACC_USER_EXISTS);
     }
 
@@ -74,8 +105,8 @@ pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
         (username, email_hash, server_email_salt, client_email_salt, pass_hash, server_pass_salt, client_pass_salt)
         VALUES \
         ($1, $2, $3, $4, $5, $6, $7)",
-        &[&account.username, 
-        &account.email_hash, &account.server_email_salt, &account.client_email_salt, 
+        &[&account.username,
+        &account.email_hash, &account.server_email_salt, &account.client_email_salt,
         &account.pass_hash, &account.server_pass_salt, &account.client_pass_salt]) {
             Ok(_) => return Ok(()),
             Err(_) => return Err(ReturnFlags::SERVER_DB_WRITE_FAILED),

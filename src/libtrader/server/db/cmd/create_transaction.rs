@@ -1,7 +1,7 @@
-use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
-use crate::server::db::initializer::db_connect;
 use crate::common::account::transaction::Transaction;
 use crate::common::misc::return_flags::ReturnFlags;
+use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
+use crate::server::db::initializer::db_connect;
 
 /// Creates a trasnaction on the postgre SQL database
 ///
@@ -26,11 +26,18 @@ pub fn create_transaction(user_id: i64, transaction: &Transaction) -> Result<(),
     let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
 
     /* insert position */
-    match client.execute("INSERT INTO accounts_schema.transactions 
+    match client.execute(
+        "INSERT INTO accounts_schema.transactions 
                          (user_id, stock_symbol, shares_size, shares_cost, is_buy) 
                          VALUES ($1, $2, $3, $4, $5)",
-                         &[&user_id, &transaction.stock_symbol, &transaction.shares_size, &transaction.shares_cost,
-                         &transaction.is_buy]) {
+        &[
+            &user_id,
+            &transaction.stock_symbol,
+            &transaction.shares_size,
+            &transaction.shares_cost,
+            &transaction.is_buy,
+        ],
+    ) {
         Ok(_rows) => Ok(()),
         Err(_) => Err(ReturnFlags::SERVER_DB_CREATE_TRANSACTION_FAILED),
     }
@@ -43,8 +50,8 @@ mod test {
     #[test]
     fn test_cmd_create_transaction() {
         match create_transaction(1, &Transaction::default()) {
-            Ok(_) => {},
-            Err(err) => panic!("TEST_CMD_CREATE_TRANSACTION_FAILED: {}", err)
+            Ok(_) => {}
+            Err(err) => panic!("TEST_CMD_CREATE_TRANSACTION_FAILED: {}", err),
         }
     }
 }

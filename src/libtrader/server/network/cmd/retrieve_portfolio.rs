@@ -2,8 +2,8 @@ use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
 
-use crate::server::network::tls_connection::TlsConnection;
 use crate::server::account::retrieval_portfolio::acc_retrieve_portfolio;
+use crate::server::network::tls_connection::TlsConnection;
 
 pub fn retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */

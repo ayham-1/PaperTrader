@@ -20,8 +20,12 @@ use crate::common::account::hash::hash;
 ///     println!("Server Email Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Server Email Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_email(hashed_email: &Vec<u8>) ->
-([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]) {
+pub fn hash_email(
+    hashed_email: &Vec<u8>,
+) -> (
+    [u8; digest::SHA512_OUTPUT_LEN],
+    [u8; digest::SHA512_OUTPUT_LEN],
+) {
     let rng = rand::SystemRandom::new();
 
     let mut salt = [0u8; digest::SHA512_OUTPUT_LEN];
@@ -53,6 +57,5 @@ mod test {
         let enc1 = hash_email(&email.as_bytes().to_vec());
         assert_ne!(HEXUPPER.encode(&enc0.0), HEXUPPER.encode(&enc1.0));
         assert_ne!(HEXUPPER.encode(&enc0.1), HEXUPPER.encode(&enc1.1));
-
     }
 }

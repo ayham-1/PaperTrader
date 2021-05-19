@@ -5,7 +5,7 @@ use crate::common::generic::stock_val::StockVal;
 
 #[derive(PartialEq, Debug)]
 pub struct GlobalState {
-    pub companies: HashMap<String, Company>, // symbol, company
+    pub companies: HashMap<String, Company>,   // symbol, company
     pub stock_vals: HashMap<String, StockVal>, // symbol, stockval
 }
 impl std::fmt::Display for GlobalState {

@@ -1,6 +1,6 @@
-use std::sync::Arc;
 use std::io;
 use std::io::Read;
+use std::sync::Arc;
 
 use mio;
 use mio::net::TcpStream;
@@ -37,7 +37,11 @@ impl TlsClient {
     /// cfg - The Client Configuration to be used.
     ///
     /// Returns: a new TlsClient
-    pub fn new(sock: TcpStream, hostname: webpki::DNSNameRef<'_>, cfg: Arc<rustls::ClientConfig>) -> TlsClient {
+    pub fn new(
+        sock: TcpStream,
+        hostname: webpki::DNSNameRef<'_>,
+        cfg: Arc<rustls::ClientConfig>,
+    ) -> TlsClient {
         TlsClient {
             socket: sock,
             closing: false,
@@ -46,7 +50,7 @@ impl TlsClient {
             branch_ctrl: false,
             read_plaintext: Vec::new(),
             tls_session: rustls::ClientSession::new(&cfg, hostname),
-            auth_jwt: String::default()
+            auth_jwt: String::default(),
         }
     }
 
@@ -54,7 +58,7 @@ impl TlsClient {
     ///
     /// Determines  if the mio::event::Event is readable/writable or is closing. Calls the
     /// appropriate TlsClient functin to handle the incoming event.
-    /// 
+    ///
     /// Arguments:
     /// ev - The event to be handled
     ///
@@ -106,15 +110,15 @@ impl TlsClient {
 
         let mut plaintext = Vec::new();
         let rc = self.tls_session.read_to_end(&mut plaintext);
-        if !plaintext.is_empty() { 
+        if !plaintext.is_empty() {
             if self.branch_ctrl {
                 self.read_plaintext = plaintext;
                 return;
             }
-            #[cfg(feature="client")]
+            #[cfg(feature = "client")]
             match handle_data(self, &plaintext) {
-                Ok(()) => {},
-                Err(err) => error!("Error handling data: {}", err)
+                Ok(()) => {}
+                Err(err) => error!("Error handling data: {}", err),
             };
         }
 
@@ -125,19 +129,21 @@ impl TlsClient {
             self.closing = true;
         }
     }
-    
+
     /// TlsClient function that writes buffered TLS packets.
     pub fn do_write(&mut self) {
         self.tls_session.write_tls(&mut self.socket).unwrap();
     }
-    
+
     /// Registers the TlsClient to a mio::Registry
     ///
     /// Arguments:
     /// registry - The registry to register
     pub fn register(&mut self, registry: &mio::Registry) {
         let interest = self.event_set();
-        registry.register(&mut self.socket, mio::Token(0), interest).unwrap();
+        registry
+            .register(&mut self.socket, mio::Token(0), interest)
+            .unwrap();
     }
 
     /// Reregisters the TlsClient to a mio::Registry
@@ -146,7 +152,9 @@ impl TlsClient {
     /// registry - The registry to reregister
     pub fn reregister(&mut self, registry: &mio::Registry) {
         let interest = self.event_set();
-        registry.reregister(&mut self.socket, mio::Token(0), interest).unwrap();
+        registry
+            .reregister(&mut self.socket, mio::Token(0), interest)
+            .unwrap();
     }
 
     /// Private TlsConnection function to return the ```self.tls_session```'s ```mio::Interest```

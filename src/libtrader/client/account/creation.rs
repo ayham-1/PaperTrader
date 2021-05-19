@@ -1,17 +1,17 @@
-use ring::digest;
 use data_encoding::HEXUPPER;
+use ring::digest;
 use std::io::Write;
 
 use crate::client::account::hash_email::hash_email;
 use crate::client::account::hash_pwd::hash_pwd;
 
-use crate::common::message::message::Message;
-use crate::common::message::message_type::MessageType;
 use crate::common::message::inst::CommandInst;
+use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
+use crate::common::message::message_type::MessageType;
 
-use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 use crate::client::network::cmd::get_server_salt::get_server_salt;
+use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 use crate::client::network::tls_client::TlsClient;
 
 /// Requests a TLS server to create an account.
@@ -36,19 +36,26 @@ use crate::client::network::tls_client::TlsClient;
 ///         Err(err) => panic!("panik {}", err),
 ///     }
 /// ```
-pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll, 
-                  username: &str, email: &str, password: &str) -> Result<(), String> {
+pub fn acc_create(
+    tls_client: &mut TlsClient,
+    poll: &mut mio::Poll,
+    username: &str,
+    email: &str,
+    password: &str,
+) -> Result<(), String> {
     /*
      * get three server salts for email, and password
      * */
-    let email_server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match get_server_salt(tls_client, poll) {
-        Ok(salt) => salt,
-        Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err))
-    };
-    let password_server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match get_server_salt(tls_client, poll) {
-        Ok(salt) => salt,
-        Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err))
-    };
+    let email_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
+        match get_server_salt(tls_client, poll) {
+            Ok(salt) => salt,
+            Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err)),
+        };
+    let password_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
+        match get_server_salt(tls_client, poll) {
+            Ok(salt) => salt,
+            Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err)),
+        };
 
     /*
      * generate hashes for email, password
@@ -57,16 +64,24 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     let password_hash = hash_pwd(&password.as_bytes().to_vec(), password_server_salt);
 
     /* generate message to be sent to the server */
-    let data = object!{
+    let data = object! {
         email_hash: HEXUPPER.encode(&email_hash.0),
         email_client_salt: HEXUPPER.encode(&email_hash.1),
         password_hash: HEXUPPER.encode(&password_hash.0),
         password_client_salt: HEXUPPER.encode(&password_hash.1),
         username: username
     };
-    let message = message_builder(MessageType::Command, CommandInst::Register as i64, 5, 0, 0, 
-                                  data.dump().as_bytes().to_vec());
-    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
+    let message = message_builder(
+        MessageType::Command,
+        CommandInst::Register as i64,
+        5,
+        0,
+        0,
+        data.dump().as_bytes().to_vec(),
+    );
+    tls_client
+        .write(&bincode::serialize(&message).unwrap())
+        .unwrap();
 
     /* wait for response */
     wait_and_read_branched(tls_client, poll, None, None)?;
@@ -74,7 +89,7 @@ pub fn acc_create(tls_client: &mut TlsClient, poll: &mut mio::Poll,
     /* decode response */
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
-    
+
     if response.msgtype == MessageType::ServerReturn && response.instruction == 1 {
         /* created successfully */
         return Ok(());

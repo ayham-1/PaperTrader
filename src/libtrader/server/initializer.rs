@@ -1,8 +1,8 @@
-use std::net;
 use mio::net::TcpListener;
+use std::net;
 
-use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
+use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::network::tls_server::TlsServer;
@@ -32,25 +32,29 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
     #[cfg(not(debug_assertions))]
     gen_log();
 
-    #[cfg(debug_assertions)] {
+    #[cfg(debug_assertions)]
+    {
         use simplelog::*;
         use std::fs::File;
 
         if !path_exists("log") {
             match std::fs::create_dir("log") {
-                Ok(()) => {},
-                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED)
+                Ok(()) => {}
+                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED),
             };
         }
         CombinedLogger::init(vec![
-                             #[cfg(debug_assertions)]
-                             TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-                             #[cfg(not(debug_assertions))]
-                             TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-                             WriteLogger::new(LevelFilter::Info, Config::default(), 
-                                              File::create(format!("log/log-{}.txt", 
-                                                                   chrono::Utc::now().to_rfc2822())).unwrap())
-        ]).unwrap();
+            #[cfg(debug_assertions)]
+            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
+            #[cfg(not(debug_assertions))]
+            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
+            WriteLogger::new(
+                LevelFilter::Info,
+                Config::default(),
+                File::create(format!("log/log-{}.txt", chrono::Utc::now().to_rfc2822())).unwrap(),
+            ),
+        ])
+        .unwrap();
     };
 
     Ok(())
@@ -69,7 +73,7 @@ pub fn libtrader_init_server() -> Result<(), ReturnFlags> {
     // Initialize log.
     #[cfg(not(test))]
     match libtrader_init_log() {
-        Ok(()) => {},
+        Ok(()) => {}
         Err(err) => return Err(ReturnFlags::LIBTRADER_INIT_LOG_FAILED | err),
     };
     let addr: net::SocketAddr = "0.0.0.0:4000".parse().unwrap();
@@ -78,7 +82,9 @@ pub fn libtrader_init_server() -> Result<(), ReturnFlags> {
     let mut listener = TcpListener::bind(addr).expect("LIBTRADER_INIT_SERVER_FAILED");
     let mut poll = mio::Poll::new().unwrap();
 
-    poll.registry().register(&mut listener, mio::Token(0), mio::Interest::READABLE).unwrap();
+    poll.registry()
+        .register(&mut listener, mio::Token(0), mio::Interest::READABLE)
+        .unwrap();
 
     let mut tls_server = TlsServer::new(listener, config);
     let mut events = mio::Events::with_capacity(256);
@@ -88,9 +94,11 @@ pub fn libtrader_init_server() -> Result<(), ReturnFlags> {
         for event in &events {
             match event.token() {
                 mio::Token(0) => {
-                    tls_server.accept(poll.registry()).expect("error accepting socket");
-                },
-                _ => tls_server.conn_event(poll.registry(), &event)
+                    tls_server
+                        .accept(poll.registry())
+                        .expect("error accepting socket");
+                }
+                _ => tls_server.conn_event(poll.registry(), &event),
             }
         }
     }

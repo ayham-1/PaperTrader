@@ -1,6 +1,6 @@
-use std::sync::Arc;
 use std::collections::HashMap;
 use std::io;
+use std::sync::Arc;
 
 use mio;
 use mio::net::TcpListener;
@@ -59,7 +59,7 @@ impl TlsServer {
                     let mut connection = TlsConnection::new(socket, token, tls_session);
                     connection.register(registry);
                     self.connections.insert(token, connection);
-                },
+                }
                 Err(err) if err.kind() == io::ErrorKind::WouldBlock => return Ok(()),
                 Err(err) => {
                     error!("tls server error accepting connections; err={:?}", err);
@@ -81,7 +81,10 @@ impl TlsServer {
         let token = event.token();
 
         if self.connections.contains_key(&token) {
-            self.connections.get_mut(&token).unwrap().ready(registry, event);
+            self.connections
+                .get_mut(&token)
+                .unwrap()
+                .ready(registry, event);
 
             if self.connections[&token].closed {
                 self.connections.remove(&token);

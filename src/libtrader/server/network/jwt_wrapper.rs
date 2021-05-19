@@ -1,6 +1,6 @@
-use jsonwebtoken::{encode, EncodingKey, decode, DecodingKey, Header, Algorithm, Validation};
-use crate::common::sessions::jwt_claim::JWTClaim;
 use crate::common::misc::return_flags::ReturnFlags;
+use crate::common::sessions::jwt_claim::JWTClaim;
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 
 pub static JWT_SECRET: &'static str = "seecreet";
 
@@ -25,11 +25,15 @@ pub fn create_jwt_token(user_id: i64, exp: u64) -> Result<String, ReturnFlags> {
 
     let claim = JWTClaim {
         user_id: user_id,
-        exp: exp
+        exp: exp,
     };
-    match encode(&header, &claim, &EncodingKey::from_secret(JWT_SECRET.as_bytes())) {
+    match encode(
+        &header,
+        &claim,
+        &EncodingKey::from_secret(JWT_SECRET.as_bytes()),
+    ) {
         Ok(token) => Ok(token),
-        Err(_) => Err(ReturnFlags::SERVER_CREATE_JWT_TOKEN_FAILED)
+        Err(_) => Err(ReturnFlags::SERVER_CREATE_JWT_TOKEN_FAILED),
     }
 }
 
@@ -49,10 +53,13 @@ pub fn create_jwt_token(user_id: i64, exp: u64) -> Result<String, ReturnFlags> {
 pub fn verify_jwt_token(token: String) -> Result<JWTClaim, ()> {
     let mut validation = Validation::new(Algorithm::HS512);
     validation.leeway = 25;
-    match decode::<JWTClaim>(&token, &DecodingKey::from_secret(JWT_SECRET.as_bytes()), 
-                                              &validation) {
-        Ok(data) => { Ok(data.claims)},
-        Err(_) => Err(())
+    match decode::<JWTClaim>(
+        &token,
+        &DecodingKey::from_secret(JWT_SECRET.as_bytes()),
+        &validation,
+    ) {
+        Ok(data) => Ok(data.claims),
+        Err(_) => Err(()),
     }
 }
 
@@ -62,29 +69,36 @@ mod test {
 
     #[test]
     fn test_create_jwt_token() {
-        use std::time::{SystemTime, UNIX_EPOCH, Duration};
-        let start = SystemTime::now() + Duration::from_secs(4*60*60);
+        use std::time::{Duration, SystemTime, UNIX_EPOCH};
+        let start = SystemTime::now() + Duration::from_secs(4 * 60 * 60);
         match create_jwt_token(1i64, start.duration_since(UNIX_EPOCH).unwrap().as_secs()) {
             Ok(token) => {
                 let claims = verify_jwt_token(token).unwrap();
                 assert_eq!(claims.user_id, 1i64);
-                assert_eq!(claims.exp, start.duration_since(UNIX_EPOCH).unwrap().as_secs());
-            },
-            Err(_) => panic!("TEST_CREATE_JWT_TOKEN_FAILED")
+                assert_eq!(
+                    claims.exp,
+                    start.duration_since(UNIX_EPOCH).unwrap().as_secs()
+                );
+            }
+            Err(_) => panic!("TEST_CREATE_JWT_TOKEN_FAILED"),
         }
     }
 
     #[test]
     fn test_verify_jwt_token() {
-        use std::time::{SystemTime, UNIX_EPOCH, Duration};
-        let start = SystemTime::now() + Duration::from_secs(4*60*60);
-        let token = create_jwt_token(1i64, start.duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
+        use std::time::{Duration, SystemTime, UNIX_EPOCH};
+        let start = SystemTime::now() + Duration::from_secs(4 * 60 * 60);
+        let token =
+            create_jwt_token(1i64, start.duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
         match verify_jwt_token(token) {
             Ok(claims) => {
                 assert_eq!(claims.user_id, 1i64);
-                assert_eq!(claims.exp, start.duration_since(UNIX_EPOCH).unwrap().as_secs());
-            },
-            Err(_) => panic!("TEST_VERIFY_JWT_TOKEN_FAILED")
+                assert_eq!(
+                    claims.exp,
+                    start.duration_since(UNIX_EPOCH).unwrap().as_secs()
+                );
+            }
+            Err(_) => panic!("TEST_VERIFY_JWT_TOKEN_FAILED"),
         }
     }
 }

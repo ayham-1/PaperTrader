@@ -22,11 +22,17 @@ use crate::common::account::hash::hash;
 ///     println!("Client Pass Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Client Pass Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_pwd(pass: &Vec<u8>, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) -> 
-([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]) { // client hash, full salt
+pub fn hash_pwd(
+    pass: &Vec<u8>,
+    server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2],
+) -> (
+    [u8; digest::SHA512_OUTPUT_LEN],
+    [u8; digest::SHA512_OUTPUT_LEN],
+) {
+    // client hash, full salt
     let rng = rand::SystemRandom::new();
 
-    let mut client_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
+    let mut client_salt = [0u8; digest::SHA512_OUTPUT_LEN / 2];
     rng.fill(&mut client_salt).unwrap();
 
     let salt = [server_salt, client_salt].concat();
@@ -39,7 +45,7 @@ pub fn hash_pwd(pass: &Vec<u8>, server_salt: [u8; digest::SHA512_OUTPUT_LEN/2]) 
 #[cfg(test)]
 mod test {
     use super::*;
-    use data_encoding::HEXUPPER; 
+    use data_encoding::HEXUPPER;
 
     #[test]
     fn test_account_hash_pwd_client() {
@@ -47,15 +53,15 @@ mod test {
 
         /* generate server salt */
         let rng = rand::SystemRandom::new();
-        let mut server_salt = [0u8; digest::SHA512_OUTPUT_LEN/2];
+        let mut server_salt = [0u8; digest::SHA512_OUTPUT_LEN / 2];
         rng.fill(&mut server_salt).unwrap();
 
         /* ensure that hash_pwd_client() works */
-        let output =  hash_pwd(&pass.as_bytes().to_vec(), server_salt);
+        let output = hash_pwd(&pass.as_bytes().to_vec(), server_salt);
         assert_ne!(output.0.len(), 0);
         assert_ne!(output.1.len(), 0);
 
-        /* ensure that hash_pwd_client() doesn't generate same output 
+        /* ensure that hash_pwd_client() doesn't generate same output
          * with the same server salt.
          * */
         let mut enc0 = hash_pwd(&pass.as_bytes().to_vec(), server_salt);
@@ -67,7 +73,7 @@ mod test {
          * with different server salts.
          * */
         // Generate new server salt.
-        let mut server_salt2 = [0u8; digest::SHA512_OUTPUT_LEN/2];
+        let mut server_salt2 = [0u8; digest::SHA512_OUTPUT_LEN / 2];
         rng.fill(&mut server_salt2).unwrap();
 
         enc0 = hash_pwd(&pass.as_bytes().to_vec(), server_salt);

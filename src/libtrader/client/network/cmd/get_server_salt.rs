@@ -1,15 +1,15 @@
-use ring::digest;
 use mio;
+use ring::digest;
 
-use std::io::{Write};
+use std::io::Write;
 
+use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
-use crate::common::message::message_type::MessageType;
-use crate::common::message::inst::{CommandInst};
 use crate::common::message::message_builder::message_builder;
+use crate::common::message::message_type::MessageType;
 
-use crate::client::network::tls_client::TlsClient;
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
+use crate::client::network::tls_client::TlsClient;
 
 /// Issues a command to the connected TLS server to obtain a salt.
 ///
@@ -28,13 +28,24 @@ use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 ///         Err(err) => panic!("could not retrieve server salt; err: {}", errj)
 ///     };
 /// ```
-pub fn get_server_salt(tls_client: &mut TlsClient, poll: &mut mio::Poll) -> 
-Result<[u8; digest::SHA512_OUTPUT_LEN/2], String> {
+pub fn get_server_salt(
+    tls_client: &mut TlsClient,
+    poll: &mut mio::Poll,
+) -> Result<[u8; digest::SHA512_OUTPUT_LEN / 2], String> {
     /*
      * request to generate a salt from the server.
      * */
-    let message = message_builder(MessageType::Command, CommandInst::GenHashSalt as i64, 0, 0, 0, Vec::new());
-    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
+    let message = message_builder(
+        MessageType::Command,
+        CommandInst::GenHashSalt as i64,
+        0,
+        0,
+        0,
+        Vec::new(),
+    );
+    tls_client
+        .write(&bincode::serialize(&message).unwrap())
+        .unwrap();
 
     wait_and_read_branched(tls_client, poll, None, None)?;
     let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
@@ -43,6 +54,6 @@ Result<[u8; digest::SHA512_OUTPUT_LEN/2], String> {
     assert_eq!(ret_msg.argument_count, 1);
     assert_eq!(ret_msg.data_message_number, 0);
     assert_eq!(ret_msg.data_message_max, 1);
-    assert_eq!(ret_msg.data.len(), digest::SHA512_OUTPUT_LEN/2);
-    Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN/2))
+    assert_eq!(ret_msg.data.len(), digest::SHA512_OUTPUT_LEN / 2);
+    Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN / 2))
 }

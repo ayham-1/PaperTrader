@@ -4,13 +4,13 @@ use ring::{digest, rand};
 use crate::common::account::hash::hash;
 
 /// Generates a storable server password hash from a client hashed password.
-/// 
+///
 /// Takes in a client hashed password, outputs a storable new hash. The returned result is 'safe'
 /// to be stored on the server side. The salt returned is for the hashed version of the hashed
 /// client password.
 ///
 /// Arguments:
-/// hashed_pass - The client hashed password sent to the server. 
+/// hashed_pass - The client hashed password sent to the server.
 ///
 /// Returns: a tuple containing the final hash and the hash's salt, nothing on failure.
 ///
@@ -20,8 +20,13 @@ use crate::common::account::hash::hash;
 ///     println!("Server Hash: {}", HEXUPPER.encode(&enc.0));
 ///     println!("Server Salt: {}", HEXUPPER.encode(&enc.1));
 /// ```
-pub fn hash_pwd(hashed_pass: &Vec<u8>) -> 
-([u8; digest::SHA512_OUTPUT_LEN], [u8; digest::SHA512_OUTPUT_LEN]) { // sever hash, server salt
+pub fn hash_pwd(
+    hashed_pass: &Vec<u8>,
+) -> (
+    [u8; digest::SHA512_OUTPUT_LEN],
+    [u8; digest::SHA512_OUTPUT_LEN],
+) {
+    // sever hash, server salt
     let rng = rand::SystemRandom::new();
 
     let mut salt = [0u8; digest::SHA512_OUTPUT_LEN];
@@ -34,7 +39,7 @@ pub fn hash_pwd(hashed_pass: &Vec<u8>) ->
 #[cfg(test)]
 mod test {
     use super::*;
-    use data_encoding::HEXUPPER; 
+    use data_encoding::HEXUPPER;
 
     #[test]
     fn test_account_hash_pwd_server() {

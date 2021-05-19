@@ -1,9 +1,9 @@
-use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
 use crate::common::misc::return_flags::ReturnFlags;
+use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
 
 /// Establishes a postgresql connection to the SQL database.
 ///
-/// Creates a postgresql connection. 
+/// Creates a postgresql connection.
 ///
 /// Arguments:
 /// user - The name of the user to connect to the database with.
@@ -18,18 +18,20 @@ use crate::common::misc::return_flags::ReturnFlags;
 /// ```
 pub fn db_connect(user: &'static str, pass: &'static str) -> Result<postgres::Client, ReturnFlags> {
     /* Generate the requested string */
-    let db_connect_str = format!("host={} port={} dbname={} user={} password={}",
-                                 DB_HOST, DB_HOST_PORT, DB_NAME, user, pass);
+    let db_connect_str = format!(
+        "host={} port={} dbname={} user={} password={}",
+        DB_HOST, DB_HOST_PORT, DB_NAME, user, pass
+    );
     match postgres::Client::connect(db_connect_str.as_str(), postgres::NoTls) {
         Ok(client) => return Ok(client),
-        Err(_) => return Err(ReturnFlags::SERVER_DB_CONNECT_FAILED)
+        Err(_) => return Err(ReturnFlags::SERVER_DB_CONNECT_FAILED),
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::server::db::config::{DB_USER, DB_PASS};
+    use crate::server::db::config::{DB_PASS, DB_USER};
     #[test]
     fn test_db_connect() {
         match db_connect(DB_USER, DB_PASS) {

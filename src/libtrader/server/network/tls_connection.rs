@@ -1,6 +1,6 @@
-use std::net;
 use std::io;
 use std::io::Read;
+use std::net;
 
 use mio;
 use mio::net::TcpStream;
@@ -35,18 +35,19 @@ impl TlsConnection {
     /// tls_session - The ```rustls::ServerSession``` to be used in the Tls Connection
     ///
     /// Returns: a new TlsConnection
-    pub fn new(socket: TcpStream,
-           token: mio::Token,
-           tls_session: rustls::ServerSession)
-        -> TlsConnection {
-            TlsConnection {
-                socket,
-                token,
-                closing: false,
-                closed: false,
-                tls_session,
-            }
+    pub fn new(
+        socket: TcpStream,
+        token: mio::Token,
+        tls_session: rustls::ServerSession,
+    ) -> TlsConnection {
+        TlsConnection {
+            socket,
+            token,
+            closing: false,
+            closed: false,
+            tls_session,
         }
+    }
 
     /// TlsConnection event reciever.
     ///
@@ -88,7 +89,8 @@ impl TlsConnection {
         if rc.is_err() {
             let err = rc.unwrap_err();
 
-            if let io::ErrorKind::WouldBlock = err.kind() { /* make this simpler */
+            if let io::ErrorKind::WouldBlock = err.kind() {
+                /* make this simpler */
                 return;
             }
 
@@ -96,7 +98,7 @@ impl TlsConnection {
             self.closing = true;
             return;
         }
-        
+
         if rc.unwrap() == 0 {
             self.closing = true;
             return;
@@ -141,8 +143,8 @@ impl TlsConnection {
     /// Dispatches decrypted TLS data to ```handle_data()```.
     fn incoming_plaintext(&mut self, buf: &[u8]) {
         match handle_data(self, buf) {
-            Ok(()) => {},
-            Err(err) => error!("Error processing TLS connection: {}", err)
+            Ok(()) => {}
+            Err(err) => error!("Error processing TLS connection: {}", err),
         }
     }
 
@@ -157,29 +159,29 @@ impl TlsConnection {
     }
 
     /// Registers the TlsConnection to a mio::Registry
-    /// 
+    ///
     /// Arguments:
     /// registry - The registry to register
     pub fn register(&mut self, registry: &mio::Registry) {
         let event_set = self.event_set();
-        registry.register(&mut self.socket,
-                          self.token,
-                          event_set).unwrap();
+        registry
+            .register(&mut self.socket, self.token, event_set)
+            .unwrap();
     }
 
     /// Reregisters the TlsConnection to a mio::Registry
-    /// 
+    ///
     /// Arguments:
     /// registry - The registry to reregister
     fn reregister(&mut self, registry: &mio::Registry) {
         let event_set = self.event_set();
-        registry.reregister(&mut self.socket,
-                            self.token,
-                            event_set).unwrap();
+        registry
+            .reregister(&mut self.socket, self.token, event_set)
+            .unwrap();
     }
 
     /// Unregisters the TlsConnection from a mio::Registry
-    /// 
+    ///
     /// Arguments:
     /// registry - The registry to unregister
     fn deregister(&mut self, registry: &mio::Registry) {
@@ -192,7 +194,7 @@ impl TlsConnection {
     fn event_set(&self) -> mio::Interest {
         let rd = self.tls_session.wants_read();
         let wr = self.tls_session.wants_write();
-        
+
         if rd && wr {
             mio::Interest::READABLE | mio::Interest::WRITABLE
         } else if wr {

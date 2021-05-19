@@ -1,8 +1,14 @@
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 
-pub fn message_builder(msg_type: MessageType, inst: i64, arg_cnt: usize, data_msg_num: usize,
-                       data_msg_max: usize, data: Vec<u8>) -> Message {
+pub fn message_builder(
+    msg_type: MessageType,
+    inst: i64,
+    arg_cnt: usize,
+    data_msg_num: usize,
+    data_msg_max: usize,
+    data: Vec<u8>,
+) -> Message {
     let mut message: Message = Message::default();
     message.msgtype = msg_type;
     message.instruction = inst;

@@ -27,7 +27,7 @@ pub fn purchase_asset(_tls_connection: &mut TlsConnection, _message: &Message) {
     //* check if the symbol exists */
     //let company = get_company_from_db(symbol);
     //if !company.is_ok() {
-    //    let msg = message_builder(MessageType::ServerReturn, 0, 1, 0, 0, 
+    //    let msg = message_builder(MessageType::ServerReturn, 0, 1, 0, 0,
     //                              bincode::serialize("COULDNOT FIND COMPANY")).unwrap();
     //    return;
     //}

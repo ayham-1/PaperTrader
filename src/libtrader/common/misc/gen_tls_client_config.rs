@@ -1,7 +1,7 @@
-use std::sync::Arc;
-use rustls;
-use webpki_roots;
 use ct_logs;
+use rustls;
+use std::sync::Arc;
+use webpki_roots;
 
 /// A "always accept" Certficate verifier.
 ///
@@ -15,11 +15,13 @@ mod danger {
     pub struct NoCertificateVerification {}
 
     impl rustls::ServerCertVerifier for NoCertificateVerification {
-        fn verify_server_cert(&self,
-                              _roots: &rustls::RootCertStore,
-                              _presented_certs: &[rustls::Certificate],
-                              _dns_name: webpki::DNSNameRef<'_>,
-                              _ocsp: &[u8]) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
+        fn verify_server_cert(
+            &self,
+            _roots: &rustls::RootCertStore,
+            _presented_certs: &[rustls::Certificate],
+            _dns_name: webpki::DNSNameRef<'_>,
+            _ocsp: &[u8],
+        ) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
             warn!("IF THIS IS NOT A DEV BUILD DO NOT PROCEED");
             Ok(rustls::ServerCertVerified::assertion())
         }
@@ -41,14 +43,18 @@ pub fn gen_tls_client_config() -> Arc<rustls::ClientConfig> {
     let mut config = rustls::ClientConfig::new();
     config.key_log = Arc::new(rustls::KeyLogFile::new());
 
-    config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
+    config
+        .root_store
+        .add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
     config.ct_logs = Some(&ct_logs::LOGS);
 
     let persist = Arc::new(rustls::NoClientSessionStorage {});
     config.set_persistence(persist);
 
     #[cfg(feature = "tls_no_verify")]
-    config.dangerous().set_certificate_verifier(Arc::new(danger::NoCertificateVerification {}));
+    config
+        .dangerous()
+        .set_certificate_verifier(Arc::new(danger::NoCertificateVerification {}));
 
     Arc::new(config)
 }

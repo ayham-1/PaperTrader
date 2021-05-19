@@ -1,7 +1,7 @@
-use crate::server::db::config::{DB_USER, DB_PASS};
-use crate::server::db::initializer::db_connect;
 use crate::common::generic::company::Company;
 use crate::common::misc::return_flags::ReturnFlags;
+use crate::server::db::config::{DB_PASS, DB_USER};
+use crate::server::db::initializer::db_connect;
 
 /// Returns a company from the postgres SQL database.
 ///
@@ -9,7 +9,7 @@ use crate::common::misc::return_flags::ReturnFlags;
 ///
 /// Arguments:
 /// search_symbol - The specific company symbol to find.
-/// 
+///
 /// Returns: a reference to the found company on success, and a string containing the reason of
 /// failure on error.
 ///
@@ -26,8 +26,10 @@ pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, ReturnFlags
      */
     // Connect to database.
     let mut client = db_connect(DB_USER, DB_PASS)?;
-    match client.query("SELECT * FROM public.companies WHERE symbol=$1",
-                       &[&searched_symbol]) {
+    match client.query(
+        "SELECT * FROM public.companies WHERE symbol=$1",
+        &[&searched_symbol],
+    ) {
         Ok(row) => {
             let mut found_company: Company = Company::default();
             found_company.id = row[0].get(0);
@@ -41,7 +43,7 @@ pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, ReturnFlags
             found_company.employees = row[0].get(8);
 
             return Ok(found_company);
-        },
+        }
         Err(_) => Err(ReturnFlags::SERVER_DB_SEARCH_COMPANY_NOT_FOUND),
     }
 }
@@ -78,8 +80,8 @@ mod test {
                 assert_eq!(found_company.industry, company.industry);
                 assert_eq!(found_company.primary_sic_code, company.primary_sic_code);
                 assert_eq!(found_company.employees, company.employees);
-            },
-            Err(err) => panic!("TEST_CMD_GET_COMPANY_FROM_DB_FAILED: {}", err)
+            }
+            Err(err) => panic!("TEST_CMD_GET_COMPANY_FROM_DB_FAILED: {}", err),
         }
     }
 }

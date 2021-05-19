@@ -3,16 +3,19 @@ use std::io::Write;
 use crate::common::account::portfolio::Portfolio;
 use crate::common::account::position::Position;
 use crate::common::message::message::Message;
-use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
+use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::server::network::tls_connection::TlsConnection;
-use crate::server::network::jwt_wrapper::verify_jwt_token;
-use crate::server::db::config::{DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS};
+use crate::server::db::config::{DB_PORTFOLIO_PASS, DB_PORTFOLIO_USER};
 use crate::server::db::initializer::db_connect;
+use crate::server::network::jwt_wrapper::verify_jwt_token;
+use crate::server::network::tls_connection::TlsConnection;
 
-pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Message) -> Result<(), ReturnFlags> {
+pub fn acc_retrieve_portfolio(
+    tls_connection: &mut TlsConnection,
+    message: &Message,
+) -> Result<(), ReturnFlags> {
     /* verify JWT token */
     let token = match verify_jwt_token(bincode::deserialize(&message.data).unwrap()) {
         Ok(token) => token,
@@ -29,7 +32,13 @@ pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Mess
     /* get userId's portfolio positions */
     let mut portfolio: Portfolio = Portfolio::default();
     // get position data from the portfolio_schema.positions table.
-    for row in client.query("SELECT * FROM portfolio_schema.positions WHERE user_id = $1", &[&token.user_id]).unwrap() {
+    for row in client
+        .query(
+            "SELECT * FROM portfolio_schema.positions WHERE user_id = $1",
+            &[&token.user_id],
+        )
+        .unwrap()
+    {
         let mut pos: Position = Position::default();
         pos.stock_symbol = row.get(2);
         pos.stock_open_amount = row.get(3);
@@ -46,7 +55,14 @@ pub fn acc_retrieve_portfolio(tls_connection: &mut TlsConnection, message: &Mess
     }
 
     /* build a message */
-    let message = message_builder(MessageType::DataTransfer, 1, 1, 0, 0, bincode::serialize(&portfolio).unwrap());
+    let message = message_builder(
+        MessageType::DataTransfer,
+        1,
+        1,
+        0,
+        0,
+        bincode::serialize(&portfolio).unwrap(),
+    );
     let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
 
     Ok(())

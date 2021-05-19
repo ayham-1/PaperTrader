@@ -2,7 +2,7 @@ use ring::{digest, pbkdf2};
 use std::num::NonZeroU32;
 
 /// A generic hashing abstraction function.
-/// 
+///
 /// Useful for quickly swapping the current hashing system.
 ///
 /// Arguments:
@@ -25,6 +25,7 @@ pub fn hash(val: &Vec<u8>, salt: &Vec<u8>, iter: u32) -> [u8; digest::SHA512_OUT
         iterations,
         &salt,
         val,
-        &mut hash);
+        &mut hash,
+    );
     hash
 }

@@ -9,7 +9,16 @@ pub struct Order {
 }
 impl std::fmt::Display for Order {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {}, {})", self.is_buy, self.stock_symbol, self.stock_price, 
-               self.stock_amount, self.stock_amount, self.stock_filled, self.is_filled)
+        write!(
+            f,
+            "({}, {}, {}, {}, {}, {}, {})",
+            self.is_buy,
+            self.stock_symbol,
+            self.stock_price,
+            self.stock_amount,
+            self.stock_amount,
+            self.stock_filled,
+            self.is_filled
+        )
     }
 }

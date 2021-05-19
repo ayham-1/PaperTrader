@@ -1,10 +1,10 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::common::account::position::Position;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct Portfolio {
-    pub open_positions: Vec<Position>
+    pub open_positions: Vec<Position>,
 }
 
 impl std::fmt::Display for Portfolio {

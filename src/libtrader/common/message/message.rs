@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::common::message::message_type::MessageType;
 
@@ -13,7 +13,15 @@ pub struct Message {
 }
 impl std::fmt::Display for Message {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {}, {}, {}, {}, {:#?})", self.msgtype, self.instruction, 
-               self.argument_count, self.data_message_number, self.data_message_max, self.data)
+        write!(
+            f,
+            "({}, {}, {}, {}, {}, {:#?})",
+            self.msgtype,
+            self.instruction,
+            self.argument_count,
+            self.data_message_number,
+            self.data_message_max,
+            self.data
+        )
     }
 }

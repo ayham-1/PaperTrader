@@ -14,13 +14,22 @@ use crate::common::message::message_type::MessageType;
 /// data_len - The length of the data payload.
 ///
 /// Returns: a boolean.
-pub fn assert_msg(message: &Message, msg_type: MessageType, arg_cnt: usize, msg_dnum: usize, msg_dmax: usize, 
-                  data_len: usize) -> bool {
-    if message.msgtype != msg_type || message.argument_count != arg_cnt
-        || message.data_message_number != msg_dnum || message.data_message_max != msg_dmax
-            || message.data.len() == data_len {
-                return false;
-            }
+pub fn assert_msg(
+    message: &Message,
+    msg_type: MessageType,
+    arg_cnt: usize,
+    msg_dnum: usize,
+    msg_dmax: usize,
+    data_len: usize,
+) -> bool {
+    if message.msgtype != msg_type
+        || message.argument_count != arg_cnt
+        || message.data_message_number != msg_dnum
+        || message.data_message_max != msg_dmax
+        || message.data.len() == data_len
+    {
+        return false;
+    }
 
     return true;
 }

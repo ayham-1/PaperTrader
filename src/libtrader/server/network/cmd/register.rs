@@ -1,12 +1,12 @@
 use std::io::Write;
 
 use crate::common::message::message::Message;
-use crate::common::message::message_type::MessageType;
 use crate::common::message::message_builder::message_builder;
+use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
 
-use crate::server::network::tls_connection::TlsConnection;
 use crate::server::account::creation::acc_create;
+use crate::server::network::tls_connection::TlsConnection;
 
 pub fn register(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */

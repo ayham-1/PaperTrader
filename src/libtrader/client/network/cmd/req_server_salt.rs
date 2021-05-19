@@ -1,12 +1,12 @@
-use ring::{digest};
+use ring::digest;
 use std::io::Write;
 
 use crate::client::network::tls_client::TlsClient;
 
-use crate::common::message::message::Message;
-use crate::common::message::message_type::MessageType;
 use crate::common::message::inst::CommandInst;
+use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
+use crate::common::message::message_type::MessageType;
 
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 
@@ -25,28 +25,38 @@ use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 ///
 /// Example:
 /// ```rust
-///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match req_server_salt(tls_client, poll, "n1ckn8me", 
+///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match req_server_salt(tls_client, poll, "n1ckn8me",
 ///                                                                     CommandInst::GetEmailSalt) {
 ///         Ok(salt) => salt,
 ///         Err(err) => panic!("could not retrieve email salt; err: {}", err)
 ///     };
 /// ```
-pub fn req_server_salt(tls_client: &mut TlsClient, poll: &mut mio::Poll, username: &str, salt_type: i64) -> 
-Result<[u8; digest::SHA512_OUTPUT_LEN], String> {
+pub fn req_server_salt(
+    tls_client: &mut TlsClient,
+    poll: &mut mio::Poll,
+    username: &str,
+    salt_type: i64,
+) -> Result<[u8; digest::SHA512_OUTPUT_LEN], String> {
     /* enforce salt_type to be either email or password */
     assert_eq!(salt_type >= CommandInst::GetEmailSalt as i64, true);
     assert_eq!(salt_type <= CommandInst::GetPasswordSalt as i64, true);
 
     /* generate message to send */
-    let message = message_builder(MessageType::Command, salt_type, 1, 0, 0, 
-                                  username.as_bytes().to_vec());
-    tls_client.write(&bincode::serialize(&message).unwrap()).unwrap();
+    let message = message_builder(
+        MessageType::Command,
+        salt_type,
+        1,
+        0,
+        0,
+        username.as_bytes().to_vec(),
+    );
+    tls_client
+        .write(&bincode::serialize(&message).unwrap())
+        .unwrap();
     wait_and_read_branched(tls_client, poll, None, None)?;
     let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     match ret_msg.msgtype {
-        MessageType::Command => {
-            Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string())
-        },
+        MessageType::Command => Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string()),
         MessageType::DataTransfer => {
             if ret_msg.data.len() != digest::SHA512_OUTPUT_LEN {
                 Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN_SIZE".to_string())
@@ -55,12 +65,10 @@ Result<[u8; digest::SHA512_OUTPUT_LEN], String> {
             } else {
                 Err("REQ_SERVER_SALT_INVALID_SERVER_INSTRUCTION_RETURN".to_string())
             }
-        },
-        MessageType::ServerReturn => {
-            match ret_msg.instruction {
-                0 => Err("REQ_SERVER_SALT_REJECTED".to_string()),
-                _ => Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string()),
-            }
         }
+        MessageType::ServerReturn => match ret_msg.instruction {
+            0 => Err("REQ_SERVER_SALT_REJECTED".to_string()),
+            _ => Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string()),
+        },
     }
 }

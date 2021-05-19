@@ -1,8 +1,8 @@
 use mio::net::TcpStream;
 
-use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
 use crate::common::misc::lookup_ipv4::lookup_ipv4;
+use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::tls_client::TlsClient;
@@ -29,25 +29,29 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
     #[cfg(not(debug_assertions))]
     gen_log();
 
-    #[cfg(debug_assertions)] {
+    #[cfg(debug_assertions)]
+    {
         use simplelog::*;
         use std::fs::File;
 
         if !path_exists("log") {
             match std::fs::create_dir("log") {
-                Ok(()) => {},
-                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED)
+                Ok(()) => {}
+                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED),
             };
         }
         CombinedLogger::init(vec![
-                             #[cfg(debug_assertions)]
-                             TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-                             #[cfg(not(debug_assertions))]
-                             TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-                             WriteLogger::new(LevelFilter::Info, Config::default(), 
-                                              File::create(format!("log/log-{}.txt", 
-                                                                   chrono::Utc::now().to_rfc2822())).unwrap())
-        ]).unwrap();
+            #[cfg(debug_assertions)]
+            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
+            #[cfg(not(debug_assertions))]
+            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
+            WriteLogger::new(
+                LevelFilter::Info,
+                Config::default(),
+                File::create(format!("log/log-{}.txt", chrono::Utc::now().to_rfc2822())).unwrap(),
+            ),
+        ])
+        .unwrap();
     };
 
     Ok(())
@@ -65,13 +69,13 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
 pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
     #[cfg(not(test))]
     match libtrader_init_log() {
-        Ok(()) => {},
+        Ok(()) => {}
         Err(err) => return Err(ReturnFlags::LIBTRADER_INIT_FAILED | err),
     };
 
     let addr = lookup_ipv4("0.0.0.0", 4000);
     let config = gen_tls_client_config();
-    
+
     let sock = match TcpStream::connect(addr) {
         Ok(socket) => socket,
         Err(err) => {
@@ -114,7 +118,7 @@ pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
             use crate::client::account::retrieval_transaction::acc_retrieve_transaction;
             match acc_retrieve_transaction(&mut tls_client, &mut poll) {
                 Ok(transaction) => println!("we got the transactions {:#?}", transaction),
-                Err(err) => panic!("panik! {}", err)
+                Err(err) => panic!("panik! {}", err),
             }
         }
     }
@@ -122,13 +126,13 @@ pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
 
 #[cfg(test)]
 mod test {
-   use super::*;
+    use super::*;
 
     #[test]
     fn test_libtrader_init_log() {
         match libtrader_init_log() {
-            Ok(()) => {},
-            Err(err) => panic!("TEST_INIT_LOG_FAILED: {}", err)
+            Ok(()) => {}
+            Err(err) => panic!("TEST_INIT_LOG_FAILED: {}", err),
         };
     }
 }
