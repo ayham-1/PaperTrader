@@ -33,7 +33,7 @@ pub fn create_company(company: Company) -> Result<Company, ReturnFlags> {
             &company.primary_exchange, &company.sector, &company.industry,
             &company.primary_sic_code, &company.employees]) {
         Ok(_row) => Ok(company),
-        Err(error) => Err(ReturnFlags::SERVER_DB_CREATE_COMPANY_FAILED)
+        Err(_) => Err(ReturnFlags::SERVER_DB_CREATE_COMPANY_FAILED)
     }
 }
 

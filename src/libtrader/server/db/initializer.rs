@@ -22,7 +22,7 @@ pub fn db_connect(user: &'static str, pass: &'static str) -> Result<postgres::Cl
                                  DB_HOST, DB_HOST_PORT, DB_NAME, user, pass);
     match postgres::Client::connect(db_connect_str.as_str(), postgres::NoTls) {
         Ok(client) => return Ok(client),
-        Err(error) => return Err(ReturnFlags::SERVER_DB_CONNECT_FAILED)
+        Err(_) => return Err(ReturnFlags::SERVER_DB_CONNECT_FAILED)
     }
 }
 

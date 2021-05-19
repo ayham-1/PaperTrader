@@ -34,7 +34,7 @@ pub fn create_position(user_id: i64, position: Position) -> Result<(), ReturnFla
                          &position.stock_open_cost, &position.stock_close_amount, &position.stock_close_price, 
                          &position.open_epoch, &position.close_epoch, &position.is_buy, &position.is_open]) {
         Ok(_rows) => Ok(()),
-        Err(err) => Err(ReturnFlags::SERVER_DB_CREATE_POSITION_FAILED),
+        Err(_) => Err(ReturnFlags::SERVER_DB_CREATE_POSITION_FAILED),
     }
 }
 

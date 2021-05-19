@@ -44,7 +44,7 @@ pub fn get_stock_from_db(searched_symbol: &str) -> Result<Vec<StockVal>, ReturnF
             }
             Ok(stocks)
         },
-        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
+        Err(_) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
     }
 }
 
@@ -91,7 +91,7 @@ pub fn get_stock_from_db_since_epoch(searched_symbol: &str, time_epoch: i64) -> 
             }
             Ok(stocks)
         },
-        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
+        Err(_) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
     }
 }
 
@@ -141,7 +141,7 @@ pub fn get_stock_from_db_between_epochs(searched_symbol: &str, first_time_epoch:
             }
             Ok(stocks)
         },
-        Err(err) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
+        Err(_) => Err(ReturnFlags::SERVER_DB_SEARCH_STOCK_NOT_FOUND)
     }
 }
 
