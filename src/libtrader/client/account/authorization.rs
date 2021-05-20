@@ -93,6 +93,7 @@ pub fn acc_auth(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
+    // TODO: what even is this kind of checking?
     if response.msgtype == MessageType::ServerReturn
         && response.instruction == 1
         && response.argument_count == 1

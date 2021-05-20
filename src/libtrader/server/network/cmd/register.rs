@@ -10,7 +10,18 @@ use crate::server::network::tls_connection::TlsConnection;
 
 pub fn register(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */
-    if assert_msg(message, MessageType::Command, 5, 0, 0, 0) {
+    if !assert_msg(
+        message,
+        MessageType::Command,
+        true,
+        5,
+        false,
+        0,
+        false,
+        0,
+        false,
+        0,
+    ) {
         warn!("REGISTER_INVALID_MESSAGE");
         tls_connection.closing = true;
         return;

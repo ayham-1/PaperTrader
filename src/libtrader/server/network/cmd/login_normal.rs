@@ -10,7 +10,18 @@ use crate::server::network::tls_connection::TlsConnection;
 
 pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */
-    if assert_msg(message, MessageType::Command, 3, 0, 0, 0) {
+    if !assert_msg(
+        message,
+        MessageType::Command,
+        true,
+        3,
+        false,
+        0,
+        false,
+        0,
+        false,
+        0,
+    ) {
         tls_connection.closing = true;
         warn!("LOGIN_INVALID_MESSAGE");
         return;

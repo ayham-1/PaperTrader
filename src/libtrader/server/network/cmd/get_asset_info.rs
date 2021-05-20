@@ -11,7 +11,18 @@ use crate::server::network::tls_connection::TlsConnection;
 
 pub fn get_asset_info(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */
-    if assert_msg(message, MessageType::DataTransfer, 1, 0, 0, 0) {
+    if assert_msg(
+        message,
+        MessageType::DataTransfer,
+        true,
+        1,
+        false,
+        0,
+        false,
+        0,
+        false,
+        0,
+    ) {
         tls_connection.closing = true;
         warn!("GET_ASSET_INFO_INVALID_MESSAGE");
         return;
