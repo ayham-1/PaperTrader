@@ -9,10 +9,12 @@ use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::get_server_salt::get_server_salt;
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 use crate::client::network::tls_client::TlsClient;
+
 
 /// Requests a TLS server to create an account.
 ///
@@ -27,7 +29,7 @@ use crate::client::network::tls_client::TlsClient;
 /// email - The email to send to the server.
 /// password - The password to send to the server.
 ///
-/// Returns: nothing on success, a string on error containing the reason of failure.
+/// Returns: nothing on success, ReturnFlag on error containing the reason of failure.
 ///
 /// Example:
 /// ```rust
@@ -42,19 +44,19 @@ pub fn acc_create(
     username: &str,
     email: &str,
     password: &str,
-) -> Result<(), String> {
+) -> Result<(), ReturnFlags> {
     /*
      * get three server salts for email, and password
      * */
     let email_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
         match get_server_salt(tls_client, poll) {
             Ok(salt) => salt,
-            Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err)),
+            Err(_) => return Err(ReturnFlags::CLIENT_REQ_SALT_FAILED),
         };
     let password_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
         match get_server_salt(tls_client, poll) {
             Ok(salt) => salt,
-            Err(err) => return Err(format!("ACC_CREATE_RETRIEVE_SALTS_FAILED: {}", err)),
+            Err(_) => return Err(ReturnFlags::CLIENT_REQ_SALT_FAILED),
         };
 
     /*
@@ -90,11 +92,12 @@ pub fn acc_create(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
+    // TODO: fix this garbage of message checking
     if response.msgtype == MessageType::ServerReturn && response.instruction == 1 {
         /* created successfully */
         return Ok(());
     } else {
         /* server rejected account creation */
-        return Err("ACC_CREATE_FAILED_SERVER_REJECTED".to_string());
+        return Err(ReturnFlags::CLIENT_ACC_CREATION_FAILED); // TODO: return server returned error too
     }
 }

@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 bitflags! {
-    // TODO: FIX NUMBERING
     #[derive(Serialize, Deserialize)]
     pub struct ReturnFlags: u64 {
         const LIBTRADER_INIT_CLIENT_CONNECT = 1;
@@ -57,9 +56,22 @@ bitflags! {
         const CLIENT_ACC_RETRIEVE_PORTFOLIO_ERROR = 36;
         const CLIENT_ACC_RETRIEVE_TRANSACTION_ERROR = 37;
         const CLIENT_ACC_CREATION_FAILED = 38;
+        const CLIENT_ACC_INVALID_SESSION_ID = 39;
+        const CLIENT_ACC_UNAUTHORIZED = 40;
 
-        const CLIENT_REQ_SALT_FAILED = 39;
-        const CLIENT_GEN_SALT_FAILED = 40;
-        const CLIENT_TLS_READ_ERROR = 41;
+        const CLIENT_REQ_SALT_FAILED = 41;
+        const CLIENT_REQ_SALT_INV_MSG = 42;
+        const CLIENT_REQ_SALT_INV_MSG_RET_SIZE = 43;
+        const CLIENT_REQ_SALT_INV_MSG_INST = 44;
+        const CLIENT_REQ_SALT_REJ = 45;
+        const CLIENT_GEN_SALT_FAILED = 46;
+
+        const CLIENT_TLS_READ_ERROR = 47;
+        const CLIENT_WAIT_AND_READ_BRANCHED = 48;
+    }
+}
+impl std::fmt::Display for ReturnFlags {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:#?}", self)
     }
 }

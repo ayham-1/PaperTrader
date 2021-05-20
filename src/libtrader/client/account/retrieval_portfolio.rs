@@ -5,6 +5,7 @@ use crate::common::message::inst::DataTransferInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 use crate::client::network::tls_client::TlsClient;
@@ -30,7 +31,7 @@ use crate::client::network::tls_client::TlsClient;
 pub fn acc_retrieve_portfolio(
     tls_client: &mut TlsClient,
     poll: &mut mio::Poll,
-) -> Result<Portfolio, String> {
+) -> Result<Portfolio, ReturnFlags> {
     assert_eq!(tls_client.auth_jwt.is_empty(), false);
 
     /* build message request */
@@ -53,6 +54,7 @@ pub fn acc_retrieve_portfolio(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
+    // TODO: fix this garbage of message checking
     if response.msgtype == MessageType::DataTransfer
         && response.instruction == 1
         && response.argument_count == 1
@@ -63,6 +65,6 @@ pub fn acc_retrieve_portfolio(
         return Ok(portfolio);
     } else {
         /* could not get data */
-        return Err("ACC_RETRIEVE_PORTFOLIO_UNAUTHORIZED".to_string());
+        return Err(ReturnFlags::CLIENT_ACC_RETRIEVE_PORTFOLIO_ERROR); // TODO: return server returned error too
     }
 }

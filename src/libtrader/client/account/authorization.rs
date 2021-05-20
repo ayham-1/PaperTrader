@@ -7,6 +7,7 @@ use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::req_server_salt::req_server_salt;
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
@@ -25,21 +26,21 @@ use crate::client::network::tls_client::TlsClient;
 /// email - The raw email to be used.
 /// password - The raw password to be used.
 ///
-/// Returns: nothing.
+/// Returns: nothing on success, and ReturnFlags on failure.
 pub fn acc_auth(
     tls_client: &mut TlsClient,
     poll: &mut mio::Poll,
     username: &str,
     email: &str,
     password: &str,
-) -> Result<(), String> {
+) -> Result<(), ReturnFlags> {
     /*
      * get email salt
      * */
     let email_salt: [u8; digest::SHA512_OUTPUT_LEN] =
         match req_server_salt(tls_client, poll, username, CommandInst::GetEmailSalt as i64) {
             Ok(salt) => salt,
-            Err(err) => return Err(format!("ACC_AUTH_CLIENT_COULD_NOT_GET_SALT: {}", err)),
+            Err(err) => return Err(err),
         };
     /*
      * get password salt
@@ -51,7 +52,7 @@ pub fn acc_auth(
         CommandInst::GetPasswordSalt as i64,
     ) {
         Ok(salt) => salt,
-        Err(err) => return Err(format!("ACC_AUTH_CLIENT_COULD_NOT_GET_SALT: {}", err)),
+        Err(err) => return Err(err),
     };
 
     /*
@@ -102,13 +103,10 @@ pub fn acc_auth(
         /* authorized */
         tls_client.auth_jwt = match String::from_utf8(response.data) {
             Ok(token) => token,
-            Err(err) => return Err(format!("ACC_AUTH_CLIENT_INVALID_SESSION_ID: {}", err)),
+            Err(_) => return Err(ReturnFlags::CLIENT_ACC_INVALID_SESSION_ID),
         };
         Ok(())
     } else {
-        Err(format!(
-            "ACC_AUTH_CLIENT_UNAUTHORIZED: {}",
-            String::from_utf8(response.data).unwrap()
-        ))
+        Err(ReturnFlags::CLIENT_ACC_UNAUTHORIZED)
     }
 }

@@ -1,10 +1,12 @@
 use std::io::Write;
 
 use crate::common::account::transaction::Transaction;
+
 use crate::common::message::inst::DataTransferInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 use crate::client::network::tls_client::TlsClient;
@@ -30,7 +32,7 @@ use crate::client::network::tls_client::TlsClient;
 pub fn acc_retrieve_transaction(
     tls_client: &mut TlsClient,
     poll: &mut mio::Poll,
-) -> Result<Vec<Transaction>, String> {
+) -> Result<Vec<Transaction>, ReturnFlags> {
     assert_eq!(tls_client.auth_jwt.is_empty(), false);
 
     /* build message request */
@@ -53,6 +55,7 @@ pub fn acc_retrieve_transaction(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
+    // TODO: fix this garbage message checking
     if response.msgtype == MessageType::ServerReturn
         && response.instruction == 1
         && response.argument_count == 1
@@ -63,6 +66,6 @@ pub fn acc_retrieve_transaction(
         return Ok(transactions);
     } else {
         /* could not get data */
-        return Err("ACC_RETRIEVE_TRANSACTION_UNAUTHORIZED".to_string());
+        return Err(ReturnFlags::CLIENT_ACC_RETRIEVE_TRANSACTION_ERROR); // TODO: return server returned error code too
     }
 }

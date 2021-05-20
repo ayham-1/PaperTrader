@@ -7,6 +7,7 @@ use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 use crate::client::network::tls_client::TlsClient;
@@ -19,7 +20,7 @@ use crate::client::network::tls_client::TlsClient;
 /// tls_client - The TLS connection to use for the salt.
 /// poll - The mio::Poll used to handle branched control of the TLS client.
 ///
-/// Returns: a [u8; 32] on success, and a string on error containing the reason of failure.
+/// Returns: a [u8; 32] on success, and ```ReturnFlags``` on error containing the reason of failure.
 ///
 /// Example:
 /// ```rust
@@ -31,7 +32,7 @@ use crate::client::network::tls_client::TlsClient;
 pub fn get_server_salt(
     tls_client: &mut TlsClient,
     poll: &mut mio::Poll,
-) -> Result<[u8; digest::SHA512_OUTPUT_LEN / 2], String> {
+) -> Result<[u8; digest::SHA512_OUTPUT_LEN / 2], ReturnFlags> {
     /*
      * request to generate a salt from the server.
      * */

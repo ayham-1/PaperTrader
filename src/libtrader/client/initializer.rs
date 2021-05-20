@@ -120,6 +120,8 @@ pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
                 Ok(transaction) => println!("we got the transactions {:#?}", transaction),
                 Err(err) => panic!("panik! {}", err),
             }
+
+            return Ok(());
         }
     }
 }

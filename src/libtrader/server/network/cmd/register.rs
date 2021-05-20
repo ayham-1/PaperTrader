@@ -33,6 +33,8 @@ pub fn register(tls_connection: &mut TlsConnection, message: &Message) {
             let message = message_builder(MessageType::ServerReturn, 1, 0, 0, 0, Vec::new());
             let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
         },
-        Err(_) => warn!("REGISTER_FAILED: " /*{}", err*/) // TODO: OUTPUT ERRORS
+        Err(err) => {
+            warn!("REGISTER_FAILED: {}", err); // TODO: OUTPUT ERRORS
+        }
     };
 }

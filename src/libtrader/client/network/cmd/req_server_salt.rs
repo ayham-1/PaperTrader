@@ -7,6 +7,7 @@ use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 
@@ -21,7 +22,7 @@ use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 /// username - The username to obtain the salt.
 /// salt_type - The CommmandInst, either GetEmailSalt, or GetPasswordSalt.
 ///
-/// Returns: a [u8; 64] on success, and a string on error containing the reason of failure.
+/// Returns: a [u8; 64] on success, and a ReturnFlags on error containing the reason of failure.
 ///
 /// Example:
 /// ```rust
@@ -36,7 +37,7 @@ pub fn req_server_salt(
     poll: &mut mio::Poll,
     username: &str,
     salt_type: i64,
-) -> Result<[u8; digest::SHA512_OUTPUT_LEN], String> {
+) -> Result<[u8; digest::SHA512_OUTPUT_LEN], ReturnFlags> {
     /* enforce salt_type to be either email or password */
     assert_eq!(salt_type >= CommandInst::GetEmailSalt as i64, true);
     assert_eq!(salt_type <= CommandInst::GetPasswordSalt as i64, true);
@@ -56,19 +57,19 @@ pub fn req_server_salt(
     wait_and_read_branched(tls_client, poll, None, None)?;
     let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     match ret_msg.msgtype {
-        MessageType::Command => Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string()),
+        MessageType::Command => Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG),
         MessageType::DataTransfer => {
             if ret_msg.data.len() != digest::SHA512_OUTPUT_LEN {
-                Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN_SIZE".to_string())
+                Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG_RET_SIZE)
             } else if ret_msg.instruction == salt_type {
                 Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN))
             } else {
-                Err("REQ_SERVER_SALT_INVALID_SERVER_INSTRUCTION_RETURN".to_string())
+                Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG_INST)
             }
         }
         MessageType::ServerReturn => match ret_msg.instruction {
-            0 => Err("REQ_SERVER_SALT_REJECTED".to_string()),
-            _ => Err("REQ_SERVER_SALT_INVALID_SERVER_RETURN".to_string()),
+            0 => Err(ReturnFlags::CLIENT_REQ_SALT_REJ),
+            _ => Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG)
         },
     }
 }
