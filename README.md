@@ -30,6 +30,14 @@ Running server/client (depends on your build command):
 $ ./target/debug/sandbox
 ```
 
+Running sandbox:
+```shell
+$ sudo ./scripts/remove_db.sh
+$ sudo ./scripts/deploy_sandbox.sh
+$ cargo run --features "server,tls_no_verify" &
+$ cargo run --features "client,tls_no_verify" &
+```
+
 ## Built With
 
 * [Rust](https://www.rust-lang.org/) - Language
