@@ -34,7 +34,7 @@ pub fn register(tls_connection: &mut TlsConnection, message: &Message) {
             let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
         }
         Err(err) => {
-            warn!("REGISTER_FAILED: {}", err); // TODO: OUTPUT ERRORS
+            warn!("REGISTER_FAILED: {}", err);
         }
     };
 }

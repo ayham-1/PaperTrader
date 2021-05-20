@@ -9,6 +9,7 @@ use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
+use crate::common::misc::assert_msg::assert_msg;
 use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::get_server_salt::get_server_salt;
@@ -91,12 +92,23 @@ pub fn acc_create(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
-    // TODO: fix this garbage of message checking
-    if response.msgtype == MessageType::ServerReturn && response.instruction == 1 {
+    if (!assert_msg(
+        &response,
+        MessageType::ServerReturn,
+        true,
+        1,
+        false,
+        0,
+        false,
+        0,
+        false,
+        0,
+    )) && response.instruction == 1
+    {
         /* created successfully */
         return Ok(());
     } else {
         /* server rejected account creation */
-        return Err(ReturnFlags::CLIENT_ACC_CREATION_FAILED); // TODO: return server returned error too
+        return Err(ReturnFlags::CLIENT_ACC_CREATION_FAILED);
     }
 }
