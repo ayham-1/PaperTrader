@@ -15,7 +15,6 @@ use crate::client::network::cmd::get_server_salt::get_server_salt;
 use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
 use crate::client::network::tls_client::TlsClient;
 
-
 /// Requests a TLS server to create an account.
 ///
 /// Gets three server salts, generates three new salts, cancatenates both salts, and use the

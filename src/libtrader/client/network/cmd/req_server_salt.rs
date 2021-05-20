@@ -69,7 +69,7 @@ pub fn req_server_salt(
         }
         MessageType::ServerReturn => match ret_msg.instruction {
             0 => Err(ReturnFlags::CLIENT_REQ_SALT_REJ),
-            _ => Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG)
+            _ => Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG),
         },
     }
 }
