@@ -1,5 +1,6 @@
 use std::io::Write;
 
+use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
@@ -21,7 +22,9 @@ pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
         0,
         false,
         0,
-    ) {
+    ) && message.instruction == CommandInst::LoginMethod1 as i64
+        && message.data.len() != 0
+    {
         tls_connection.closing = true;
         warn!("LOGIN_INVALID_MESSAGE");
         return;

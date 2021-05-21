@@ -56,7 +56,7 @@ pub fn acc_retrieve_transaction(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
-    if (!assert_msg(
+    if assert_msg(
         &response,
         MessageType::ServerReturn,
         true,
@@ -67,7 +67,7 @@ pub fn acc_retrieve_transaction(
         0,
         false,
         0,
-    )) && response.data.len() != 0
+    ) && response.data.len() != 0
         && response.instruction == 1
     {
         /* returned data*/

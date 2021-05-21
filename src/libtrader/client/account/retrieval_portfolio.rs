@@ -55,7 +55,7 @@ pub fn acc_retrieve_portfolio(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
-    if (!assert_msg(
+    if assert_msg(
         &response,
         MessageType::DataTransfer,
         true,
@@ -66,7 +66,7 @@ pub fn acc_retrieve_portfolio(
         0,
         false,
         0,
-    )) && response.instruction == 1
+    ) && response.instruction == 1
         && response.data.len() != 0
     {
         /* returned data */

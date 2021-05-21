@@ -1,3 +1,4 @@
+use crate::common::message::inst::DataTransferInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
@@ -18,7 +19,9 @@ pub fn retrieve_transactions(tls_connection: &mut TlsConnection, message: &Messa
         0,
         false,
         0,
-    ) {
+    ) && message.instruction == DataTransferInst::GetUserTransactionHist as i64
+        && message.data.len() != 0
+    {
         tls_connection.closing = true;
         warn!("RETRIEVE_TRANSACTION_INVALID_MESSAGE");
         return;

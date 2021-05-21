@@ -11,7 +11,7 @@ use crate::server::network::tls_connection::TlsConnection;
 
 pub fn get_asset_info(tls_connection: &mut TlsConnection, message: &Message) {
     /* assert recieved message */
-    if assert_msg(
+    if !assert_msg(
         message,
         MessageType::DataTransfer,
         true,

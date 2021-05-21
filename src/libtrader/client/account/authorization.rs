@@ -95,7 +95,7 @@ pub fn acc_auth(
     let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     tls_client.read_plaintext.clear();
 
-    if !assert_msg(
+    if assert_msg(
         &response,
         MessageType::ServerReturn,
         true,

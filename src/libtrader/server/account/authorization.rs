@@ -103,7 +103,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
         1,
         1,
         0,
-        1,
+        0,
         jwt_token.as_bytes().to_vec(),
     );
     let _ = tls_connection.write(bincode::serialize(&message).unwrap().as_slice());

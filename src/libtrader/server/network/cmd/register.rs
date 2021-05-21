@@ -1,5 +1,6 @@
 use std::io::Write;
 
+use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
@@ -21,7 +22,9 @@ pub fn register(tls_connection: &mut TlsConnection, message: &Message) {
         0,
         false,
         0,
-    ) {
+    ) && message.instruction == CommandInst::Register as i64
+        && message.data.len() != 0
+    {
         warn!("REGISTER_INVALID_MESSAGE");
         tls_connection.closing = true;
         return;
