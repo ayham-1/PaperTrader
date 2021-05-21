@@ -51,12 +51,12 @@ pub fn acc_create(
     let email_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
         match get_server_salt(tls_client, poll) {
             Ok(salt) => salt,
-            Err(_) => return Err(ReturnFlags::CLIENT_REQ_SALT_FAILED),
+            Err(_) => return Err(ReturnFlags::ClientReqSaltFailed),
         };
     let password_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
         match get_server_salt(tls_client, poll) {
             Ok(salt) => salt,
-            Err(_) => return Err(ReturnFlags::CLIENT_REQ_SALT_FAILED),
+            Err(_) => return Err(ReturnFlags::ClientReqSaltFailed),
         };
 
     /*
@@ -109,6 +109,6 @@ pub fn acc_create(
         return Ok(());
     } else {
         /* server rejected account creation */
-        return Err(ReturnFlags::CLIENT_ACC_CREATION_FAILED);
+        return Err(ReturnFlags::ClientAccCreationFailed);
     }
 }

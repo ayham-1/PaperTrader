@@ -39,7 +39,7 @@ pub fn create_transaction(user_id: i64, transaction: &Transaction) -> Result<(),
         ],
     ) {
         Ok(_rows) => Ok(()),
-        Err(_) => Err(ReturnFlags::SERVER_DB_CREATE_TRANSACTION_FAILED),
+        Err(_) => Err(ReturnFlags::ServerDbCreateTransactionFailed),
     }
 }
 

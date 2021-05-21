@@ -21,9 +21,6 @@ extern crate arrayref;
 #[macro_use]
 extern crate json;
 
-#[macro_use]
-extern crate bitflags;
-
 extern crate bincode;
 extern crate crypto;
 extern crate os_type;

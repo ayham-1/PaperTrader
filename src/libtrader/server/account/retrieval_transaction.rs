@@ -21,7 +21,7 @@ pub fn acc_retrieve_transaction(
         Err(_) => {
             warn!("ACC_RETRIEVE_TRANSACTION_UNAUTH_TOKEN");
             tls_connection.closing = true;
-            return Err(ReturnFlags::SERVER_ACC_UNAUTHORIZED);
+            return Err(ReturnFlags::ServerAccUnauthorized);
         }
     };
 

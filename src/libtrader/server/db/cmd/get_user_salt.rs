@@ -43,5 +43,5 @@ pub fn get_user_salt(
         }
     }
 
-    Err(ReturnFlags::SERVER_DB_USER_SALT_NOT_FOUND)
+    Err(ReturnFlags::ServerDbUserSaltNotFound)
 }

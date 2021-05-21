@@ -10,6 +10,8 @@ fn main() {
     #[cfg(feature = "server")]
     libtrader_init_server().unwrap();
 
+    /* this is a sandbox, we should try to atleast
+     * implement a testing method */
     #[cfg(feature = "client")]
     libtrader_init_client().unwrap();
 }

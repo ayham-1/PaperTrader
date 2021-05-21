@@ -74,6 +74,6 @@ pub fn acc_retrieve_portfolio(
         return Ok(portfolio);
     } else {
         /* could not get data */
-        return Err(ReturnFlags::CLIENT_ACC_RETRIEVE_PORTFOLIO_ERROR);
+        return Err(ReturnFlags::ClientAccRetrievePortfolioError);
     }
 }

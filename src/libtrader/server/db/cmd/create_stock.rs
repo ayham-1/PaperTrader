@@ -43,7 +43,7 @@ pub fn create_stock(stock_name: &str) -> Result<(), ReturnFlags> {
         &[],
     ) {
         Ok(_rows) => Ok(()),
-        Err(_) => Err(ReturnFlags::SERVER_DB_CREATE_STOCK_FAILED),
+        Err(_) => Err(ReturnFlags::ServerDbCreateStockFailed),
     }
 }
 #[cfg(test)]

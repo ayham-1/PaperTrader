@@ -40,7 +40,7 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
         if !path_exists("log") {
             match std::fs::create_dir("log") {
                 Ok(()) => {}
-                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED),
+                Err(_err) => return Err(ReturnFlags::CommonGenLogDirCreationFailed),
             };
         }
         CombinedLogger::init(vec![
@@ -74,7 +74,7 @@ pub fn libtrader_init_server() -> Result<(), ReturnFlags> {
     #[cfg(not(test))]
     match libtrader_init_log() {
         Ok(()) => {}
-        Err(err) => return Err(ReturnFlags::LIBTRADER_INIT_LOG_FAILED | err),
+        Err(err) => return Err(err),
     };
     let addr: net::SocketAddr = "0.0.0.0:4000".parse().unwrap();
     let config = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);

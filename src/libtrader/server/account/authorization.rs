@@ -64,7 +64,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     );
     match email_ret.is_ok() {
         true => {}
-        false => return Err(ReturnFlags::SERVER_ACC_UNAUTHORIZED),
+        false => return Err(ReturnFlags::ServerAccUnauthorized),
     };
     let pass_ret = pbkdf2::verify(
         pbkdf2::PBKDF2_HMAC_SHA512,
@@ -75,7 +75,7 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
     );
     match pass_ret.is_ok() {
         true => {}
-        false => return Err(ReturnFlags::SERVER_ACC_UNAUTHORIZED),
+        false => return Err(ReturnFlags::ServerAccUnauthorized),
     };
 
     /*

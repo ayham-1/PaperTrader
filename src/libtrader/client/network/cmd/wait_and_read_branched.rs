@@ -47,5 +47,5 @@ pub fn wait_and_read_branched(
         thread::sleep(time::Duration::from_millis(sleep_time_ms.unwrap_or(50)));
         counter -= 1;
     }
-    Err(ReturnFlags::CLIENT_WAIT_AND_READ_BRANCHED)
+    Err(ReturnFlags::ClientWaitAndReadBranched)
 }

@@ -19,5 +19,5 @@ pub fn get_user_id(username: &str) -> Result<i64, ReturnFlags> {
             return Ok(row.get(0));
         }
     }
-    Err(ReturnFlags::SERVER_GET_USER_ID_NOT_FOUND)
+    Err(ReturnFlags::ServerGetUserIdNotFound)
 }

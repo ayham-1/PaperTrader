@@ -24,5 +24,5 @@ pub fn get_user_hash(username: &str, is_email: bool) -> Result<String, ReturnFla
         }
     }
 
-    Err(ReturnFlags::SERVER_DB_USER_HASH_NOT_FOUND)
+    Err(ReturnFlags::ServerDbUserHashNotFound)
 }

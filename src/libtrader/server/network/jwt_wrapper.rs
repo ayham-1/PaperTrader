@@ -33,7 +33,7 @@ pub fn create_jwt_token(user_id: i64, exp: u64) -> Result<String, ReturnFlags> {
         &EncodingKey::from_secret(JWT_SECRET.as_bytes()),
     ) {
         Ok(token) => Ok(token),
-        Err(_) => Err(ReturnFlags::SERVER_CREATE_JWT_TOKEN_FAILED),
+        Err(_) => Err(ReturnFlags::ServerCreateJwtTokenFailed),
     }
 }
 

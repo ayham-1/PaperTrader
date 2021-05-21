@@ -57,19 +57,19 @@ pub fn req_server_salt(
     wait_and_read_branched(tls_client, poll, None, None)?;
     let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
     match ret_msg.msgtype {
-        MessageType::Command => Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG),
+        MessageType::Command => Err(ReturnFlags::ClientReqSaltInvMsg),
         MessageType::DataTransfer => {
             if ret_msg.data.len() != digest::SHA512_OUTPUT_LEN {
-                Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG_RET_SIZE)
+                Err(ReturnFlags::ClientReqSaltInvMsgRetSize)
             } else if ret_msg.instruction == salt_type {
                 Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN))
             } else {
-                Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG_INST)
+                Err(ReturnFlags::ClientReqSaltInvMsgInst)
             }
         }
         MessageType::ServerReturn => match ret_msg.instruction {
-            0 => Err(ReturnFlags::CLIENT_REQ_SALT_REJ),
-            _ => Err(ReturnFlags::CLIENT_REQ_SALT_INV_MSG),
+            0 => Err(ReturnFlags::ClientReqSaltRej),
+            _ => Err(ReturnFlags::ClientReqSaltInvMsg),
         },
     }
 }

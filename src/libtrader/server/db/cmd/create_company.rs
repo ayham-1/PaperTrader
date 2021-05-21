@@ -42,7 +42,7 @@ pub fn create_company(company: Company) -> Result<Company, ReturnFlags> {
         ],
     ) {
         Ok(_row) => Ok(company),
-        Err(_) => Err(ReturnFlags::SERVER_DB_CREATE_COMPANY_FAILED),
+        Err(_) => Err(ReturnFlags::ServerDbCreateCompanyFailed),
     }
 }
 

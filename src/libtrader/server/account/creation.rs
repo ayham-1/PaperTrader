@@ -83,7 +83,7 @@ pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
         )
         .unwrap()
     {
-        return Err(ReturnFlags::SERVER_ACC_USER_EXISTS);
+        return Err(ReturnFlags::ServerAccUserExists);
     }
 
     /*
@@ -109,6 +109,6 @@ pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
         &account.email_hash, &account.server_email_salt, &account.client_email_salt,
         &account.pass_hash, &account.server_pass_salt, &account.client_pass_salt]) {
             Ok(_) => return Ok(()),
-            Err(_) => return Err(ReturnFlags::SERVER_DB_WRITE_FAILED),
+            Err(_) => return Err(ReturnFlags::ServerDbWriteFailed),
     }
 }

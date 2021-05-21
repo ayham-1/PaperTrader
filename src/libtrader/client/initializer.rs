@@ -37,7 +37,7 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
         if !path_exists("log") {
             match std::fs::create_dir("log") {
                 Ok(()) => {}
-                Err(_err) => return Err(ReturnFlags::COMMON_GEN_LOG_DIR_CREATION_FAILED),
+                Err(_err) => return Err(ReturnFlags::CommonGenLogDirCreationFailed),
             };
         }
         CombinedLogger::init(vec![
@@ -70,7 +70,7 @@ pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
     #[cfg(not(test))]
     match libtrader_init_log() {
         Ok(()) => {}
-        Err(err) => return Err(ReturnFlags::LIBTRADER_INIT_FAILED | err),
+        Err(err) => return Err(err),
     };
 
     let addr = lookup_ipv4("0.0.0.0", 4000);
@@ -80,7 +80,7 @@ pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
         Ok(socket) => socket,
         Err(err) => {
             error!("LIBTRADER_INIT_CLIENT_CONNECT_FAILED: {}", err);
-            return Err(ReturnFlags::LIBTRADER_INIT_CLIENT_CONNECT);
+            return Err(ReturnFlags::LibtraderInitClientConnect);
         }
     };
     let dns_name = webpki::DNSNameRef::try_from_ascii_str("localhost").unwrap();

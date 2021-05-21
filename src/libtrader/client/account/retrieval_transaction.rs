@@ -75,6 +75,6 @@ pub fn acc_retrieve_transaction(
         return Ok(transactions);
     } else {
         /* could not get data */
-        return Err(ReturnFlags::CLIENT_ACC_RETRIEVE_TRANSACTION_ERROR);
+        return Err(ReturnFlags::ClientAccRetrieveTransactionError);
     }
 }

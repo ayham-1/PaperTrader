@@ -112,10 +112,10 @@ pub fn acc_auth(
         /* authorized */
         tls_client.auth_jwt = match String::from_utf8(response.data) {
             Ok(token) => token,
-            Err(_) => return Err(ReturnFlags::CLIENT_ACC_INVALID_SESSION_ID),
+            Err(_) => return Err(ReturnFlags::ClientAccInvalidSessionId),
         };
         Ok(())
     } else {
-        Err(ReturnFlags::CLIENT_ACC_UNAUTHORIZED)
+        Err(ReturnFlags::ClientAccUnauthorized)
     }
 }
