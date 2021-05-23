@@ -1,11 +1,32 @@
-use mio::net::TcpListener;
-use std::net;
+use argh::FromArgs;
+use std::path::PathBuf;
+use tokio::io::{copy, sink, split, AsyncWriteExt};
+use tokio::net::TcpListener;
+use tokio_rustls::TlsAcceptor;
+
+use std::net::ToSocketAddrs;
 
 use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
 use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::server::network::tls_server::TlsServer;
+//use crate::server::network::tls_server::TlsServer;
+
+/// Server Options
+#[derive(FromArgs)]
+struct Options {
+    /// bind addr
+    #[argh(positional)]
+    addr: String,
+
+    /// cert file
+    #[argh(option, short = 'c')]
+    cert: PathBuf,
+
+    /// key file
+    #[argh(option, short = 'k')]
+    key: PathBuf,
+}
 
 #[cfg(not(debug_assertions))]
 use crate::common::misc::gen_log::gen_log;
@@ -33,8 +54,7 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
     gen_log();
 
     #[cfg(debug_assertions)]
-    {
-        use simplelog::*;
+    { use simplelog::*;
         use std::fs::File;
 
         if !path_exists("log") {
@@ -69,37 +89,42 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
 /// ```rust
 ///     libtrader_init_server()?;
 /// ```
-pub fn libtrader_init_server() -> Result<(), ReturnFlags> {
+#[tokio::main]
+pub async fn libtrader_init_server() -> std::io::Result<()> {
     // Initialize log.
-    #[cfg(not(test))] // wot dis
+    //#[cfg(not(test))] // wot dis
     match libtrader_init_log() {
         Ok(()) => {}
-        Err(err) => return Err(err),
+        Err(err) => {}, // TODO: handle this case
     };
-    let addr: net::SocketAddr = "0.0.0.0:4000".parse().unwrap();
-    let config = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);
 
-    let mut listener = TcpListener::bind(addr).expect("LIBTRADER_INIT_SERVER_FAILED");
-    let mut poll = mio::Poll::new().unwrap();
+    // Initialize arguments
+    let options: Options = argh::from_env();
 
-    poll.registry()
-        .register(&mut listener, mio::Token(0), mio::Interest::READABLE)
-        .unwrap();
+    let addr = options.addr.to_socket_addrs()?.next().
+        ok_or_else(|| std::io::Error::from(std::io::ErrorKind::AddrNotAvailable))?;
 
-    let mut tls_server = TlsServer::new(listener, config);
-    let mut events = mio::Events::with_capacity(256);
+    let config = gen_tls_server_config(&options.cert, &options.key)?;
+    let acceptor = TlsAcceptor::from(config);
+
+    let listener = TcpListener::bind(&addr).await?;
+
     loop {
-        poll.poll(&mut events, None).unwrap();
+        let (stream, peer_addr) = listener.accept().await?;
+        let acceptor = acceptor.clone();
 
-        for event in &events {
-            match event.token() {
-                mio::Token(0) => {
-                    tls_server
-                        .accept(poll.registry())
-                        .expect("error accepting socket");
-                }
-                _ => tls_server.conn_event(poll.registry(), &event),
+        let fut = async move {
+            let mut _stream = acceptor.accept(stream).await?;
+
+            // handle_data here?
+
+            Ok(()) as std::io::Result<()>
+        };
+
+        tokio::spawn(async move {
+            if let Err(err) = fut.await {
+                eprintln!("{:?}", err);
             }
-        }
+        });
     }
 }

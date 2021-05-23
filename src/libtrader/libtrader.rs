@@ -6,6 +6,8 @@ extern crate log;
 extern crate arrayref;
 #[cfg(all(feature = "server", not(feature = "client")))]
 extern crate json;
+#[cfg(all(feature = "server", not(feature = "client")))]
+extern crate tokio;
 
 #[cfg(all(feature = "client", not(feature = "server")))]
 #[macro_use]
