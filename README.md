@@ -12,17 +12,17 @@ $ git clone https://github.com/realaltffour/PaperTrader.git
 
 Build command, Server:
 ```shell
-$ cargo build --features "server"
+$ cargo build --no-default-features --features "server"
 ```
 
 Build command, Client:
 ```shell
-$ cargo build --features "client"
+$ cargo build --no-default-features --features "client"
 ```
 
 Build command, Hybrid:
 ```shell
-$ cargo build --features "server,client"
+$ cargo build --no-default-features --features "server,client"
 ```
 
 Running server/client (depends on your build command):
