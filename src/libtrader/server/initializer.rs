@@ -71,7 +71,7 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
 /// ```
 pub fn libtrader_init_server() -> Result<(), ReturnFlags> {
     // Initialize log.
-    #[cfg(not(test))]
+    #[cfg(not(test))] // wot dis
     match libtrader_init_log() {
         Ok(()) => {}
         Err(err) => return Err(err),
