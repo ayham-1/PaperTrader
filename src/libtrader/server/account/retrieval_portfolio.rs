@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use crate::common::account::portfolio::Portfolio;
 use crate::common::account::position::Position;
 use crate::common::message::message::Message;
@@ -10,10 +8,13 @@ use crate::common::misc::return_flags::ReturnFlags;
 use crate::server::db::config::{DB_PORTFOLIO_PASS, DB_PORTFOLIO_USER};
 use crate::server::db::initializer::db_connect;
 use crate::server::network::jwt_wrapper::verify_jwt_token;
-use crate::server::network::tls_connection::TlsConnection;
 
-pub fn acc_retrieve_portfolio(
-    tls_connection: &mut TlsConnection,
+use tokio::io::AsyncWriteExt;
+use tokio::net::TcpStream;
+use tokio_rustls::server::TlsStream;
+
+pub async fn acc_retrieve_portfolio(
+    tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> Result<(), ReturnFlags> {
     /* verify JWT token */
@@ -21,7 +22,7 @@ pub fn acc_retrieve_portfolio(
         Ok(token) => token,
         Err(_) => {
             warn!("ACC_RETRIEVE_PORTFOLIO_UNAUTH_TOKEN");
-            tls_connection.closing = true;
+            tls_connection.shutdown().await.unwrap();
             return Err(ReturnFlags::ServerAccUnauthorized);
         }
     };
@@ -63,7 +64,10 @@ pub fn acc_retrieve_portfolio(
         0,
         bincode::serialize(&portfolio).unwrap(),
     );
-    let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
+    let _ = tls_connection
+        .write_all(&bincode::serialize(&message).unwrap())
+        .await
+        .expect("could not write to client");
 
     Ok(())
 }

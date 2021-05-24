@@ -1,8 +1,11 @@
-use rustls;
-use rustls::NoClientAuth;
-use std::fs;
-use std::io::{BufReader, Read};
+use std::fs::File;
+use std::io::{self, BufReader};
+use std::path::Path;
 use std::sync::Arc;
+
+//use tokio_rustls::rustls::internal::pemfile::{certs, rsa_private_keys};
+use tokio_rustls::rustls::internal::pemfile::{certs, pkcs8_private_keys, rsa_private_keys};
+use tokio_rustls::rustls::{Certificate, NoClientAuth, PrivateKey, ServerConfig};
 
 /// Loads a TLS public certificate
 ///
@@ -10,10 +13,9 @@ use std::sync::Arc;
 /// filename - Path to .crt file.
 ///
 /// Returns: vector of rustls' Certificate
-fn load_certs(filename: &str) -> Vec<rustls::Certificate> {
-    let certfile = fs::File::open(filename).expect("cannot open certificate file");
-    let mut reader = BufReader::new(certfile);
-    rustls::internal::pemfile::certs(&mut reader).unwrap()
+fn load_certs(path: &Path) -> io::Result<Vec<Certificate>> {
+    certs(&mut BufReader::new(File::open(path)?))
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid cert"))
 }
 
 /// Load a TLS private key.
@@ -22,46 +24,30 @@ fn load_certs(filename: &str) -> Vec<rustls::Certificate> {
 /// filename - Path to .key file.
 ///
 /// Returns: rustls::PrivateKey
-fn load_private_key(filename: &str) -> rustls::PrivateKey {
+fn load_private_keys(path: &Path) -> io::Result<Vec<PrivateKey>> {
     let rsa_keys = {
-        let keyfile = fs::File::open(filename).expect("cannot open private key file");
+        let keyfile = File::open(path).expect("cannot open private key file");
         let mut reader = BufReader::new(keyfile);
-        rustls::internal::pemfile::rsa_private_keys(&mut reader)
-            .expect("file contains invalid rsa private key")
+        rsa_private_keys(&mut reader).expect("file contains invalid rsa private key")
     };
 
     let pkcs8_keys = {
-        let keyfile = fs::File::open(filename).expect("cannot open private key file");
+        let keyfile = File::open(path).expect("cannot open private key file");
         let mut reader = BufReader::new(keyfile);
-        rustls::internal::pemfile::pkcs8_private_keys(&mut reader)
+        pkcs8_private_keys(&mut reader)
             .expect("file contains invalid pkcs8 private key (encrypted keys not supported)")
     };
 
     // prefer to load pkcs8 keys
     if !pkcs8_keys.is_empty() {
-        pkcs8_keys[0].clone()
+        Ok(pkcs8_keys.clone())
     } else {
         assert!(!rsa_keys.is_empty());
-        rsa_keys[0].clone()
+        Ok(rsa_keys.clone())
     }
-}
-
-/// Loads OCSP stapling key.
-///
-/// Argument:
-/// filename - path to OCSP stapling key.
-///
-/// Returns: u8 vec
-fn load_ocsp(filename: &Option<&str>) -> Vec<u8> {
-    let mut ret = Vec::new();
-
-    if let &Some(ref name) = filename {
-        fs::File::open(name)
-            .expect("cannot open ocsp file")
-            .read_to_end(&mut ret)
-            .unwrap();
-    }
-    ret
+    //rsa_private_keys(&mut BufReader::new(File::open(path)?))
+    //   .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid key"))
+    // TODO: use this kind of chekcing elsewhere too
 }
 
 /// Generates a TlsServer Config.
@@ -87,34 +73,22 @@ fn load_ocsp(filename: &Option<&str>) -> Vec<u8> {
 ///      let config = gen_tls_server_config("tests.crt", "priv.key", None);
 /// ```
 pub fn gen_tls_server_config(
-    certs_file: &str,
-    priv_key_file: &str,
-    ocsp_key_file: Option<&str>,
-) -> Arc<rustls::ServerConfig> {
-    let mut config = rustls::ServerConfig::new(NoClientAuth::new());
-    config.key_log = Arc::new(rustls::KeyLogFile::new());
+    certs_file: &Path,
+    priv_key_file: &Path,
+) -> io::Result<Arc<ServerConfig>> {
+    let mut config = ServerConfig::new(NoClientAuth::new());
+    //config.key_log = Arc::new(rustls::KeyLogFile::new());
 
     /* load TLS certificate */
-    let certs = load_certs(certs_file);
-    let privkey = load_private_key(priv_key_file);
-    let ocsp = load_ocsp(&ocsp_key_file);
+    let certs = load_certs(certs_file)?;
+    let mut privkeys = load_private_keys(priv_key_file)?;
     config
-        .set_single_cert_with_ocsp_and_sct(certs, privkey, ocsp, vec![])
-        .expect("bad certs/priv key");
+        .set_single_cert(certs, privkeys.remove(0))
+        .map_err(|err| io::Error::new(io::ErrorKind::InvalidInput, err))?;
 
     /* enable session resumption */
-    config.set_persistence(rustls::ServerSessionMemoryCache::new(512));
-    config.ticketer = rustls::Ticketer::new();
+    //config.set_persistence(rustls::ServerSessionMemoryCache::new(512));
+    //config.ticketer = rustls::Ticketer::new();
 
-    Arc::new(config)
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_gen_tls_server_config() {
-        let _ = gen_tls_server_config("certs/test_tls.crt", "certs/test_tls.key", None);
-    }
+    Ok(Arc::new(config))
 }

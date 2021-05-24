@@ -16,12 +16,12 @@ jobs:
     - name: Check Code Format
       run: cargo fmt --all -- --check
     - name: Build Minimal
-      run: cargo build 
+      run: cargo build  --no-default-features
     - name: Build Client
-      run: cargo build --features "client"
+      run: cargo build --no-default-features --features "client"
     - name: Build Server
-      run: cargo build --features "server"
+      run: cargo build --no-default-features --features "server"
     - name: Build Hybrid
-      run: cargo build --features "server,client"
+      run: cargo build --no-default-features --features "server,client"
     - name: Run benches
       run: cargo bench

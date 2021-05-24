@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use data_encoding::HEXUPPER;
 use ring::pbkdf2;
 use std::num::NonZeroU32;
@@ -12,11 +10,17 @@ use crate::common::misc::return_flags::ReturnFlags;
 use crate::server::db::cmd::get_user_hash::get_user_hash;
 use crate::server::db::cmd::get_user_id::get_user_id;
 use crate::server::db::cmd::get_user_salt::get_user_salt;
-use crate::server::network::tls_connection::TlsConnection;
 
 use crate::server::network::jwt_wrapper::create_jwt_token;
 
-pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result<(), ReturnFlags> {
+use tokio::io::AsyncWriteExt;
+use tokio::net::TcpStream;
+use tokio_rustls::server::TlsStream;
+
+pub async fn acc_auth(
+    tls_connection: &mut TlsStream<TcpStream>,
+    message: &Message,
+) -> Result<(), ReturnFlags> {
     /*
      * Parse account data.
      * */
@@ -106,7 +110,10 @@ pub fn acc_auth(tls_connection: &mut TlsConnection, message: &Message) -> Result
         0,
         jwt_token.as_bytes().to_vec(),
     );
-    let _ = tls_connection.write(bincode::serialize(&message).unwrap().as_slice());
+    tls_connection
+        .write_all(bincode::serialize(&message).unwrap().as_slice())
+        .await
+        .expect("could not write to client");
 
     Ok(())
 }

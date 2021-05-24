@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
@@ -7,9 +5,15 @@ use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
 
 use crate::server::account::authorization::acc_auth;
-use crate::server::network::tls_connection::TlsConnection;
 
-pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
+use tokio::io::AsyncWriteExt;
+use tokio::net::TcpStream;
+use tokio_rustls::server::TlsStream;
+
+pub async fn login_normal(
+    tls_connection: &mut TlsStream<TcpStream>,
+    message: &Message,
+) -> std::io::Result<()> {
     /* assert recieved message */
     if !assert_msg(
         message,
@@ -25,16 +29,15 @@ pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
     ) && message.instruction == CommandInst::LoginMethod1 as i64
         && message.data.len() != 0
     {
-        tls_connection.closing = true;
         warn!("LOGIN_INVALID_MESSAGE");
-        return;
+        return tls_connection.shutdown().await;
     }
 
     /* call acc_auth() server version */
-    match acc_auth(tls_connection, message) {
-        Ok(_) => {}
+    match acc_auth(tls_connection, message).await {
+        Ok(_) => Ok(()),
         Err(err) => {
-            let message = message_builder(
+            let server_response = message_builder(
                 MessageType::ServerReturn,
                 0,
                 0,
@@ -42,7 +45,9 @@ pub fn login_normal(tls_connection: &mut TlsConnection, message: &Message) {
                 0,
                 bincode::serialize(&err).unwrap(),
             );
-            let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
+            tls_connection
+                .write_all(&bincode::serialize(&server_response).unwrap())
+                .await
         }
     }
 }

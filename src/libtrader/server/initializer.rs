@@ -1,6 +1,6 @@
 use argh::FromArgs;
 use std::path::PathBuf;
-use tokio::io::{copy, sink, split, AsyncWriteExt};
+use tokio::io::AsyncReadExt;
 use tokio::net::TcpListener;
 use tokio_rustls::TlsAcceptor;
 
@@ -9,8 +9,7 @@ use std::net::ToSocketAddrs;
 use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
 use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::return_flags::ReturnFlags;
-
-//use crate::server::network::tls_server::TlsServer;
+use crate::server::network::handle_data::handle_data;
 
 /// Server Options
 #[derive(FromArgs)]
@@ -54,7 +53,8 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
     gen_log();
 
     #[cfg(debug_assertions)]
-    { use simplelog::*;
+    {
+        use simplelog::*;
         use std::fs::File;
 
         if !path_exists("log") {
@@ -94,15 +94,18 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
     // Initialize log.
     //#[cfg(not(test))] // wot dis
     match libtrader_init_log() {
-        Ok(()) => {}
-        Err(err) => {}, // TODO: handle this case
+        Ok(_) => {}
+        Err(_) => {} // TODO: handle this case
     };
 
     // Initialize arguments
     let options: Options = argh::from_env();
 
-    let addr = options.addr.to_socket_addrs()?.next().
-        ok_or_else(|| std::io::Error::from(std::io::ErrorKind::AddrNotAvailable))?;
+    let addr = options
+        .addr
+        .to_socket_addrs()?
+        .next()
+        .ok_or_else(|| std::io::Error::from(std::io::ErrorKind::AddrNotAvailable))?;
 
     let config = gen_tls_server_config(&options.cert, &options.key)?;
     let acceptor = TlsAcceptor::from(config);
@@ -110,13 +113,24 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
     let listener = TcpListener::bind(&addr).await?;
 
     loop {
-        let (stream, peer_addr) = listener.accept().await?;
+        let (socket, _) = listener.accept().await?; // socket, peer_addr
         let acceptor = acceptor.clone();
 
+        // function to run in the thread
         let fut = async move {
-            let mut _stream = acceptor.accept(stream).await?;
+            let mut socket = acceptor.accept(socket).await?;
 
-            // handle_data here?
+            let mut buf = Vec::with_capacity(4096);
+            loop {
+                socket.read_buf(&mut buf).await?;
+                match handle_data(&mut socket, buf.as_slice()).await {
+                    Ok(()) => {}
+                    Err(err) => {
+                        warn!("{}", format!("Failed running handle_data: {:#?}", err));
+                        break;
+                    }
+                };
+            }
 
             Ok(()) as std::io::Result<()>
         };

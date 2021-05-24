@@ -29,6 +29,8 @@ chrono = "0.4"
 tokio = { version = "*", features = [ "full" ] }
 tokio-io = "*"
 tokio-rustls = { version = "*" }
+tokio-util = { version = "*" }
+#rustls-pemfile = { version = "*" }
 futures = "*"
 bytes = "*"
 postgres = "0.17.3"

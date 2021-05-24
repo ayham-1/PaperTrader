@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use crate::common::account::transaction::Transaction;
 use crate::common::message::message::Message;
 use crate::common::message::message_builder::message_builder;
@@ -9,10 +7,13 @@ use crate::common::misc::return_flags::ReturnFlags;
 use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
 use crate::server::db::initializer::db_connect;
 use crate::server::network::jwt_wrapper::verify_jwt_token;
-use crate::server::network::tls_connection::TlsConnection;
 
-pub fn acc_retrieve_transaction(
-    tls_connection: &mut TlsConnection,
+use tokio::io::AsyncWriteExt;
+use tokio::net::TcpStream;
+use tokio_rustls::server::TlsStream;
+
+pub async fn acc_retrieve_transaction(
+    tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> Result<(), ReturnFlags> {
     /* verify JWT token */
@@ -20,7 +21,7 @@ pub fn acc_retrieve_transaction(
         Ok(token) => token,
         Err(_) => {
             warn!("ACC_RETRIEVE_TRANSACTION_UNAUTH_TOKEN");
-            tls_connection.closing = true;
+            tls_connection.shutdown().await.unwrap();
             return Err(ReturnFlags::ServerAccUnauthorized);
         }
     };
