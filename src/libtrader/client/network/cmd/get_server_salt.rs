@@ -1,7 +1,6 @@
-use mio;
 use ring::digest;
 
-use std::io::Write;
+use std::io;
 
 use crate::common::message::inst::CommandInst;
 use crate::common::message::message::Message;
@@ -9,16 +8,16 @@ use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
-use crate::client::network::tls_client::TlsClient;
+use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::net::TcpStream;
+use tokio_rustls::client::TlsStream;
 
 /// Issues a command to the connected TLS server to obtain a salt.
 ///
 /// All salts returned are of size ```digest::SHA512_OUTPUT_LEN/2``` or 32 bytes.
 ///
 /// Arguments:
-/// tls_client - The TLS connection to use for the salt.
-/// poll - The mio::Poll used to handle branched control of the TLS client.
+/// socket - The TLS connection to use for the salt.
 ///
 /// Returns: a [u8; 32] on success, and ```ReturnFlags``` on error containing the reason of failure.
 ///
@@ -29,10 +28,9 @@ use crate::client::network::tls_client::TlsClient;
 ///         Err(err) => panic!("could not retrieve server salt; err: {}", errj)
 ///     };
 /// ```
-pub fn get_server_salt(
-    tls_client: &mut TlsClient,
-    poll: &mut mio::Poll,
-) -> Result<[u8; digest::SHA512_OUTPUT_LEN / 2], ReturnFlags> {
+pub async fn get_server_salt(
+    socket: &mut TlsStream<TcpStream>,
+) -> io::Result<[u8; digest::SHA512_OUTPUT_LEN / 2]> {
     /*
      * request to generate a salt from the server.
      * */
@@ -44,12 +42,16 @@ pub fn get_server_salt(
         0,
         Vec::new(),
     );
-    tls_client
-        .write(&bincode::serialize(&message).unwrap())
-        .unwrap();
+    socket
+        .write_all(&bincode::serialize(&message).unwrap()).await?;
 
-    wait_and_read_branched(tls_client, poll, None, None)?;
-    let ret_msg: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
+    let mut buf = Vec::with_capacity(4096);
+    socket.read_buf(&mut buf).await?;
+
+    let ret_msg: Message = bincode::deserialize(&buf)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
+                                      format!("{}", ReturnFlags::ClientGenSaltFailed)))?;
+
     assert_eq!(ret_msg.msgtype, MessageType::DataTransfer);
     assert_eq!(ret_msg.instruction, CommandInst::GenHashSalt as i64);
     assert_eq!(ret_msg.argument_count, 1);

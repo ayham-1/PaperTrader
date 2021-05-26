@@ -17,7 +17,10 @@ use tokio_rustls::server::TlsStream;
 
 pub async fn handle_data(socket: &mut TlsStream<TcpStream>, buf: &[u8]) -> std::io::Result<()> {
     /* decode incoming message */
-    let client_msg: Message = bincode::deserialize(&buf).expect("HANDLE_DATA_RCVD_INV_MSG");
+    let client_msg: Message = bincode::deserialize(&buf)
+        .map_err(|err| std::io::Error::new(std::io::ErrorKind::InvalidInput,
+                                            format!("HANDLE_DATA_RCVD_INVALID_MSG: {}", err)))?;
+    println!("This is a message: {}", client_msg);
 
     /* handle individual client instructions */
     match client_msg.instruction {

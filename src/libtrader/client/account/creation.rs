@@ -1,6 +1,6 @@
 use data_encoding::HEXUPPER;
 use ring::digest;
-use std::io::Write;
+use std::io;
 
 use crate::client::account::hash_email::hash_email;
 use crate::client::account::hash_pwd::hash_pwd;
@@ -13,8 +13,10 @@ use crate::common::misc::assert_msg::assert_msg;
 use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::get_server_salt::get_server_salt;
-use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
-use crate::client::network::tls_client::TlsClient;
+
+use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::net::TcpStream;
+use tokio_rustls::client::TlsStream;
 
 /// Requests a TLS server to create an account.
 ///
@@ -38,26 +40,17 @@ use crate::client::network::tls_client::TlsClient;
 ///         Err(err) => panic!("panik {}", err),
 ///     }
 /// ```
-pub fn acc_create(
-    tls_client: &mut TlsClient,
-    poll: &mut mio::Poll,
+pub async fn acc_create(
+    socket: &mut TlsStream<TcpStream>,
     username: &str,
     email: &str,
     password: &str,
-) -> Result<(), ReturnFlags> {
+) -> io::Result<()> {
     /*
-     * get three server salts for email, and password
+     * get two server salts for email, and password
      * */
-    let email_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
-        match get_server_salt(tls_client, poll) {
-            Ok(salt) => salt,
-            Err(_) => return Err(ReturnFlags::ClientReqSaltFailed),
-        };
-    let password_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] =
-        match get_server_salt(tls_client, poll) {
-            Ok(salt) => salt,
-            Err(_) => return Err(ReturnFlags::ClientReqSaltFailed),
-        };
+    let email_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] = get_server_salt(socket).await?;
+    let password_server_salt: [u8; digest::SHA512_OUTPUT_LEN / 2] = get_server_salt(socket).await?;
 
     /*
      * generate hashes for email, password
@@ -81,17 +74,15 @@ pub fn acc_create(
         0,
         data.dump().as_bytes().to_vec(),
     );
-    tls_client
-        .write(&bincode::serialize(&message).unwrap())
-        .unwrap();
-
-    /* wait for response */
-    wait_and_read_branched(tls_client, poll, None, None)?;
+    socket
+        .write_all(&bincode::serialize(&message).unwrap()).await?;
 
     /* decode response */
-    let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-    tls_client.read_plaintext.clear();
-
+    let mut buf = Vec::with_capacity(4096);
+    socket.read_buf(&mut buf).await?;
+    let response: Message = bincode::deserialize(&buf)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
+                                      format!("{}", ReturnFlags::ClientTlsReadError)))?;
     if !assert_msg(
         &response,
         MessageType::ServerReturn,
@@ -104,11 +95,13 @@ pub fn acc_create(
         false,
         0,
     ) && response.instruction == 1
+        && response.data.len() != 0
     {
         /* created successfully */
         return Ok(());
     } else {
         /* server rejected account creation */
-        return Err(ReturnFlags::ClientAccCreationFailed);
+        return Err(io::Error::new(io::ErrorKind::ConnectionRefused,
+                              format!("{}", ReturnFlags::ClientAccCreationFailed)));
     }
 }

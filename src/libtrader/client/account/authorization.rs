@@ -1,6 +1,6 @@
 use data_encoding::HEXUPPER;
 use ring::digest;
-use std::io::Write;
+use std::io;
 
 use crate::common::account::hash::hash;
 use crate::common::message::inst::CommandInst;
@@ -11,8 +11,10 @@ use crate::common::misc::assert_msg::assert_msg;
 use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::req_server_salt::req_server_salt;
-use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
-use crate::client::network::tls_client::TlsClient;
+
+use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::net::TcpStream;
+use tokio_rustls::client::TlsStream;
 
 /// Client authentication procedure.
 ///
@@ -28,33 +30,23 @@ use crate::client::network::tls_client::TlsClient;
 /// password - The raw password to be used.
 ///
 /// Returns: nothing on success, and ReturnFlags on failure.
-pub fn acc_auth(
-    tls_client: &mut TlsClient,
-    poll: &mut mio::Poll,
+pub async fn acc_auth(
+    socket: &mut TlsStream<TcpStream>,
     username: &str,
     email: &str,
     password: &str,
-) -> Result<(), ReturnFlags> {
+) -> io::Result<String> {
     /*
      * get email salt
      * */
-    let email_salt: [u8; digest::SHA512_OUTPUT_LEN] =
-        match req_server_salt(tls_client, poll, username, CommandInst::GetEmailSalt as i64) {
-            Ok(salt) => salt,
-            Err(err) => return Err(err),
-        };
+    let email_salt: [u8; digest::SHA512_OUTPUT_LEN] = 
+        req_server_salt(socket, username, CommandInst::GetEmailSalt as i64).await?;
+
     /*
      * get password salt
      * */
-    let password_salt: [u8; digest::SHA512_OUTPUT_LEN] = match req_server_salt(
-        tls_client,
-        poll,
-        username,
-        CommandInst::GetPasswordSalt as i64,
-    ) {
-        Ok(salt) => salt,
-        Err(err) => return Err(err),
-    };
+    let password_salt: [u8; digest::SHA512_OUTPUT_LEN] = 
+        req_server_salt(socket, username, CommandInst::GetPasswordSalt as i64).await?;
 
     /*
      * hash the email
@@ -84,16 +76,16 @@ pub fn acc_auth(
         0,
         data.dump().as_bytes().to_vec(),
     );
-    tls_client
-        .write(&bincode::serialize(&message).unwrap())
-        .unwrap();
+    socket
+        .write_all(&bincode::serialize(&message).unwrap()).await?;
 
-    /* wait for a response */
-    wait_and_read_branched(tls_client, poll, Some(15), Some(500))?;
 
     /* decode response */
-    let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-    tls_client.read_plaintext.clear();
+    let mut buf = Vec::with_capacity(4096);
+    socket.read_buf(&mut buf).await?;
+    let response: Message = bincode::deserialize(&buf)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
+                                      format!("{}", ReturnFlags::ClientAccUnauthorized)))?;
 
     if assert_msg(
         &response,
@@ -110,12 +102,11 @@ pub fn acc_auth(
         && response.instruction == 1
     {
         /* authorized */
-        tls_client.auth_jwt = match String::from_utf8(response.data) {
-            Ok(token) => token,
-            Err(_) => return Err(ReturnFlags::ClientAccInvalidSessionId),
-        };
-        Ok(())
+        return Ok(String::from_utf8(response.data)
+                  .map_err(|_| io::Error::new(io::ErrorKind::InvalidData,
+                                                format!("{}", ReturnFlags::ClientAccInvalidSessionId)))?);
     } else {
-        Err(ReturnFlags::ClientAccUnauthorized)
+        return Err(io::Error::new(io::ErrorKind::ConnectionRefused,
+                                  format!("{}", ReturnFlags::ClientAccUnauthorized)))
     }
 }

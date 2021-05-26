@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io;
 
 use crate::common::account::portfolio::Portfolio;
 use crate::common::message::inst::DataTransferInst;
@@ -8,8 +8,9 @@ use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
-use crate::client::network::tls_client::TlsClient;
+use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::net::TcpStream;
+use tokio_rustls::client::TlsStream;
 
 /// Retrieves from the connected TLS server an authorized portfolio.
 ///
@@ -29,11 +30,12 @@ use crate::client::network::tls_client::TlsClient;
 ///         Err(err) => panic!("can not retrieve portfolio! error: {}", err)
 ///     };
 /// ```
-pub fn acc_retrieve_portfolio(
-    tls_client: &mut TlsClient,
-    poll: &mut mio::Poll,
-) -> Result<Portfolio, ReturnFlags> {
-    assert_eq!(tls_client.auth_jwt.is_empty(), false);
+pub async fn acc_retrieve_portfolio(
+    socket: &mut TlsStream<TcpStream>,
+    auth_jwt: String
+) -> io::Result<Portfolio> {
+    // TODO: yea absolutely, let's crash the thread
+    assert_eq!(auth_jwt.is_empty(), false);
 
     /* build message request */
     let message = message_builder(
@@ -42,18 +44,18 @@ pub fn acc_retrieve_portfolio(
         1,
         0,
         0,
-        bincode::serialize(&tls_client.auth_jwt).unwrap(),
+        bincode::serialize(&auth_jwt).unwrap(),
     );
-    tls_client
-        .write(&bincode::serialize(&message).unwrap())
-        .unwrap();
-
-    /* wait for response */
-    wait_and_read_branched(tls_client, poll, Some(20), Some(500))?;
+    socket
+        .write_all(&bincode::serialize(&message).unwrap()).await?;
 
     /* decode response */
-    let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-    tls_client.read_plaintext.clear();
+    let mut buf = Vec::with_capacity(4096);
+    socket.read_buf(&mut buf).await?;
+
+    let response: Message = bincode::deserialize(&buf)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
+                                      format!("{}", ReturnFlags::ClientAccRetrievePortfolioError)))?;
 
     if assert_msg(
         &response,
@@ -74,6 +76,7 @@ pub fn acc_retrieve_portfolio(
         return Ok(portfolio);
     } else {
         /* could not get data */
-        return Err(ReturnFlags::ClientAccRetrievePortfolioError);
+        return Err(io::Error::new(io::ErrorKind::InvalidData,
+                                      format!("{}", ReturnFlags::ClientAccRetrievePortfolioError)));
     }
 }

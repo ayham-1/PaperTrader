@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, BufReader};
+use std::io::BufReader;
 use std::path::Path;
 use std::sync::Arc;
 
@@ -13,9 +13,9 @@ use tokio_rustls::rustls::{Certificate, NoClientAuth, PrivateKey, ServerConfig};
 /// filename - Path to .crt file.
 ///
 /// Returns: vector of rustls' Certificate
-fn load_certs(path: &Path) -> io::Result<Vec<Certificate>> {
+fn load_certs(path: &Path) -> std::io::Result<Vec<Certificate>> {
     certs(&mut BufReader::new(File::open(path)?))
-        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid cert"))
+        .map_err(|_| std::io::Error::new(std::io::ErrorKind::InvalidInput, "invalid cert"))
 }
 
 /// Load a TLS private key.
@@ -24,7 +24,7 @@ fn load_certs(path: &Path) -> io::Result<Vec<Certificate>> {
 /// filename - Path to .key file.
 ///
 /// Returns: rustls::PrivateKey
-fn load_private_keys(path: &Path) -> io::Result<Vec<PrivateKey>> {
+fn load_private_keys(path: &Path) -> std::io::Result<Vec<PrivateKey>> {
     let rsa_keys = {
         let keyfile = File::open(path).expect("cannot open private key file");
         let mut reader = BufReader::new(keyfile);
@@ -45,9 +45,6 @@ fn load_private_keys(path: &Path) -> io::Result<Vec<PrivateKey>> {
         assert!(!rsa_keys.is_empty());
         Ok(rsa_keys.clone())
     }
-    //rsa_private_keys(&mut BufReader::new(File::open(path)?))
-    //   .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid key"))
-    // TODO: use this kind of chekcing elsewhere too
 }
 
 /// Generates a TlsServer Config.
@@ -75,7 +72,7 @@ fn load_private_keys(path: &Path) -> io::Result<Vec<PrivateKey>> {
 pub fn gen_tls_server_config(
     certs_file: &Path,
     priv_key_file: &Path,
-) -> io::Result<Arc<ServerConfig>> {
+) -> std::io::Result<Arc<ServerConfig>> {
     let mut config = ServerConfig::new(NoClientAuth::new());
     //config.key_log = Arc::new(rustls::KeyLogFile::new());
 
@@ -84,7 +81,7 @@ pub fn gen_tls_server_config(
     let mut privkeys = load_private_keys(priv_key_file)?;
     config
         .set_single_cert(certs, privkeys.remove(0))
-        .map_err(|err| io::Error::new(io::ErrorKind::InvalidInput, err))?;
+        .map_err(|err| std::io::Error::new(std::io::ErrorKind::InvalidInput, err))?;
 
     /* enable session resumption */
     //config.set_persistence(rustls::ServerSessionMemoryCache::new(512));

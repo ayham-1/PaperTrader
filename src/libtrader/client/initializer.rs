@@ -1,11 +1,12 @@
-use mio::net::TcpStream;
+use std::io;
+use std::net::ToSocketAddrs;
+
+use tokio::net::TcpStream;
+use tokio_rustls::TlsConnector;
+use tokio_rustls::webpki::DNSNameRef;
 
 use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
-use crate::common::misc::lookup_ipv4::lookup_ipv4;
 use crate::common::misc::path_exists::path_exists;
-use crate::common::misc::return_flags::ReturnFlags;
-
-use crate::client::network::tls_client::TlsClient;
 
 /// Initializes global logger.
 ///
@@ -24,7 +25,7 @@ use crate::client::network::tls_client::TlsClient;
 ///     };
 /// ```
 ///
-fn libtrader_init_log() -> Result<(), ReturnFlags> {
+fn libtrader_init_log() -> io::Result<()> {
     info!("Started Logger.");
     #[cfg(not(debug_assertions))]
     gen_log();
@@ -35,10 +36,7 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
         use std::fs::File;
 
         if !path_exists("log") {
-            match std::fs::create_dir("log") {
-                Ok(()) => {}
-                Err(_err) => return Err(ReturnFlags::CommonGenLogDirCreationFailed),
-            };
+            std::fs::create_dir("log")?;
         }
         CombinedLogger::init(vec![
             #[cfg(debug_assertions)]
@@ -66,75 +64,54 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
 /// ```rust
 ///     libtrader_init_client()?;
 /// ```
-pub fn libtrader_init_client() -> Result<(), ReturnFlags> {
-    #[cfg(not(test))]
+#[tokio::main]
+pub async fn libtrader_init_client() -> std::io::Result<()> {
     match libtrader_init_log() {
         Ok(()) => {}
         Err(err) => return Err(err),
     };
 
-    let addr = lookup_ipv4("0.0.0.0", 4000);
-    let config = gen_tls_client_config();
+    let addr = ("0.0.0.0", 4000).to_socket_addrs()?.next()
+        .ok_or_else(|| std::io::Error::from(std::io::ErrorKind::NotFound))?;
+    let domain = "localhost";
+    let config = gen_tls_client_config()?;
 
-    let sock = match TcpStream::connect(addr) {
-        Ok(socket) => socket,
-        Err(err) => {
-            error!("LIBTRADER_INIT_CLIENT_CONNECT_FAILED: {}", err);
-            return Err(ReturnFlags::LibtraderInitClientConnect);
-        }
-    };
-    let dns_name = webpki::DNSNameRef::try_from_ascii_str("localhost").unwrap();
-    let mut tls_client = TlsClient::new(sock, dns_name, config);
+    let connector = TlsConnector::from(config);
+    let stream = TcpStream::connect(&addr).await?;
 
-    let mut poll = mio::Poll::new().unwrap();
-    let mut events = mio::Events::with_capacity(32);
-    tls_client.register(poll.registry());
+    let domain = DNSNameRef::try_from_ascii_str(&domain)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid dnsname"))?;
 
-    loop {
-        poll.poll(&mut events, None).unwrap();
+    let mut socket = connector.connect(domain, stream).await?;
 
-        for ev in &events {
-            tls_client.ready(&ev);
-            tls_client.reregister(poll.registry());
-
-            use crate::client::account::creation::acc_create;
-            match acc_create(&mut tls_client, &mut poll, "test", "email", "password") {
-                Ok(_) => println!("we created it"),
-                Err(err) => panic!("panik! {}", err),
-            }
-
-            use crate::client::account::authorization::acc_auth;
-            match acc_auth(&mut tls_client, &mut poll, "test", "email", "password") {
-                Ok(_) => println!("we accessed it, the token: {}", tls_client.auth_jwt),
-                Err(err) => panic!("panik! {}", err),
-            }
-
-            use crate::client::account::retrieval_portfolio::acc_retrieve_portfolio;
-            match acc_retrieve_portfolio(&mut tls_client, &mut poll) {
-                Ok(portfolio) => println!("we got portfolio {:#?}", portfolio),
-                Err(err) => panic!("panik! {}", err),
-            }
-
-            use crate::client::account::retrieval_transaction::acc_retrieve_transaction;
-            match acc_retrieve_transaction(&mut tls_client, &mut poll) {
-                Ok(transaction) => println!("we got the transactions {:#?}", transaction),
-                Err(err) => panic!("panik! {}", err),
-            }
-
-            return Ok(());
-        }
+    use crate::client::account::creation::acc_create;
+    match acc_create(&mut socket, "test", "email", "password").await {
+        Ok(_) => println!("we created it"),
+        Err(err) => panic!("panik! {}", err),
     }
-}
 
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_libtrader_init_log() {
-        match libtrader_init_log() {
-            Ok(()) => {}
-            Err(err) => panic!("TEST_INIT_LOG_FAILED: {}", err),
-        };
+    use crate::client::account::authorization::acc_auth;
+    let mut jwt: String = String::new();
+    match acc_auth(&mut socket, "test", "email", "password").await {
+        Ok(auth) => {
+            jwt = auth;
+            println!("we accessed it, the token: {}", jwt);
+        },
+        Err(err) => panic!("panik! {}", err),
     }
+
+    use crate::client::account::retrieval_portfolio::acc_retrieve_portfolio;
+    match acc_retrieve_portfolio(&mut socket, String::from(jwt.as_str())).await {
+        Ok(portfolio) => println!("we got portfolio {:#?}", portfolio),
+        Err(err) => panic!("panik! {}", err),
+    }
+
+    use crate::client::account::retrieval_transaction::acc_retrieve_transaction;
+    match acc_retrieve_transaction(&mut socket, String::from(jwt.as_str())).await {
+        Ok(transaction) => println!("we got the transactions {:#?}", transaction),
+        Err(err) => panic!("panik! {}", err),
+    }
+
+
+    Ok(())
 }

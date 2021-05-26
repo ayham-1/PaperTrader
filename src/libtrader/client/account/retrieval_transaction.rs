@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io;
 
 use crate::common::account::transaction::Transaction;
 
@@ -9,10 +9,11 @@ use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::client::network::cmd::wait_and_read_branched::wait_and_read_branched;
-use crate::client::network::tls_client::TlsClient;
+use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::net::TcpStream;
+use tokio_rustls::client::TlsStream;
 
-/// Retrieves ffrom the connected TLS server an authorized transaction history.
+/// Retrieves from the connected TLS server an authorized transaction history.
 ///
 /// Sends a request for a transaction history with the JWT token of the client connection. Handles
 /// any response and returns.
@@ -30,11 +31,12 @@ use crate::client::network::tls_client::TlsClient;
 ///         Err(err) => panic!("can not retrieve transaction history! error: {}", err)
 ///     };
 /// ```
-pub fn acc_retrieve_transaction(
-    tls_client: &mut TlsClient,
-    poll: &mut mio::Poll,
-) -> Result<Vec<Transaction>, ReturnFlags> {
-    assert_eq!(tls_client.auth_jwt.is_empty(), false);
+pub async fn acc_retrieve_transaction(
+    socket: &mut TlsStream<TcpStream>,
+    auth_jwt: String
+) -> io::Result<Vec<Transaction>> {
+    // TODO: yea absolutely, let's crash the thread
+    assert_eq!(auth_jwt.is_empty(), false);
 
     /* build message request */
     let message = message_builder(
@@ -43,18 +45,19 @@ pub fn acc_retrieve_transaction(
         1,
         0,
         0,
-        bincode::serialize(&tls_client.auth_jwt).unwrap(),
+        bincode::serialize(&auth_jwt).unwrap(),
     );
-    tls_client
-        .write(&bincode::serialize(&message).unwrap())
-        .unwrap();
+    socket
+        .write_all(&bincode::serialize(&message).unwrap()).await?;
 
-    /* wait for response */
-    wait_and_read_branched(tls_client, poll, Some(20), Some(500))?;
 
     /* decode response */
-    let response: Message = bincode::deserialize(&tls_client.read_plaintext).unwrap();
-    tls_client.read_plaintext.clear();
+    let mut buf = Vec::with_capacity(4096);
+    socket.read_buf(&mut buf).await?;
+
+    let response: Message = bincode::deserialize(&buf)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
+                                      format!("{}", ReturnFlags::ClientAccRetrieveTransactionError)))?;
 
     if assert_msg(
         &response,
@@ -71,10 +74,12 @@ pub fn acc_retrieve_transaction(
         && response.instruction == 1
     {
         /* returned data*/
-        let transactions: Vec<Transaction> = bincode::deserialize(&response.data).unwrap();
+        let transactions: Vec<Transaction> = bincode::deserialize(&response.data)
+            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
+                                          format!("{}", ReturnFlags::ClientAccRetrievePortfolioError)))?;
         return Ok(transactions);
     } else {
         /* could not get data */
-        return Err(ReturnFlags::ClientAccRetrieveTransactionError);
+        return Err(io::Error::new(io::ErrorKind::InvalidData, format!("{}", ReturnFlags::ClientAccRetrieveTransactionError)));
     }
 }

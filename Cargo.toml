@@ -21,7 +21,7 @@ bench = false
 default = ["server", "client"]
 server = []
 client = []
-#tls_no_verify = ["rustls/dangerous_configuration"]
+tls_no_verify = ["tokio-rustls/dangerous_configuration"]
 
 [dependencies]
 argh = "*"
@@ -30,7 +30,7 @@ tokio = { version = "*", features = [ "full" ] }
 tokio-io = "*"
 tokio-rustls = { version = "*" }
 tokio-util = { version = "*" }
-#rustls-pemfile = { version = "*" }
+webpki-roots = { version = "*" }
 futures = "*"
 bytes = "*"
 postgres = "0.17.3"
@@ -43,8 +43,6 @@ ring="*"
 data-encoding="*"
 bincode="*"
 serde={ version = "1.0", features = ["derive"] }
-webpki="0.21.0"
-webpki-roots="0.20"
 ct-logs="0.7"
 either="*"
 arrayref="*"

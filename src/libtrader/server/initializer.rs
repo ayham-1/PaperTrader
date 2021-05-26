@@ -65,9 +65,9 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
         }
         CombinedLogger::init(vec![
             #[cfg(debug_assertions)]
-            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
+            TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Mixed),
             #[cfg(not(debug_assertions))]
-            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
+            TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Mixed),
             WriteLogger::new(
                 LevelFilter::Info,
                 Config::default(),
