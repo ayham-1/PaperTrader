@@ -15,8 +15,11 @@ use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
-pub async fn handle_data(sql_conn: &tokio_postgres::Client,
-                         socket: &mut TlsStream<TcpStream>, buf: &[u8]) -> std::io::Result<()> {
+pub async fn handle_data(
+    sql_conn: &tokio_postgres::Client,
+    socket: &mut TlsStream<TcpStream>,
+    buf: &[u8],
+) -> std::io::Result<()> {
     /* decode incoming message */
     let client_msg: Message = bincode::deserialize(&buf).map_err(|err| {
         std::io::Error::new(
@@ -54,7 +57,9 @@ pub async fn handle_data(sql_conn: &tokio_postgres::Client,
                 String::from_utf8(client_msg.data).unwrap().as_str(),
                 true,
                 false,
-            ).await {
+            )
+            .await
+            {
                 Ok(salt) => {
                     let server_response: Message = message_builder(
                         MessageType::DataTransfer,
@@ -84,7 +89,9 @@ pub async fn handle_data(sql_conn: &tokio_postgres::Client,
                 String::from_utf8(client_msg.data).unwrap().as_str(),
                 false,
                 false,
-            ).await {
+            )
+            .await
+            {
                 Ok(salt) => {
                     let server_response: Message = message_builder(
                         MessageType::DataTransfer,

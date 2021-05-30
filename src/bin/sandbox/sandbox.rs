@@ -19,7 +19,9 @@ fn main() {
 
         // Spawn server
         rt.block_on(async move {
-            libtrader_init_server().await.expect("failed running server");
+            libtrader_init_server()
+                .await
+                .expect("failed running server");
         });
     }
 

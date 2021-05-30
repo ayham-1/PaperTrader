@@ -41,20 +41,40 @@ pub async fn acc_auth(
      * Get server salts
      * */
     let email_salt = HEXUPPER
-        .decode(get_user_salt(sql_conn, username, true, true).await.unwrap().as_bytes())
+        .decode(
+            get_user_salt(sql_conn, username, true, true)
+                .await
+                .unwrap()
+                .as_bytes(),
+        )
         .unwrap();
     let password_salt = HEXUPPER
-        .decode(get_user_salt(sql_conn, username, false, true).await.unwrap().as_bytes())
+        .decode(
+            get_user_salt(sql_conn, username, false, true)
+                .await
+                .unwrap()
+                .as_bytes(),
+        )
         .unwrap();
 
     /*
      * Get server hashes
      * */
     let email_db = HEXUPPER
-        .decode(get_user_hash(sql_conn, username, true).await.unwrap().as_bytes())
+        .decode(
+            get_user_hash(sql_conn, username, true)
+                .await
+                .unwrap()
+                .as_bytes(),
+        )
         .unwrap();
     let password_db = HEXUPPER
-        .decode(get_user_hash(sql_conn, username, false).await.unwrap().as_bytes())
+        .decode(
+            get_user_hash(sql_conn, username, false)
+                .await
+                .unwrap()
+                .as_bytes(),
+        )
         .unwrap();
 
     /*

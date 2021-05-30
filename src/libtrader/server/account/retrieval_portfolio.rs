@@ -1,3 +1,5 @@
+use std::io;
+
 use crate::common::account::portfolio::Portfolio;
 use crate::common::account::position::Position;
 use crate::common::message::message::Message;
@@ -6,13 +8,14 @@ use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::network::jwt_wrapper::verify_jwt_token;
+use crate::server::db::config::{DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS};
+use crate::server::db::initializer::db_connect;
 
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
 pub async fn acc_retrieve_portfolio(
-    sql_conn: &tokio_postgres::Client,
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> Result<(), ReturnFlags> {
@@ -26,6 +29,10 @@ pub async fn acc_retrieve_portfolio(
         }
     };
 
+    /* connect to SQL database using user ```postfolio_schema_user``` */
+    let sql_conn = db_connect(DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS)
+        .await
+        .map_err(|_| {ReturnFlags::ServerRetrievePortfolioFailed})?;
 
     /* get userId's portfolio positions */
     let mut portfolio: Portfolio = Portfolio::default();
@@ -34,7 +41,8 @@ pub async fn acc_retrieve_portfolio(
         .query(
             "SELECT * FROM portfolio_schema.positions WHERE user_id = $1",
             &[&token.user_id],
-        ).await
+        )
+        .await
         .unwrap()
     {
         let mut pos: Position = Position::default();

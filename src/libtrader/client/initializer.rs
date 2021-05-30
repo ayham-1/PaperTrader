@@ -1,7 +1,6 @@
 use std::io;
 use std::net::ToSocketAddrs;
 
-
 use tokio::net::TcpStream;
 use tokio_rustls::webpki::DNSNameRef;
 use tokio_rustls::TlsConnector;
@@ -9,8 +8,8 @@ use tokio_rustls::TlsConnector;
 use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
 use crate::common::misc::path_exists::path_exists;
 
-use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 
 /// Initializes global logger.
 ///
@@ -107,14 +106,14 @@ pub async fn libtrader_init_client() -> std::io::Result<()> {
         .collect();
 
     use crate::client::account::creation::acc_create;
-    match acc_create(&mut socket, "test", "email", "password").await {
+    match acc_create(&mut socket, &username, &email, &password).await {
         Ok(_) => println!("we created it"),
         Err(err) => panic!("panik! {}", err),
     }
 
     use crate::client::account::authorization::acc_auth;
     let mut jwt: String = String::new();
-    match acc_auth(&mut socket, "test", "email", "password").await {
+    match acc_auth(&mut socket, &username, &email, &password).await {
         Ok(auth) => {
             jwt = auth;
             println!("we accessed it, the token: {}", jwt);

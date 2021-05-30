@@ -19,17 +19,23 @@ use crate::common::misc::return_flags::ReturnFlags;
 ///         Err(err) => panic!("failed to get the stock value, reason: {}", err)
 ///   };
 /// ```
-pub async fn get_stock_from_db(sql_conn: &mut tokio_postgres::Client, searched_symbol: &str) -> Result<Vec<StockVal>, ReturnFlags> {
+pub async fn get_stock_from_db(
+    sql_conn: &mut tokio_postgres::Client,
+    searched_symbol: &str,
+) -> Result<Vec<StockVal>, ReturnFlags> {
     /*
      * Returns all stock values from database.
      */
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match sql_conn.query(
-        format!("SELECT * FROM asset_schema.{}", searched_symbol).as_str(),
-        &[],
-    ).await {
+    match sql_conn
+        .query(
+            format!("SELECT * FROM asset_schema.{}", searched_symbol).as_str(),
+            &[],
+        )
+        .await
+    {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();
@@ -77,14 +83,17 @@ pub async fn get_stock_from_db_since_epoch(
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match sql_conn.query(
-        format!(
-            "SELECT * FROM asset_schema.{} WHERE time_epoch >= {}",
-            searched_symbol, time_epoch
+    match sql_conn
+        .query(
+            format!(
+                "SELECT * FROM asset_schema.{} WHERE time_epoch >= {}",
+                searched_symbol, time_epoch
+            )
+            .as_str(),
+            &[],
         )
-        .as_str(),
-        &[],
-    ).await {
+        .await
+    {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();
@@ -135,14 +144,17 @@ pub async fn get_stock_from_db_between_epochs(
 
     // Query database for table.
     let mut stocks: Vec<StockVal> = Vec::new();
-    match sql_conn.query(
-        format!(
-            "SELECT * FROM asset_schema.{} WHERE time_epoch >= {} AND time_epoch <= {}",
-            searched_symbol, first_time_epoch, second_time_epoch
+    match sql_conn
+        .query(
+            format!(
+                "SELECT * FROM asset_schema.{} WHERE time_epoch >= {} AND time_epoch <= {}",
+                searched_symbol, first_time_epoch, second_time_epoch
+            )
+            .as_str(),
+            &[],
         )
-        .as_str(),
-        &[],
-    ).await {
+        .await
+    {
         Ok(all_rows) => {
             for row in all_rows {
                 let mut val: StockVal = StockVal::default();

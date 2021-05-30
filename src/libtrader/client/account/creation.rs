@@ -99,7 +99,6 @@ pub async fn acc_create(
         false,
         0,
     ) && response.instruction == 1
-        && response.data.len() != 0
     {
         /* created successfully */
         return Ok(());

@@ -12,7 +12,7 @@ use tokio_rustls::server::TlsStream;
 
 pub async fn acc_retrieve_transaction(
     sql_conn: &tokio_postgres::Client,
-    tls_connection: &mut TlsStream<TcpStream>,
+    socket: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> Result<(), ReturnFlags> {
     /* verify JWT token */
@@ -20,7 +20,7 @@ pub async fn acc_retrieve_transaction(
         Ok(token) => token,
         Err(_) => {
             warn!("ACC_RETRIEVE_TRANSACTION_UNAUTH_TOKEN");
-            tls_connection.shutdown().await.unwrap();
+            socket.shutdown().await.unwrap();
             return Err(ReturnFlags::ServerAccUnauthorized);
         }
     };
@@ -53,7 +53,9 @@ pub async fn acc_retrieve_transaction(
         0,
         bincode::serialize(&transactions).unwrap(),
     );
-    let _ = tls_connection.write(&bincode::serialize(&message).unwrap());
+    socket.write_all(&bincode::serialize(&message).unwrap())
+        .await
+        .map_err(|_| {ReturnFlags::ServerRetrieveTransactionFailed})?;
 
     Ok(())
 }

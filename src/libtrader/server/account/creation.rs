@@ -8,7 +8,10 @@ use crate::server::account::hash_email::hash_email;
 use crate::server::account::hash_pwd::hash_pwd;
 use crate::server::ds::account::Account;
 
-pub async fn acc_create(sql_conn: &tokio_postgres::Client, message: &Message) -> Result<(), ReturnFlags> {
+pub async fn acc_create(
+    sql_conn: &tokio_postgres::Client,
+    message: &Message,
+) -> Result<(), ReturnFlags> {
     /*
      * Parse account data
      * */
@@ -77,7 +80,8 @@ pub async fn acc_create(sql_conn: &tokio_postgres::Client, message: &Message) ->
             "SELECT username FROM accounts_schema.accounts WHERE username LIKE $1",
             &[&account.username],
         )
-        .await.unwrap()
+        .await
+        .unwrap()
     {
         return Err(ReturnFlags::ServerAccUserExists);
     }

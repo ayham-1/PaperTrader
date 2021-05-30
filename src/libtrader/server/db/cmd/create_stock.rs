@@ -16,15 +16,19 @@ use crate::common::misc::return_flags::ReturnFlags;
 ///        Err(err) => error!("failed to create stock table {}", err),
 ///    }
 /// ```
-pub async fn create_stock(sql_conn: &mut tokio_postgres::Client, stock_name: &str) -> Result<(), ReturnFlags> {
+pub async fn create_stock(
+    sql_conn: &mut tokio_postgres::Client,
+    stock_name: &str,
+) -> Result<(), ReturnFlags> {
     /*
      * Creates a stock table in database in assets schema.
      */
 
     // Create the table.
-    match sql_conn.execute(
-        format!(
-            "CREATE TABLE asset_schema.{} ( \
+    match sql_conn
+        .execute(
+            format!(
+                "CREATE TABLE asset_schema.{} ( \
                         id                  BIGSERIAL PRIMARY KEY, \
                         isin                TEXT NOT NULL, \
                         time_epoch          BIGINT NOT NULL, \
@@ -32,11 +36,13 @@ pub async fn create_stock(sql_conn: &mut tokio_postgres::Client, stock_name: &st
                         bid_price           DOUBLE PRECISION NOT NULL, \
                         volume              BIGINT NOT NULL \
                 )",
-            stock_name
+                stock_name
+            )
+            .as_str(),
+            &[],
         )
-        .as_str(),
-        &[],
-    ).await {
+        .await
+    {
         Ok(_rows) => Ok(()),
         Err(_) => Err(ReturnFlags::ServerDbCreateStockFailed),
     }

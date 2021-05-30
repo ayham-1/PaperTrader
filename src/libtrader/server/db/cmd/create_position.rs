@@ -16,7 +16,11 @@ use crate::common::misc::return_flags::ReturnFlags;
 ///         Err(err) => panic!("TEST_CMD_CREATE_PORTFOLIO_FAILED: {}", err)
 ///     }
 /// ```
-pub async fn create_position(sql_conn: &mut tokio_postgres::Client, user_id: i64, position: Position) -> Result<(), ReturnFlags> {
+pub async fn create_position(
+    sql_conn: &mut tokio_postgres::Client,
+    user_id: i64,
+    position: Position,
+) -> Result<(), ReturnFlags> {
     /*
      * Creates a position entry in database in portfolio_schema.positions.
      * */

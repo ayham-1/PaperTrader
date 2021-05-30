@@ -2,7 +2,11 @@ use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::db::cmd::user_exists::user_exists;
 
-pub async fn get_user_hash(sql_conn: &tokio_postgres::Client, username: &str, is_email: bool) -> Result<String, ReturnFlags> {
+pub async fn get_user_hash(
+    sql_conn: &tokio_postgres::Client,
+    username: &str,
+    is_email: bool,
+) -> Result<String, ReturnFlags> {
     /* check that user exists*/
     if user_exists(sql_conn, username).await {
         if is_email {

@@ -34,7 +34,7 @@ pub async fn retrieve_portfolio(
     }
 
     /* call acc_retrieve_portfolio() server version */
-    match acc_retrieve_portfolio(sql_conn, tls_connection, message).await {
+    match acc_retrieve_portfolio(tls_connection, message).await {
         Ok(_) => Ok(()),
         Err(err) => {
             warn!("RETRIEVE_PORTFOLIO_FAILED: {}", err);

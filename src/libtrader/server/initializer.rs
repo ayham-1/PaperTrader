@@ -1,7 +1,7 @@
-use std::io;
-use std::sync::Arc;
 use argh::FromArgs;
+use std::io;
 use std::path::PathBuf;
+use std::sync::Arc;
 use tokio::io::AsyncReadExt;
 use tokio::net::TcpListener;
 use tokio_rustls::TlsAcceptor;
@@ -12,9 +12,9 @@ use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
 use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
-use crate::server::network::handle_data::handle_data;
+use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
 use crate::server::db::initializer::db_connect;
+use crate::server::network::handle_data::handle_data;
 
 /// Server Options
 #[derive(FromArgs)]
@@ -103,9 +103,12 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
     };
 
     // Initialize SQL connection
-    let sql_shared_conn = Arc::new(db_connect(DB_ACC_USER, DB_ACC_PASS)
-        .await
-        .map_err(|err| io::Error::new(io::ErrorKind::ConnectionAborted, format!("SQL_CONNECTION_FAILED: {}", err)))?);
+    let sql_shared_conn = Arc::new(db_connect(DB_ACC_USER, DB_ACC_PASS).await.map_err(|err| {
+        io::Error::new(
+            io::ErrorKind::ConnectionAborted,
+            format!("SQL_CONNECTION_FAILED: {}", err),
+        )
+    })?);
 
     // Initialize arguments
     let options: Options = argh::from_env();
@@ -133,7 +136,7 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
                 let mut buf = Vec::with_capacity(4096);
                 socket.read_buf(&mut buf).await?;
                 match handle_data(&sql_conn, &mut socket, buf.as_slice()).await {
-                    Ok(()) => {},
+                    Ok(()) => {}
                     Err(err) => {
                         warn!("{}", format!("Failed running handle_data: {:#?}", err));
                         break;

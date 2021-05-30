@@ -18,15 +18,21 @@ use crate::common::misc::return_flags::ReturnFlags;
 ///        Err(err) => error!("we must found the sacred company! err: {}", err),
 ///    }
 /// ```
-pub async fn get_company_from_db(sql_conn: &mut tokio_postgres::Client, searched_symbol: &str) -> Result<Company, ReturnFlags> {
+pub async fn get_company_from_db(
+    sql_conn: &mut tokio_postgres::Client,
+    searched_symbol: &str,
+) -> Result<Company, ReturnFlags> {
     /*
      * Returns company entry from database
      */
     // Connect to database.
-    match sql_conn.query(
-        "SELECT * FROM public.companies WHERE symbol=$1",
-        &[&searched_symbol],
-    ).await {
+    match sql_conn
+        .query(
+            "SELECT * FROM public.companies WHERE symbol=$1",
+            &[&searched_symbol],
+        )
+        .await
+    {
         Ok(row) => {
             let mut found_company: Company = Company::default();
             found_company.id = row[0].get(0);
