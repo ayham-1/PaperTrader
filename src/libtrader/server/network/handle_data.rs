@@ -15,12 +15,16 @@ use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
-pub async fn handle_data(socket: &mut TlsStream<TcpStream>, buf: &[u8]) -> std::io::Result<()> {
+pub async fn handle_data(sql_conn: &tokio_postgres::Client,
+                         socket: &mut TlsStream<TcpStream>, buf: &[u8]) -> std::io::Result<()> {
     /* decode incoming message */
-    let client_msg: Message = bincode::deserialize(&buf)
-        .map_err(|err| std::io::Error::new(std::io::ErrorKind::InvalidInput,
-                                            format!("HANDLE_DATA_RCVD_INVALID_MSG: {}", err)))?;
-    println!("This is a message: {}", client_msg);
+    let client_msg: Message = bincode::deserialize(&buf).map_err(|err| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("HANDLE_DATA_RCVD_INVALID_MSG: {}", err),
+        )
+    })?;
+    //println!("This is a message: {}", client_msg);
 
     /* handle individual client instructions */
     match client_msg.instruction {
@@ -46,10 +50,11 @@ pub async fn handle_data(socket: &mut TlsStream<TcpStream>, buf: &[u8]) -> std::
         _ if client_msg.instruction == CommandInst::GetEmailSalt as i64 => {
             use crate::server::db::cmd::get_user_salt::get_user_salt;
             match get_user_salt(
+                sql_conn,
                 String::from_utf8(client_msg.data).unwrap().as_str(),
                 true,
                 false,
-            ) {
+            ).await {
                 Ok(salt) => {
                     let server_response: Message = message_builder(
                         MessageType::DataTransfer,
@@ -75,10 +80,11 @@ pub async fn handle_data(socket: &mut TlsStream<TcpStream>, buf: &[u8]) -> std::
         _ if client_msg.instruction == CommandInst::GetPasswordSalt as i64 => {
             use crate::server::db::cmd::get_user_salt::get_user_salt;
             match get_user_salt(
+                sql_conn,
                 String::from_utf8(client_msg.data).unwrap().as_str(),
                 false,
                 false,
-            ) {
+            ).await {
                 Ok(salt) => {
                     let server_response: Message = message_builder(
                         MessageType::DataTransfer,
@@ -103,16 +109,16 @@ pub async fn handle_data(socket: &mut TlsStream<TcpStream>, buf: &[u8]) -> std::
             }
         }
         _ if client_msg.instruction == CommandInst::Register as i64 => {
-            register(socket, &client_msg).await
+            register(sql_conn, socket, &client_msg).await
         }
         _ if client_msg.instruction == CommandInst::LoginMethod1 as i64 => {
-            login_normal(socket, &client_msg).await
+            login_normal(sql_conn, socket, &client_msg).await
         }
         _ if client_msg.instruction == DataTransferInst::GetUserPortfolio as i64 => {
-            retrieve_portfolio(socket, &client_msg).await
+            retrieve_portfolio(sql_conn, socket, &client_msg).await
         }
         _ if client_msg.instruction == DataTransferInst::GetUserTransactionHist as i64 => {
-            retrieve_transactions(socket, &client_msg).await
+            retrieve_transactions(sql_conn, socket, &client_msg).await
         }
         _ => Ok(()),
     }

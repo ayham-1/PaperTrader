@@ -7,7 +7,7 @@ use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio_rustls::client::TlsStream;
 
@@ -50,34 +50,49 @@ pub async fn req_server_salt(
         0,
         username.as_bytes().to_vec(),
     );
-    socket.write_all(&bincode::serialize(&message).unwrap()).await?;
+    socket
+        .write_all(&bincode::serialize(&message).unwrap())
+        .await?;
 
     let mut buf = Vec::with_capacity(4096);
     socket.read_buf(&mut buf).await?;
 
-    let ret_msg: Message = bincode::deserialize(&buf)
-        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
-                                      format!("{}", ReturnFlags::ClientReqSaltInvMsg)))?;
+    let ret_msg: Message = bincode::deserialize(&buf).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!("{}", ReturnFlags::ClientReqSaltInvMsg),
+        )
+    })?;
 
     match ret_msg.msgtype {
-        MessageType::Command => Err(io::Error::new(io::ErrorKind::InvalidData, 
-                                                   format!("{}", ReturnFlags::ClientReqSaltInvMsg))),
+        MessageType::Command => Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("{}", ReturnFlags::ClientReqSaltInvMsg),
+        )),
         MessageType::DataTransfer => {
             if ret_msg.data.len() != digest::SHA512_OUTPUT_LEN {
-                Err(io::Error::new(io::ErrorKind::InvalidData, 
-                                   format!("{}", ReturnFlags::ClientReqSaltInvMsgRetSize)))
+                Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    format!("{}", ReturnFlags::ClientReqSaltInvMsgRetSize),
+                ))
             } else if ret_msg.instruction == salt_type {
                 Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN))
             } else {
-                Err(io::Error::new(io::ErrorKind::InvalidData, 
-                                   format!("{}", ReturnFlags::ClientReqSaltInvMsgInst)))
+                Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    format!("{}", ReturnFlags::ClientReqSaltInvMsgInst),
+                ))
             }
         }
         MessageType::ServerReturn => match ret_msg.instruction {
-            0 => Err(io::Error::new(io::ErrorKind::InvalidData, 
-                                   format!("{}", ReturnFlags::ClientReqSaltRej))),
-            _ => Err(io::Error::new(io::ErrorKind::InvalidData, 
-                                    format!("{}", ReturnFlags::ClientReqSaltInvMsg))),
+            0 => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("{}", ReturnFlags::ClientReqSaltRej),
+            )),
+            _ => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("{}", ReturnFlags::ClientReqSaltInvMsg),
+            )),
         },
     }
 }

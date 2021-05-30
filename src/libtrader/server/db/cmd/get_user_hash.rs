@@ -1,24 +1,20 @@
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
-use crate::server::db::initializer::db_connect;
-
 use crate::server::db::cmd::user_exists::user_exists;
 
-pub fn get_user_hash(username: &str, is_email: bool) -> Result<String, ReturnFlags> {
+pub async fn get_user_hash(sql_conn: &tokio_postgres::Client, username: &str, is_email: bool) -> Result<String, ReturnFlags> {
     /* check that user exists*/
-    if user_exists(username) {
-        let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
+    if user_exists(sql_conn, username).await {
         if is_email {
             for row in
-                &client.query("SELECT username, email_hash FROM accounts_schema.accounts WHERE username LIKE $1", 
-                              &[&username]).unwrap() {
+                &sql_conn.query("SELECT username, email_hash FROM accounts_schema.accounts WHERE username LIKE $1", 
+                              &[&username]).await.unwrap() {
                     return Ok(row.get(1));
                 }
         } else {
             for row in
-                &client.query("SELECT username, pass_hash FROM accounts_schema.accounts WHERE username LIKE $1", 
-                              &[&username]).unwrap() {
+                &sql_conn.query("SELECT username, pass_hash FROM accounts_schema.accounts WHERE username LIKE $1", 
+                              &[&username]).await.unwrap() {
                     return Ok(row.get(1));
                 }
         }

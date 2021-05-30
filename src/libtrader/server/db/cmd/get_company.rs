@@ -1,7 +1,5 @@
 use crate::common::generic::company::Company;
 use crate::common::misc::return_flags::ReturnFlags;
-use crate::server::db::config::{DB_PASS, DB_USER};
-use crate::server::db::initializer::db_connect;
 
 /// Returns a company from the postgres SQL database.
 ///
@@ -20,16 +18,15 @@ use crate::server::db::initializer::db_connect;
 ///        Err(err) => error!("we must found the sacred company! err: {}", err),
 ///    }
 /// ```
-pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, ReturnFlags> {
+pub async fn get_company_from_db(sql_conn: &mut tokio_postgres::Client, searched_symbol: &str) -> Result<Company, ReturnFlags> {
     /*
      * Returns company entry from database
      */
     // Connect to database.
-    let mut client = db_connect(DB_USER, DB_PASS)?;
-    match client.query(
+    match sql_conn.query(
         "SELECT * FROM public.companies WHERE symbol=$1",
         &[&searched_symbol],
-    ) {
+    ).await {
         Ok(row) => {
             let mut found_company: Company = Company::default();
             found_company.id = row[0].get(0);
@@ -45,43 +42,5 @@ pub fn get_company_from_db(searched_symbol: &str) -> Result<Company, ReturnFlags
             return Ok(found_company);
         }
         Err(_) => Err(ReturnFlags::ServerDbSearchCompanyNotFound),
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use crate::server::db::cmd::create_company::create_company;
-
-    #[test]
-    fn test_cmd_get_company_from_db() {
-        /* create a new company */
-        let mut company = Company::default();
-        company.id = 454;
-        company.symbol = "BBP".to_string();
-        company.isin = "14141".to_string();
-        company.company_name = "BBP?".to_string();
-        company.primary_exchange = "NYSE".to_string();
-        company.sector = "Tech".to_string();
-        company.industry = "Tech".to_string();
-        company.primary_sic_code = "141499".to_string();
-        company.employees = 1;
-        create_company(company.clone()).unwrap();
-
-        /* test get_company_from_db() */
-        match get_company_from_db("BBP".into()) {
-            Ok(found_company) => {
-                assert_eq!(found_company.id, company.id);
-                assert_eq!(found_company.symbol, company.symbol);
-                assert_eq!(found_company.isin, company.isin);
-                assert_eq!(found_company.company_name, company.company_name);
-                assert_eq!(found_company.primary_exchange, company.primary_exchange);
-                assert_eq!(found_company.sector, company.sector);
-                assert_eq!(found_company.industry, company.industry);
-                assert_eq!(found_company.primary_sic_code, company.primary_sic_code);
-                assert_eq!(found_company.employees, company.employees);
-            }
-            Err(err) => panic!("TEST_CMD_GET_COMPANY_FROM_DB_FAILED: {}", err),
-        }
     }
 }

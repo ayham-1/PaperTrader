@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use tokio_rustls::rustls::{KeyLogFile, ClientConfig, NoClientSessionStorage};
+use tokio_rustls::rustls::{ClientConfig, KeyLogFile, NoClientSessionStorage};
 
 /// A "always accept" Certficate verifier.
 ///
@@ -33,7 +33,7 @@ mod danger {
 /// - TLs Protocol CypherSuite.
 ///
 /// Assumed Settings:
-/// - if cargo feature "tls_no_verify", then certificates are not 
+/// - if cargo feature "tls_no_verify", then certificates are not
 /// checked, else they are.
 /// - No persistent session storage.
 ///

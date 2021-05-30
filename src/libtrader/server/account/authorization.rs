@@ -18,6 +18,7 @@ use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
 pub async fn acc_auth(
+    sql_conn: &tokio_postgres::Client,
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> Result<(), ReturnFlags> {
@@ -40,20 +41,20 @@ pub async fn acc_auth(
      * Get server salts
      * */
     let email_salt = HEXUPPER
-        .decode(get_user_salt(username, true, true).unwrap().as_bytes())
+        .decode(get_user_salt(sql_conn, username, true, true).await.unwrap().as_bytes())
         .unwrap();
     let password_salt = HEXUPPER
-        .decode(get_user_salt(username, false, true).unwrap().as_bytes())
+        .decode(get_user_salt(sql_conn, username, false, true).await.unwrap().as_bytes())
         .unwrap();
 
     /*
      * Get server hashes
      * */
     let email_db = HEXUPPER
-        .decode(get_user_hash(username, true).unwrap().as_bytes())
+        .decode(get_user_hash(sql_conn, username, true).await.unwrap().as_bytes())
         .unwrap();
     let password_db = HEXUPPER
-        .decode(get_user_hash(username, false).unwrap().as_bytes())
+        .decode(get_user_hash(sql_conn, username, false).await.unwrap().as_bytes())
         .unwrap();
 
     /*
@@ -86,7 +87,7 @@ pub async fn acc_auth(
      * Generate JWT token
      * */
     /* get user id*/
-    let user_id = get_user_id(username)?;
+    let user_id = get_user_id(sql_conn, username).await?;
 
     /* gen the actual token */
     use std::time::{Duration, SystemTime, UNIX_EPOCH};

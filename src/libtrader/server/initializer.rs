@@ -1,3 +1,5 @@
+use std::io;
+use std::sync::Arc;
 use argh::FromArgs;
 use std::path::PathBuf;
 use tokio::io::AsyncReadExt;
@@ -9,7 +11,10 @@ use std::net::ToSocketAddrs;
 use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
 use crate::common::misc::path_exists::path_exists;
 use crate::common::misc::return_flags::ReturnFlags;
+
+use crate::server::db::config::{DB_ACC_USER, DB_ACC_PASS};
 use crate::server::network::handle_data::handle_data;
+use crate::server::db::initializer::db_connect;
 
 /// Server Options
 #[derive(FromArgs)]
@@ -89,7 +94,6 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
 /// ```rust
 ///     libtrader_init_server()?;
 /// ```
-#[tokio::main]
 pub async fn libtrader_init_server() -> std::io::Result<()> {
     // Initialize log.
     //#[cfg(not(test))] // wot dis
@@ -97,6 +101,11 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
         Ok(_) => {}
         Err(_) => {} // TODO: handle this case
     };
+
+    // Initialize SQL connection
+    let sql_shared_conn = Arc::new(db_connect(DB_ACC_USER, DB_ACC_PASS)
+        .await
+        .map_err(|err| io::Error::new(io::ErrorKind::ConnectionAborted, format!("SQL_CONNECTION_FAILED: {}", err)))?);
 
     // Initialize arguments
     let options: Options = argh::from_env();
@@ -115,16 +124,16 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
     loop {
         let (socket, _) = listener.accept().await?; // socket, peer_addr
         let acceptor = acceptor.clone();
+        let sql_conn = sql_shared_conn.clone();
 
         // function to run in the thread
         let fut = async move {
             let mut socket = acceptor.accept(socket).await?;
-
-            let mut buf = Vec::with_capacity(4096);
             loop {
+                let mut buf = Vec::with_capacity(4096);
                 socket.read_buf(&mut buf).await?;
-                match handle_data(&mut socket, buf.as_slice()).await {
-                    Ok(()) => {}
+                match handle_data(&sql_conn, &mut socket, buf.as_slice()).await {
+                    Ok(()) => {},
                     Err(err) => {
                         warn!("{}", format!("Failed running handle_data: {:#?}", err));
                         break;

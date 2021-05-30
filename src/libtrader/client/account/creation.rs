@@ -14,7 +14,7 @@ use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::client::network::cmd::get_server_salt::get_server_salt;
 
-use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio_rustls::client::TlsStream;
 
@@ -75,14 +75,18 @@ pub async fn acc_create(
         data.dump().as_bytes().to_vec(),
     );
     socket
-        .write_all(&bincode::serialize(&message).unwrap()).await?;
+        .write_all(&bincode::serialize(&message).unwrap())
+        .await?;
 
     /* decode response */
     let mut buf = Vec::with_capacity(4096);
     socket.read_buf(&mut buf).await?;
-    let response: Message = bincode::deserialize(&buf)
-        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
-                                      format!("{}", ReturnFlags::ClientTlsReadError)))?;
+    let response: Message = bincode::deserialize(&buf).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!("{}", ReturnFlags::ClientTlsReadError),
+        )
+    })?;
     if !assert_msg(
         &response,
         MessageType::ServerReturn,
@@ -101,7 +105,9 @@ pub async fn acc_create(
         return Ok(());
     } else {
         /* server rejected account creation */
-        return Err(io::Error::new(io::ErrorKind::ConnectionRefused,
-                              format!("{}", ReturnFlags::ClientAccCreationFailed)));
+        return Err(io::Error::new(
+            io::ErrorKind::ConnectionRefused,
+            format!("{}", ReturnFlags::ClientAccCreationFailed),
+        ));
     }
 }

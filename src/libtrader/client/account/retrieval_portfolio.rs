@@ -8,7 +8,7 @@ use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio_rustls::client::TlsStream;
 
@@ -32,7 +32,7 @@ use tokio_rustls::client::TlsStream;
 /// ```
 pub async fn acc_retrieve_portfolio(
     socket: &mut TlsStream<TcpStream>,
-    auth_jwt: String
+    auth_jwt: String,
 ) -> io::Result<Portfolio> {
     // TODO: yea absolutely, let's crash the thread
     assert_eq!(auth_jwt.is_empty(), false);
@@ -47,15 +47,19 @@ pub async fn acc_retrieve_portfolio(
         bincode::serialize(&auth_jwt).unwrap(),
     );
     socket
-        .write_all(&bincode::serialize(&message).unwrap()).await?;
+        .write_all(&bincode::serialize(&message).unwrap())
+        .await?;
 
     /* decode response */
     let mut buf = Vec::with_capacity(4096);
     socket.read_buf(&mut buf).await?;
 
-    let response: Message = bincode::deserialize(&buf)
-        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
-                                      format!("{}", ReturnFlags::ClientAccRetrievePortfolioError)))?;
+    let response: Message = bincode::deserialize(&buf).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!("{}", ReturnFlags::ClientAccRetrievePortfolioError),
+        )
+    })?;
 
     if assert_msg(
         &response,
@@ -76,7 +80,9 @@ pub async fn acc_retrieve_portfolio(
         return Ok(portfolio);
     } else {
         /* could not get data */
-        return Err(io::Error::new(io::ErrorKind::InvalidData,
-                                      format!("{}", ReturnFlags::ClientAccRetrievePortfolioError)));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("{}", ReturnFlags::ClientAccRetrievePortfolioError),
+        ));
     }
 }

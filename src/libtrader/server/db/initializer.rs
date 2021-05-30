@@ -1,4 +1,3 @@
-use crate::common::misc::return_flags::ReturnFlags;
 use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
 
 /// Establishes a postgresql connection to the SQL database.
@@ -16,27 +15,17 @@ use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
 /// ```rust
 /// let mut client = db_connect(DB_USER, DB_PASS)?;
 /// ```
-pub fn db_connect(user: &'static str, pass: &'static str) -> Result<postgres::Client, ReturnFlags> {
+pub async fn db_connect(user: &'static str, pass: &'static str) -> Result<tokio_postgres::Client, tokio_postgres::Error> {
     /* Generate the requested string */
     let db_connect_str = format!(
         "host={} port={} dbname={} user={} password={}",
         DB_HOST, DB_HOST_PORT, DB_NAME, user, pass
     );
-    match postgres::Client::connect(db_connect_str.as_str(), postgres::NoTls) {
-        Ok(client) => return Ok(client),
-        Err(_) => return Err(ReturnFlags::ServerDbConnectFailed),
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use crate::server::db::config::{DB_PASS, DB_USER};
-    #[test]
-    fn test_db_connect() {
-        match db_connect(DB_USER, DB_PASS) {
-            Ok(client) => assert_eq!(client.is_closed(), false),
-            Err(err) => panic!("TEST_DB_CONNECT_FAILED: {}", err),
+    let (client, connection) = tokio_postgres::connect(db_connect_str.as_str(), tokio_postgres::NoTls).await?;
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("SQL connection error: {}", e);
         }
-    }
+    });
+    Ok(client)
 }

@@ -8,7 +8,7 @@ use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use tokio::io::{AsyncWriteExt, AsyncReadExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio_rustls::client::TlsStream;
 
@@ -43,15 +43,20 @@ pub async fn get_server_salt(
         Vec::new(),
     );
     socket
-        .write_all(&bincode::serialize(&message).unwrap()).await?;
+        .write_all(&bincode::serialize(&message).unwrap())
+        .await?;
 
     let mut buf = Vec::with_capacity(4096);
     socket.read_buf(&mut buf).await?;
 
-    let ret_msg: Message = bincode::deserialize(&buf)
-        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput,
-                                      format!("{}", ReturnFlags::ClientGenSaltFailed)))?;
+    let ret_msg: Message = bincode::deserialize(&buf).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!("{}", ReturnFlags::ClientGenSaltFailed),
+        )
+    })?;
 
+    // TODO: crash this thread LOVELY ERROR CHECKING!
     assert_eq!(ret_msg.msgtype, MessageType::DataTransfer);
     assert_eq!(ret_msg.instruction, CommandInst::GenHashSalt as i64);
     assert_eq!(ret_msg.argument_count, 1);

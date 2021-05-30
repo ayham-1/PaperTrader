@@ -1,4 +1,4 @@
-use postgres_types::{FromSql, ToSql};
+use postgres_types::{ToSql, FromSql};
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, PartialEq, Debug, ToSql, FromSql, Serialize, Deserialize)]

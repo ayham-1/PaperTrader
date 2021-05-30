@@ -11,6 +11,7 @@ use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
 pub async fn login_normal(
+    sql_conn: &tokio_postgres::Client,
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> std::io::Result<()> {
@@ -34,7 +35,7 @@ pub async fn login_normal(
     }
 
     /* call acc_auth() server version */
-    match acc_auth(tls_connection, message).await {
+    match acc_auth(sql_conn, tls_connection, message).await {
         Ok(_) => Ok(()),
         Err(err) => {
             let server_response = message_builder(

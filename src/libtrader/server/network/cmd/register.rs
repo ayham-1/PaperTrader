@@ -11,9 +11,11 @@ use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
 pub async fn register(
+    sql_conn: &tokio_postgres::Client,
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> std::io::Result<()> {
+    println!("hello");
     /* assert recieved message */
     if !assert_msg(
         message,
@@ -34,7 +36,7 @@ pub async fn register(
     }
 
     /* call acc_create() server version */
-    match acc_create(message) {
+    match acc_create(sql_conn, message).await {
         Ok(_) => {
             let server_response =
                 message_builder(MessageType::ServerReturn, 1, 0, 0, 0, Vec::new());

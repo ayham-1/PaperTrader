@@ -5,8 +5,6 @@ use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::server::db::config::{DB_PORTFOLIO_PASS, DB_PORTFOLIO_USER};
-use crate::server::db::initializer::db_connect;
 use crate::server::network::jwt_wrapper::verify_jwt_token;
 
 use tokio::io::AsyncWriteExt;
@@ -14,6 +12,7 @@ use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
 pub async fn acc_retrieve_portfolio(
+    sql_conn: &tokio_postgres::Client,
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> Result<(), ReturnFlags> {
@@ -27,17 +26,15 @@ pub async fn acc_retrieve_portfolio(
         }
     };
 
-    /* connect to database */
-    let mut client = db_connect(DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS)?;
 
     /* get userId's portfolio positions */
     let mut portfolio: Portfolio = Portfolio::default();
     // get position data from the portfolio_schema.positions table.
-    for row in client
+    for row in sql_conn
         .query(
             "SELECT * FROM portfolio_schema.positions WHERE user_id = $1",
             &[&token.user_id],
-        )
+        ).await
         .unwrap()
     {
         let mut pos: Position = Position::default();

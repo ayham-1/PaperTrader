@@ -10,6 +10,7 @@ use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
 pub async fn retrieve_portfolio(
+    sql_conn: &tokio_postgres::Client,
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> std::io::Result<()> {
@@ -33,7 +34,7 @@ pub async fn retrieve_portfolio(
     }
 
     /* call acc_retrieve_portfolio() server version */
-    match acc_retrieve_portfolio(tls_connection, message).await {
+    match acc_retrieve_portfolio(sql_conn, tls_connection, message).await {
         Ok(_) => Ok(()),
         Err(err) => {
             warn!("RETRIEVE_PORTFOLIO_FAILED: {}", err);

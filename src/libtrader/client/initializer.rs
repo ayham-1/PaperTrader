@@ -1,12 +1,16 @@
 use std::io;
 use std::net::ToSocketAddrs;
 
+
 use tokio::net::TcpStream;
-use tokio_rustls::TlsConnector;
 use tokio_rustls::webpki::DNSNameRef;
+use tokio_rustls::TlsConnector;
 
 use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
 use crate::common::misc::path_exists::path_exists;
+
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
 
 /// Initializes global logger.
 ///
@@ -71,7 +75,9 @@ pub async fn libtrader_init_client() -> std::io::Result<()> {
         Err(err) => return Err(err),
     };
 
-    let addr = ("0.0.0.0", 4000).to_socket_addrs()?.next()
+    let addr = ("0.0.0.0", 4000)
+        .to_socket_addrs()?
+        .next()
         .ok_or_else(|| std::io::Error::from(std::io::ErrorKind::NotFound))?;
     let domain = "localhost";
     let config = gen_tls_client_config()?;
@@ -83,6 +89,22 @@ pub async fn libtrader_init_client() -> std::io::Result<()> {
         .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "invalid dnsname"))?;
 
     let mut socket = connector.connect(domain, stream).await?;
+
+    let username: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(30)
+        .map(char::from)
+        .collect();
+    let email: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(30)
+        .map(char::from)
+        .collect();
+    let password: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(30)
+        .map(char::from)
+        .collect();
 
     use crate::client::account::creation::acc_create;
     match acc_create(&mut socket, "test", "email", "password").await {
@@ -96,7 +118,7 @@ pub async fn libtrader_init_client() -> std::io::Result<()> {
         Ok(auth) => {
             jwt = auth;
             println!("we accessed it, the token: {}", jwt);
-        },
+        }
         Err(err) => panic!("panik! {}", err),
     }
 
@@ -111,7 +133,6 @@ pub async fn libtrader_init_client() -> std::io::Result<()> {
         Ok(transaction) => println!("we got the transactions {:#?}", transaction),
         Err(err) => panic!("panik! {}", err),
     }
-
 
     Ok(())
 }

@@ -6,11 +6,9 @@ use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::account::hash_email::hash_email;
 use crate::server::account::hash_pwd::hash_pwd;
-use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
-use crate::server::db::initializer::db_connect;
 use crate::server::ds::account::Account;
 
-pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
+pub async fn acc_create(sql_conn: &tokio_postgres::Client, message: &Message) -> Result<(), ReturnFlags> {
     /*
      * Parse account data
      * */
@@ -72,16 +70,14 @@ pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
     /*
      * check if username is available in the database
      * */
-    /* connect to database */
-    let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
 
     /* search for an account with same name */
-    for _ in &client
+    for _ in &sql_conn
         .query(
             "SELECT username FROM accounts_schema.accounts WHERE username LIKE $1",
             &[&account.username],
         )
-        .unwrap()
+        .await.unwrap()
     {
         return Err(ReturnFlags::ServerAccUserExists);
     }
@@ -101,13 +97,13 @@ pub fn acc_create(message: &Message) -> Result<(), ReturnFlags> {
     /*
      * Write the account to the database.
      * */
-    match client.execute("INSERT INTO accounts_schema.accounts \
+    match sql_conn.execute("INSERT INTO accounts_schema.accounts \
         (username, email_hash, server_email_salt, client_email_salt, pass_hash, server_pass_salt, client_pass_salt)
         VALUES \
         ($1, $2, $3, $4, $5, $6, $7)",
         &[&account.username,
         &account.email_hash, &account.server_email_salt, &account.client_email_salt,
-        &account.pass_hash, &account.server_pass_salt, &account.client_pass_salt]) {
+        &account.pass_hash, &account.server_pass_salt, &account.client_pass_salt]).await {
             Ok(_) => return Ok(()),
             Err(_) => return Err(ReturnFlags::ServerDbWriteFailed),
     }

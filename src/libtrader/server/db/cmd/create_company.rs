@@ -1,7 +1,5 @@
 use crate::common::generic::company::Company;
 use crate::common::misc::return_flags::ReturnFlags;
-use crate::server::db::config::{DB_PASS, DB_USER};
-use crate::server::db::initializer::db_connect;
 
 /// Creates a company on the postgres SQL database.
 ///
@@ -19,15 +17,13 @@ use crate::server::db::initializer::db_connect;
 ///        Err(err) => error!("Failed to create company with error: {}", err),
 ///    }
 /// ```
-pub fn create_company(company: Company) -> Result<Company, ReturnFlags> {
+pub async fn create_company(sql_conn: &mut tokio_postgres::Client, company: Company) -> Result<Company, ReturnFlags> {
     /*
      * Creates a company entry in database in public.companies.
      */
-    // Connect to database.
-    let mut client = db_connect(DB_USER, DB_PASS)?;
 
     // Insert argument company into public.companies database table.
-    match client.execute(
+    match sql_conn.execute(
         "INSERT INTO public.companies VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
         &[
             &company.id,
@@ -40,45 +36,8 @@ pub fn create_company(company: Company) -> Result<Company, ReturnFlags> {
             &company.primary_sic_code,
             &company.employees,
         ],
-    ) {
+    ).await {
         Ok(_row) => Ok(company),
         Err(_) => Err(ReturnFlags::ServerDbCreateCompanyFailed),
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_cmd_create_company() {
-        /* create a new company */
-        let mut company = Company::default();
-        company.id = 1;
-        company.symbol = "APP".to_string();
-        company.isin = "131".to_string();
-        company.company_name = "Apple1".to_string();
-        company.primary_exchange = "NYSE".to_string();
-        company.sector = "Tech".to_string();
-        company.industry = "Tech".to_string();
-        company.primary_sic_code = "1".to_string();
-        company.employees = 1;
-
-        /* test create_company() with created company */
-        match create_company(company.clone()) {
-            Ok(company) => {
-                /* test create_company() */
-                assert_eq!(company.id, company.id);
-                assert_eq!(company.symbol, company.symbol);
-                assert_eq!(company.isin, company.isin);
-                assert_eq!(company.company_name, company.company_name);
-                assert_eq!(company.primary_exchange, company.primary_exchange);
-                assert_eq!(company.sector, company.sector);
-                assert_eq!(company.industry, company.industry);
-                assert_eq!(company.primary_sic_code, company.primary_sic_code);
-                assert_eq!(company.employees, company.employees);
-            }
-            Err(err) => panic!("TEST_CMD_CREATE_COMPANY_FAILED: {}", err),
-        };
     }
 }

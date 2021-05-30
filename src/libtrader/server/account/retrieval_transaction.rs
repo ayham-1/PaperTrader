@@ -4,8 +4,6 @@ use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
-use crate::server::db::initializer::db_connect;
 use crate::server::network::jwt_wrapper::verify_jwt_token;
 
 use tokio::io::AsyncWriteExt;
@@ -13,6 +11,7 @@ use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 
 pub async fn acc_retrieve_transaction(
+    sql_conn: &tokio_postgres::Client,
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> Result<(), ReturnFlags> {
@@ -26,16 +25,14 @@ pub async fn acc_retrieve_transaction(
         }
     };
 
-    /* connect to database */
-    let mut client = db_connect(DB_ACC_USER, DB_ACC_PASS)?;
-
     /* get userId's transactions */
     let mut transactions: Vec<Transaction> = Vec::new();
-    for row in client
+    for row in sql_conn
         .query(
             "SELECT * FROM accounts_schema.transactions WHERE user_id = $1",
             &[&token.user_id],
         )
+        .await
         .unwrap()
     {
         let mut transaction = Transaction::default();
