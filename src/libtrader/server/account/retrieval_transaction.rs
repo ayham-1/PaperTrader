@@ -53,9 +53,10 @@ pub async fn acc_retrieve_transaction(
         0,
         bincode::serialize(&transactions).unwrap(),
     );
-    socket.write_all(&bincode::serialize(&message).unwrap())
+    socket
+        .write_all(&bincode::serialize(&message).unwrap())
         .await
-        .map_err(|_| {ReturnFlags::ServerRetrieveTransactionFailed})?;
+        .map_err(|_| ReturnFlags::ServerRetrieveTransactionFailed)?;
 
     Ok(())
 }

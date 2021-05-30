@@ -17,11 +17,11 @@ jobs:
       run: cargo fmt --all -- --check
     - name: Build Minimal
       run: cargo build  --no-default-features
-    - name: Build Client
+    - name: Build Client with TLS verification
       run: cargo build --no-default-features --features "client"
+    - name: Build Client without TLS verification
+      run: cargo build --no-default-features --features "client,tls_no_verify"
     - name: Build Server
       run: cargo build --no-default-features --features "server"
     - name: Build Hybrid
       run: cargo build --no-default-features --features "server,client"
-    - name: Run benches
-      run: cargo bench

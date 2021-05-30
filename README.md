@@ -25,17 +25,13 @@ Build command, Hybrid:
 $ cargo build --no-default-features --features "server,client"
 ```
 
-Running server/client (depends on your build command):
-```shell
-$ ./target/debug/sandbox
-```
-
 Running sandbox:
 ```shell
 $ sudo ./scripts/remove_db.sh
 $ sudo ./scripts/deploy_sandbox.sh
-$ cargo run --features "server,tls_no_verify" &
-$ cargo run --features "client,tls_no_verify" &
+$ cargo run --no-default-features --features "server" -- 0.0.0.0:4000 
+	--cert certs/certificate.crt --key private.key &
+$ cargo run --no-default-features --features "client,tls_no_verify" &
 ```
 
 ## Built With

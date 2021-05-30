@@ -7,9 +7,9 @@ use crate::common::message::message_builder::message_builder;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::return_flags::ReturnFlags;
 
-use crate::server::network::jwt_wrapper::verify_jwt_token;
-use crate::server::db::config::{DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS};
+use crate::server::db::config::{DB_PORTFOLIO_PASS, DB_PORTFOLIO_USER};
 use crate::server::db::initializer::db_connect;
+use crate::server::network::jwt_wrapper::verify_jwt_token;
 
 use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
@@ -32,7 +32,7 @@ pub async fn acc_retrieve_portfolio(
     /* connect to SQL database using user ```postfolio_schema_user``` */
     let sql_conn = db_connect(DB_PORTFOLIO_USER, DB_PORTFOLIO_PASS)
         .await
-        .map_err(|_| {ReturnFlags::ServerRetrievePortfolioFailed})?;
+        .map_err(|_| ReturnFlags::ServerRetrievePortfolioFailed)?;
 
     /* get userId's portfolio positions */
     let mut portfolio: Portfolio = Portfolio::default();
