@@ -122,7 +122,7 @@ pub async fn handle_data(
             login_normal(sql_conn, socket, &client_msg).await
         }
         _ if client_msg.instruction == DataTransferInst::GetUserPortfolio as i64 => {
-            retrieve_portfolio(sql_conn, socket, &client_msg).await
+            retrieve_portfolio(socket, &client_msg).await
         }
         _ if client_msg.instruction == DataTransferInst::GetUserTransactionHist as i64 => {
             retrieve_transactions(sql_conn, socket, &client_msg).await
