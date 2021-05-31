@@ -113,7 +113,7 @@ pub async fn libtrader_init_client() -> std::io::Result<()> {
 
     use crate::client::account::authorization::acc_auth;
     let mut jwt: String = String::new();
-    println!("{}", jwt); // this is for removing pisky warnings, 
+    println!("{}", jwt); // this is for removing pisky warnings,
                          // this is fine as long as this code is sandbox
     match acc_auth(&mut socket, &username, &email, &password).await {
         Ok(auth) => {
