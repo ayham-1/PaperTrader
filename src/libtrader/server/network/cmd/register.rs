@@ -15,7 +15,6 @@ pub async fn register(
     tls_connection: &mut TlsStream<TcpStream>,
     message: &Message,
 ) -> std::io::Result<()> {
-    println!("hello");
     /* assert recieved message */
     if !assert_msg(
         message,

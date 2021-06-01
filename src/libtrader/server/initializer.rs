@@ -2,6 +2,7 @@ use argh::FromArgs;
 use std::io;
 use std::path::PathBuf;
 use std::sync::Arc;
+
 use tokio::io::AsyncReadExt;
 use tokio::net::TcpListener;
 use tokio_rustls::TlsAcceptor;
@@ -9,8 +10,6 @@ use tokio_rustls::TlsAcceptor;
 use std::net::ToSocketAddrs;
 
 use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
-use crate::common::misc::path_exists::path_exists;
-use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
 use crate::server::db::initializer::db_connect;
@@ -32,15 +31,16 @@ struct Options {
     key: PathBuf,
 }
 
-#[cfg(not(debug_assertions))]
-use crate::common::misc::gen_log::gen_log;
+tokio::task_local! {
+    pub static IP: std::net::SocketAddr;
+}
 
-/// Initializes global logger.
+/// Initializes global and local logger.
 ///
 /// Private function used by libtrader_init() to initialize the logger. Log destinations are
 /// platfrom dependent.
 /// On unix systems: /var/log/papertrader/
-/// On windows/unkown systems: $(pwd)/log/
+/// On windows/unknown systems: $(pwd)/log/
 ///
 /// Returns: nothing on success, on error contains the reason of failure.
 ///
@@ -52,37 +52,59 @@ use crate::common::misc::gen_log::gen_log;
 ///     };
 /// ```
 ///
-fn libtrader_init_log() -> Result<(), ReturnFlags> {
-    info!("Started Logger.");
-    #[cfg(not(debug_assertions))]
-    gen_log();
+fn libtrader_init_log() -> std::io::Result<()> {
+    use fern::colors::{Color, ColoredLevelConfig};
 
+    let mut dispatch = fern::Dispatch::new().format(|out, message, record| {
+        // configure colors for the whole line
+        let colors_line = ColoredLevelConfig::new()
+            .error(Color::Red)
+            .warn(Color::White)
+            // we actually don't need to specify the color for debug and info, they are white by default
+            .info(Color::Green)
+            .debug(Color::Yellow)
+            // depending on the terminals color scheme, this is the same as the background color
+            .trace(Color::BrightBlack);
+
+        // configure colors for the name of the level.
+        // since almost all of them are the same as the color for the whole line, we
+        // just clone `colors_line` and overwrite our changes
+        let colors_level = colors_line.clone().info(Color::Green);
+
+        out.finish(format_args!(
+            "{color_line}{date}[{addr}][{level}{color_line}] {message}\x1B[0m",
+            color_line = format_args!(
+                "\x1B[{}m",
+                colors_level.get_color(&record.level()).to_fg_str()
+            ),
+            date = chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+            addr = IP.get(),
+            level = record.level(),
+            message = message
+        ))
+    });
     #[cfg(debug_assertions)]
     {
-        use simplelog::*;
-        use std::fs::File;
-
-        if !path_exists("log") {
-            match std::fs::create_dir("log") {
-                Ok(()) => {}
-                Err(_err) => return Err(ReturnFlags::CommonGenLogDirCreationFailed),
-            };
-        }
-        CombinedLogger::init(vec![
-            #[cfg(debug_assertions)]
-            TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Mixed),
-            #[cfg(not(debug_assertions))]
-            TermLogger::new(LevelFilter::Debug, Config::default(), TerminalMode::Mixed),
-            WriteLogger::new(
-                LevelFilter::Info,
-                Config::default(),
-                File::create(format!("log/log-{}.txt", chrono::Utc::now().to_rfc2822())).unwrap(),
-            ),
-        ])
-        .unwrap();
-    };
-
-    Ok(())
+        dispatch = dispatch
+            .level(log::LevelFilter::Debug)
+            .chain(std::io::stdout());
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        dispatch = dispatch
+            .level(log::LevelFilter::Warn)
+            .chain(std::io::stdout())
+            .chain(fern::log_file(format!(
+                "log/log-{}.log",
+                chrono::Utc::now().to_rfc2822()
+            ))?);
+    }
+    dispatch.apply().map_err(|err| {
+        io::Error::new(
+            io::ErrorKind::Other,
+            format!("LIBTRADER_INIT_SERVER_LOG_FAILED: {}", err),
+        )
+    })
 }
 
 /// Server Initialization of the library.
@@ -96,11 +118,7 @@ fn libtrader_init_log() -> Result<(), ReturnFlags> {
 /// ```
 pub async fn libtrader_init_server() -> std::io::Result<()> {
     // Initialize log.
-    //#[cfg(not(test))] // wot dis
-    match libtrader_init_log() {
-        Ok(_) => {}
-        Err(_) => {} // TODO: handle this case
-    };
+    libtrader_init_log()?;
 
     // Initialize SQL connection
     let sql_shared_conn = Arc::new(db_connect(DB_ACC_USER, DB_ACC_PASS).await.map_err(|err| {
@@ -125,7 +143,7 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
     let listener = TcpListener::bind(&addr).await?;
 
     loop {
-        let (socket, _) = listener.accept().await?; // socket, peer_addr
+        let (socket, peer_addr) = listener.accept().await?; // socket, peer_addr
         let acceptor = acceptor.clone();
         let sql_conn = sql_shared_conn.clone();
 
@@ -148,9 +166,12 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
         };
 
         tokio::spawn(async move {
-            if let Err(err) = fut.await {
-                eprintln!("{:?}", err);
-            }
+            IP.scope(peer_addr, async move {
+                if let Err(err) = fut.await {
+                    eprintln!("{:?}", err);
+                }
+            })
+            .await;
         });
     }
 }

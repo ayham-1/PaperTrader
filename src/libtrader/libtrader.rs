@@ -28,7 +28,6 @@ extern crate json;
 extern crate bincode;
 extern crate crypto;
 extern crate os_type;
-extern crate simplelog;
 
 pub mod common;
 

@@ -1,10 +1,9 @@
 extern crate log;
-extern crate simplelog;
 
 #[cfg(feature = "client")]
 use libtrader::client::initializer::libtrader_init_client;
 #[cfg(feature = "server")]
-use libtrader::server::initializer::libtrader_init_server;
+use libtrader::server::initializer::{libtrader_init_server, IP};
 
 fn main() {
     #[cfg(feature = "server")]
@@ -19,9 +18,13 @@ fn main() {
 
         // Spawn server
         rt.block_on(async move {
-            libtrader_init_server()
-                .await
-                .expect("failed running server");
+            IP.scope("0.0.0.0:0000".parse().unwrap(), async move {
+                // for main task logging
+                libtrader_init_server()
+                    .await
+                    .expect("failed running server");
+            })
+            .await;
         });
     }
 

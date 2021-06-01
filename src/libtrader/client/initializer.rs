@@ -6,7 +6,6 @@ use tokio_rustls::webpki::DNSNameRef;
 use tokio_rustls::TlsConnector;
 
 use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
-use crate::common::misc::path_exists::path_exists;
 
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -29,33 +28,58 @@ use rand::{thread_rng, Rng};
 /// ```
 ///
 fn libtrader_init_log() -> io::Result<()> {
-    info!("Started Logger.");
-    #[cfg(not(debug_assertions))]
-    gen_log();
+    use fern::colors::{Color, ColoredLevelConfig};
 
+    let mut dispatch = fern::Dispatch::new().format(|out, message, record| {
+        // configure colors for the whole line
+        let colors_line = ColoredLevelConfig::new()
+            .error(Color::Red)
+            .warn(Color::White)
+            // we actually don't need to specify the color for debug and info, they are white by default
+            .info(Color::Green)
+            .debug(Color::Yellow)
+            // depending on the terminals color scheme, this is the same as the background color
+            .trace(Color::BrightBlack);
+
+        // configure colors for the name of the level.
+        // since almost all of them are the same as the color for the whole line, we
+        // just clone `colors_line` and overwrite our changes
+        let colors_level = colors_line.clone().info(Color::Green);
+
+        out.finish(format_args!(
+            "{color_line}{date}[{target}][{level}{color_line}] {message}\x1B[0m",
+            color_line = format_args!(
+                "\x1B[{}m",
+                colors_level.get_color(&record.level()).to_fg_str()
+            ),
+            date = chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+            target = record.target(),
+            level = record.level(),
+            message = message
+        ))
+    });
     #[cfg(debug_assertions)]
     {
-        use simplelog::*;
-        use std::fs::File;
-
-        if !path_exists("log") {
-            std::fs::create_dir("log")?;
-        }
-        CombinedLogger::init(vec![
-            #[cfg(debug_assertions)]
-            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-            #[cfg(not(debug_assertions))]
-            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-            WriteLogger::new(
-                LevelFilter::Info,
-                Config::default(),
-                File::create(format!("log/log-{}.txt", chrono::Utc::now().to_rfc2822())).unwrap(),
-            ),
-        ])
-        .unwrap();
-    };
-
-    Ok(())
+        dispatch = dispatch
+            .level(log::LevelFilter::Debug)
+            .chain(std::io::stdout());
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        dispatch = dispatch
+            .level(log::LevelFilter::Warn)
+            .chain(std::io::stdout())
+            .chain(fern::log_file(format!(
+                "log/log-{}.log",
+                chrono::Utc::now().to_rfc2822()
+            ))?);
+    }
+    dispatch.apply().map_err(|err| {
+        io::Error::new(
+            io::ErrorKind::Other,
+            format!("LIBTRADER_INIT_SERVER_LOG_FAILED: {}", err),
+        )
+    })
 }
 
 /// Client Initialization of the library.
@@ -69,10 +93,8 @@ fn libtrader_init_log() -> io::Result<()> {
 /// ```
 #[tokio::main]
 pub async fn libtrader_init_client() -> std::io::Result<()> {
-    match libtrader_init_log() {
-        Ok(()) => {}
-        Err(err) => return Err(err),
-    };
+    // Initialize log.
+    libtrader_init_log()?;
 
     let addr = ("0.0.0.0", 4000)
         .to_socket_addrs()?
