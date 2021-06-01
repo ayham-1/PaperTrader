@@ -9,7 +9,7 @@ use tokio_rustls::TlsAcceptor;
 
 use std::net::ToSocketAddrs;
 
-use crate::common::misc::gen_tls_server_config::gen_tls_server_config;
+use crate::server::network::gen_tls_server_config::gen_tls_server_config;
 
 use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
 use crate::server::db::initializer::db_connect;

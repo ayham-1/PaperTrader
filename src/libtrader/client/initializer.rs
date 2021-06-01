@@ -5,7 +5,7 @@ use tokio::net::TcpStream;
 use tokio_rustls::webpki::DNSNameRef;
 use tokio_rustls::TlsConnector;
 
-use crate::common::misc::gen_tls_client_config::gen_tls_client_config;
+use crate::client::network::gen_tls_client_config::gen_tls_client_config;
 
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
