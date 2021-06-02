@@ -12,7 +12,6 @@ use tokio_rustls::TlsAcceptor;
 
 use crate::server::network::gen_tls_server_config::gen_tls_server_config;
 
-use crate::server::db::config::{DB_ACC_PASS, DB_ACC_USER};
 use crate::server::db::initializer::db_connect;
 use crate::server::network::handle_data::handle_data;
 
@@ -122,12 +121,19 @@ pub async fn libtrader_init_server() -> std::io::Result<()> {
     libtrader_init_log()?;
 
     // Initialize SQL connection
-    let sql_shared_conn = Arc::new(db_connect(DB_ACC_USER, DB_ACC_PASS).await.map_err(|err| {
-        io::Error::new(
-            io::ErrorKind::ConnectionAborted,
-            format!("SQL_CONNECTION_FAILED: {}", err),
+    let sql_shared_conn = Arc::new(
+        db_connect(
+            std::env::var("DB_ACC_USER").unwrap(),
+            std::env::var("DB_ACC_PASS").unwrap(),
         )
-    })?);
+        .await
+        .map_err(|err| {
+            io::Error::new(
+                io::ErrorKind::ConnectionAborted,
+                format!("SQL_CONNECTION_FAILED: {}", err),
+            )
+        })?,
+    );
 
     // Initialize arguments
     let options: Options = argh::from_env();

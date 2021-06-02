@@ -29,9 +29,11 @@ Running sandbox:
 ```shell
 $ sudo ./scripts/remove_db.sh
 $ sudo ./scripts/deploy_sandbox.sh
-$ cargo run --no-default-features --features "server" -- 0.0.0.0:4000 
+$ . ./scripts/env.sh && cargo run --no-default-features 
+	--features "server" -- 0.0.0.0:4000 
 	--cert certs/certificate.crt --key private.key &
-$ cargo run --no-default-features --features "client,tls_no_verify" &
+$ cargo run --no-default-features 
+	--features "client,tls_no_verify" &
 ```
 
 ## Built With

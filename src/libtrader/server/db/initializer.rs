@@ -1,5 +1,3 @@
-use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
-
 /// Establishes a postgresql connection to the SQL database.
 ///
 /// Creates a postgresql connection.
@@ -16,13 +14,17 @@ use crate::server::db::config::{DB_HOST, DB_HOST_PORT, DB_NAME};
 /// let mut client = db_connect(DB_USER, DB_PASS)?;
 /// ```
 pub async fn db_connect(
-    user: &'static str,
-    pass: &'static str,
+    user: String,
+    pass: String,
 ) -> Result<tokio_postgres::Client, tokio_postgres::Error> {
     /* Generate the requested string */
     let db_connect_str = format!(
         "host={} port={} dbname={} user={} password={}",
-        DB_HOST, DB_HOST_PORT, DB_NAME, user, pass
+        std::env::var("DB_HOST").unwrap(),
+        std::env::var("DB_HOST_PORT").unwrap(),
+        std::env::var("DB_NAME").unwrap(),
+        user,
+        pass
     );
     let (client, connection) =
         tokio_postgres::connect(db_connect_str.as_str(), tokio_postgres::NoTls).await?;
