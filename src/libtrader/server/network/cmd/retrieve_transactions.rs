@@ -1,7 +1,11 @@
+use std::io;
+use log::warn;
+
 use crate::common::message::inst::DataTransferInst;
 use crate::common::message::message::Message;
 use crate::common::message::message_type::MessageType;
 use crate::common::misc::assert_msg::assert_msg;
+use crate::common::misc::return_flags::ReturnFlags;
 
 use crate::server::account::retrieval_transaction::acc_retrieve_transaction;
 
@@ -38,7 +42,9 @@ pub async fn retrieve_transactions(
         Ok(_) => Ok(()),
         Err(err) => {
             warn!("RETRIEVE_TRANSACTION_FAILED: {}", err);
-            Ok(()) // TODO: return error
+            Err(io::Error::new(
+                    io::ErrorKind::Other, 
+                    format!("{}: {}", ReturnFlags::ServerRetrieveTransactionFailed, err)))
         }
     }
 }

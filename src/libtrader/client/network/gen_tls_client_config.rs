@@ -8,6 +8,7 @@ use tokio_rustls::rustls::{ClientConfig, KeyLogFile, NoClientSessionStorage};
 /// using this in production envs will be a HUGE security vuln.
 #[cfg(feature = "tls_no_verify")]
 mod danger {
+    use log::warn;
     use tokio_rustls::rustls;
     use tokio_rustls::webpki;
     pub struct NoCertificateVerification {}

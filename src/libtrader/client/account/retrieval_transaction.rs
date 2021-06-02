@@ -35,8 +35,12 @@ pub async fn acc_retrieve_transaction(
     socket: &mut TlsStream<TcpStream>,
     auth_jwt: String,
 ) -> io::Result<Vec<Transaction>> {
-    // TODO: yea absolutely, let's crash the thread
-    assert_eq!(auth_jwt.is_empty(), false);
+    if auth_jwt.is_empty() == true {
+        return Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "ACC_RETRIEVE_TRANSACTION: JWT TOKEN EMPTY"
+                                 ));
+    }
 
     /* build message request */
     let message = message_builder(

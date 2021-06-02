@@ -1,7 +1,3 @@
-#[cfg(any(feature = "server", feature = "client"))]
-#[macro_use]
-extern crate log;
-
 /* Server crates */
 #[cfg(all(feature = "server", not(feature = "client")))]
 extern crate arrayref;
@@ -29,6 +25,7 @@ extern crate bincode;
 extern crate crypto;
 extern crate os_type;
 
+extern crate log;
 pub mod common;
 
 #[cfg(feature = "client")]

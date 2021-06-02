@@ -34,8 +34,12 @@ pub async fn acc_retrieve_portfolio(
     socket: &mut TlsStream<TcpStream>,
     auth_jwt: String,
 ) -> io::Result<Portfolio> {
-    // TODO: yea absolutely, let's crash the thread
-    assert_eq!(auth_jwt.is_empty(), false);
+    if auth_jwt.is_empty() == true {
+        return Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "ACC_RETRIEVE_PORTFOLIO: JWT TOKEN EMPTY"
+                                 ));
+    }
 
     /* build message request */
     let message = message_builder(
