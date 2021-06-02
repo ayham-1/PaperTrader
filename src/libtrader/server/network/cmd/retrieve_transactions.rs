@@ -1,5 +1,5 @@
-use std::io;
 use log::warn;
+use std::io;
 
 use crate::common::message::inst::DataTransferInst;
 use crate::common::message::message::Message;
@@ -43,8 +43,9 @@ pub async fn retrieve_transactions(
         Err(err) => {
             warn!("RETRIEVE_TRANSACTION_FAILED: {}", err);
             Err(io::Error::new(
-                    io::ErrorKind::Other, 
-                    format!("{}: {}", ReturnFlags::ServerRetrieveTransactionFailed, err)))
+                io::ErrorKind::Other,
+                format!("{}: {}", ReturnFlags::ServerRetrieveTransactionFailed, err),
+            ))
         }
     }
 }

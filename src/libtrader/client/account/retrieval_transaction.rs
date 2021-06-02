@@ -37,9 +37,9 @@ pub async fn acc_retrieve_transaction(
 ) -> io::Result<Vec<Transaction>> {
     if auth_jwt.is_empty() == true {
         return Err(io::Error::new(
-                io::ErrorKind::PermissionDenied,
-                "ACC_RETRIEVE_TRANSACTION: JWT TOKEN EMPTY"
-                                 ));
+            io::ErrorKind::PermissionDenied,
+            "ACC_RETRIEVE_TRANSACTION: JWT TOKEN EMPTY",
+        ));
     }
 
     /* build message request */

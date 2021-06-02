@@ -57,16 +57,23 @@ pub async fn get_server_salt(
         )
     })?;
 
-    if assert_msg(&ret_msg, MessageType::DataTransfer, 
-                  true, 1, 
-                  false, 0, 
-                  true, 1,
-                  true, digest::SHA512_OUTPUT_LEN / 2) {
+    if assert_msg(
+        &ret_msg,
+        MessageType::DataTransfer,
+        true,
+        1,
+        false,
+        0,
+        true,
+        1,
+        true,
+        digest::SHA512_OUTPUT_LEN / 2,
+    ) {
         Ok(*array_ref!(ret_msg.data, 0, digest::SHA512_OUTPUT_LEN / 2))
-    }
-    else {
-        Err(io::Error::new(io::ErrorKind::InvalidData,
-                           format!("{}", ReturnFlags::ClientReqSaltInvMsg),
-                           ))
+    } else {
+        Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("{}", ReturnFlags::ClientReqSaltInvMsg),
+        ))
     }
 }

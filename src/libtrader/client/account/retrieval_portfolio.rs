@@ -36,9 +36,9 @@ pub async fn acc_retrieve_portfolio(
 ) -> io::Result<Portfolio> {
     if auth_jwt.is_empty() == true {
         return Err(io::Error::new(
-                io::ErrorKind::PermissionDenied,
-                "ACC_RETRIEVE_PORTFOLIO: JWT TOKEN EMPTY"
-                                 ));
+            io::ErrorKind::PermissionDenied,
+            "ACC_RETRIEVE_PORTFOLIO: JWT TOKEN EMPTY",
+        ));
     }
 
     /* build message request */

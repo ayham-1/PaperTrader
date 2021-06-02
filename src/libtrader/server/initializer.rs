@@ -1,10 +1,10 @@
 use std::io;
+use std::net::ToSocketAddrs;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::net::ToSocketAddrs;
 
-use log::warn;
 use argh::FromArgs;
+use log::warn;
 
 use tokio::io::AsyncReadExt;
 use tokio::net::TcpListener;

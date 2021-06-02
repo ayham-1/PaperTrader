@@ -1,5 +1,5 @@
-use std::io;
 use log::warn;
+use std::io;
 
 use crate::common::message::inst::DataTransferInst;
 use crate::common::message::message::Message;
@@ -42,8 +42,9 @@ pub async fn retrieve_portfolio(
         Err(err) => {
             warn!("RETRIEVE_PORTFOLIO_FAILED: {}", err);
             Err(io::Error::new(
-                    io::ErrorKind::Other, 
-                    format!("{}: {}", ReturnFlags::ServerRetrievePortfolioFailed, err)))
+                io::ErrorKind::Other,
+                format!("{}: {}", ReturnFlags::ServerRetrievePortfolioFailed, err),
+            ))
         }
     }
 }
