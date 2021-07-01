@@ -28,7 +28,7 @@ $ cargo build --no-default-features --features "server,client"
 Running sandbox:
 ```shell
 $ sudo ./scripts/remove_db.sh
-$ sudo ./scripts/deploy_sandbox.sh
+$ sudo ./scripts/deploy_sandbox_db.sh
 $ ./scripts/deploy_sandbox_server.sh
 $ ./scripts/deploy_sandbox_client.sh
 $ cargo run --no-default-features 
