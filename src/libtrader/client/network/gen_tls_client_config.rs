@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use tokio_rustls::rustls::{ClientConfig, KeyLogFile, NoClientSessionStorage};
 
-/// A "always accept" Certficate verifier.
+/// A "always accept" certficate verifier.
 ///
 /// WARN: only to be used in development environments.
-/// using this in production envs will be a HUGE security vuln.
+/// using this in production envs WILL BE A HUGE security vuln.
 #[cfg(feature = "tls_no_verify")]
 mod danger {
     use log::warn;
@@ -38,7 +38,8 @@ mod danger {
 /// checked, else they are.
 /// - No persistent session storage.
 ///
-/// Returns; the client configuration in an Arc.
+/// Returns; the client configuration in an ```std::io::Result<Arc<ClientConfig>>```.
+/// Example already present in rustls' examples on github.
 pub fn gen_tls_client_config() -> std::io::Result<Arc<ClientConfig>> {
     let mut config = ClientConfig::new();
     config.key_log = Arc::new(KeyLogFile::new());
