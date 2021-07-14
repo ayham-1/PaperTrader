@@ -15,19 +15,18 @@ use tokio_rustls::client::TlsStream;
 
 /// Issues a command to the connected TLS server to obtain a salt.
 ///
-/// All salts returned are of size ```digest::SHA512_OUTPUT_LEN/2``` or 32 bytes.
+/// All salts returned are of size ```digest::SHA512_OUTPUT_LEN/2```, 32 bytes.
+/// Should be used in contexts that return ```io::Result```.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
-/// socket - The TLS connection to use for the salt.
+/// socket - The TLS stream to use for the salt.
 ///
 /// Returns: a [u8; 32] on success, and ```ReturnFlags``` on error containing the reason of failure.
 ///
 /// Example:
 /// ```rust
-///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match get_server_salt(tls_client, poll) {
-///         Ok(salt) => salt,
-///         Err(err) => panic!("could not retrieve server salt; err: {}", errj)
-///     };
+///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = get_server_salt(tls_client)?;
 /// ```
 pub async fn get_server_salt(
     socket: &mut TlsStream<TcpStream>,
