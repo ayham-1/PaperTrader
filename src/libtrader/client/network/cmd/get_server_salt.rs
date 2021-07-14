@@ -22,7 +22,7 @@ use tokio_rustls::client::TlsStream;
 /// Arguments:
 /// socket - The TLS stream to use for the salt.
 ///
-/// Returns: a [u8; 32] on success, and ```ReturnFlags``` on error containing the reason of failure.
+/// Returns: a ```io::Result<[u8; 32]>```.
 ///
 /// Example:
 /// ```rust

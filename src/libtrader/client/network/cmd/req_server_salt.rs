@@ -15,22 +15,19 @@ use tokio_rustls::client::TlsStream;
 /// password.
 ///
 /// All salts returned are of size ```digest::SHA512_OUTPUT_LEN``` or 64 bytes.
+/// Should be used in contexts that return ```io::Result```.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
-/// tls_client - The TLS connection to use for the salt.
-/// poll - The mio::Poll used to handle branched control of the TLS client events.
+/// socket - The TLS client to use for the salt.
 /// username - The username to obtain the salt.
 /// salt_type - The CommmandInst, either GetEmailSalt, or GetPasswordSalt.
 ///
-/// Returns: a [u8; 64] on success, and a ReturnFlags on error containing the reason of failure.
-///
+/// Returns: a ```io::Result<[u8; 64]>```.
 /// Example:
 /// ```rust
-///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = match req_server_salt(tls_client, poll, "n1ckn8me",
-///                                                                     CommandInst::GetEmailSalt) {
-///         Ok(salt) => salt,
-///         Err(err) => panic!("could not retrieve email salt; err: {}", err)
-///     };
+///     let server_salt: [u8; digest::SHA512_OUTPUT_LEN/2] = req_server_salt(tls_client, "n1ckn8me",
+///                                                                          CommandInst::GetEmailSalt)?;
 /// ```
 pub async fn req_server_salt(
     socket: &mut TlsStream<TcpStream>,
