@@ -16,15 +16,13 @@ use rand::{thread_rng, Rng};
 /// platfrom dependent.
 /// On unix systems: /var/log/papertrader/
 /// On windows/unkown systems: $(pwd)/log/
+/// Should be used contexts that return ```io::Result```.
 ///
-/// Returns: nothing on success, on error contains the reason of failure.
+/// Returns: ```io::Result```
 ///
 /// Example:
 /// ```rust
-///     match libtrader_init_log() {
-///         Ok(()) => {},
-///         Err(err) => panic!("failed initializing log, reason: {}", err)
-///     };
+///     libtrader_init_client().expect("failed running client");
 /// ```
 ///
 fn libtrader_init_log() -> io::Result<()> {
