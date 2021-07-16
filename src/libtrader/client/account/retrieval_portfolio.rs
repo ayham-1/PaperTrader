@@ -16,19 +16,18 @@ use tokio_rustls::client::TlsStream;
 ///
 /// Sends a request for portfolio with the JWT token of the client connection. Handles any response
 /// and returns.
+/// Should be used in contexts that return ```io::Result```.
+/// Should be used in Async context.
 ///
 /// Arguments:
-/// tls_client - TLS client to use containing the JWT token to authorize.
-/// poll - For event handling.
+/// socket - TLS socket to use.
+/// auth_jwt - JWT token to authenticate with.
 ///
-/// Returns: portfolio on success, string on error containing reason of failure.
+/// Returns: ```io::Result``` wraps ```Portfolio```.
 ///
 /// Example:
 /// ```rust
-///     match acc_retrieve_portfolio(&mut tls_client, &mut poll) {
-///         Ok(portfolio) => {/* interesting stuff with portfolio */},
-///         Err(err) => panic!("can not retrieve portfolio! error: {}", err)
-///     };
+///     let mut portfolio = acc_retrieve_portfolio(&mut tls_client, &mut poll)?;
 /// ```
 pub async fn acc_retrieve_portfolio(
     socket: &mut TlsStream<TcpStream>,
