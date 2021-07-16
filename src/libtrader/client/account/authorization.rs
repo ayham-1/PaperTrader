@@ -21,15 +21,24 @@ use tokio_rustls::client::TlsStream;
 /// Takes in the username, email and password. Data is hashed and then sent to the server for
 /// further hashing and confirmation of authentication. A session token is returned.
 /// The function is not complete.
-///
-/// Currently only sends authentication request and does not process any returned values.
+/// Should be used in contexts that return ```io::Result```.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// socket - TLS socket to use.
 /// username - The raw username to be used.
 /// email - The raw email to be used.
 /// password - The raw password to be used.
 ///
-/// Returns: nothing on success, and ReturnFlags on failure.
+/// Returns: ```io::Result``` wraps JWT token on succes, and contains error message on failure.
+///
+/// Example:
+/// ```rust
+///     match acc_auth(&mut socket, "username", "email", "password").await {
+///         Ok(jwt) => { /* use JWT token */ }
+///         Err(err) => panic!("panik! {}", err), /* unauth OR invalid JWT token */
+///     }
+/// ```
 pub async fn acc_auth(
     socket: &mut TlsStream<TcpStream>,
     username: &str,
