@@ -17,19 +17,18 @@ use tokio_rustls::client::TlsStream;
 ///
 /// Sends a request for a transaction history with the JWT token of the client connection. Handles
 /// any response and returns.
+/// Should be used in contexts that return ```io::Result```.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
-/// tls_client - TLS client to use containing the JWT token to authorize.
-/// poll - For event handling.
+/// socket - TLS socket to use.
+/// auth_jwt - JWT Token to authenticate with
 ///
-/// Returns: transaction vector on success, string on error containing reason of failure.
+/// Returns: ```io::Result``` wrapped ```Vec<Transaction>```
 ///
 /// Example:
 /// ```rust
-///     match acc_retrieve_transaction(&mut tls_client, &mut poll) {
-///         Ok(transaction) => {/* interesting stuff with portfolio */},
-///         Err(err) => panic!("can not retrieve transaction history! error: {}", err)
-///     };
+///     let mut transaction = acc_retrieve_transaction(&mut tls_client, &mut poll)?
 /// ```
 pub async fn acc_retrieve_transaction(
     socket: &mut TlsStream<TcpStream>,
