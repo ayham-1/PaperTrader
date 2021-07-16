@@ -10,9 +10,9 @@ use tokio_rustls::rustls::{Certificate, NoClientAuth, PrivateKey, ServerConfig};
 /// Loads a TLS public certificate
 ///
 /// Arguments:
-/// filename - Path to .crt file.
+/// path - Path to .crt file.
 ///
-/// Returns: vector of rustls' Certificate
+/// Returns: ```io::Results``` wrapping vector of rustls' Certificate.
 fn load_certs(path: &Path) -> std::io::Result<Vec<Certificate>> {
     certs(&mut BufReader::new(File::open(path)?))
         .map_err(|_| std::io::Error::new(std::io::ErrorKind::InvalidInput, "invalid cert"))
@@ -21,9 +21,9 @@ fn load_certs(path: &Path) -> std::io::Result<Vec<Certificate>> {
 /// Load a TLS private key.
 ///
 /// Arguments:
-/// filename - Path to .key file.
+/// path - Path to .key file.
 ///
-/// Returns: rustls::PrivateKey
+/// Returns: ```io::Results``` wrapping ```rustls::PrivateKey```.
 fn load_private_keys(path: &Path) -> std::io::Result<Vec<PrivateKey>> {
     let rsa_keys = {
         let keyfile = File::open(path).expect("cannot open private key file");
@@ -61,13 +61,12 @@ fn load_private_keys(path: &Path) -> std::io::Result<Vec<PrivateKey>> {
 /// Arguments:
 /// certs_file - public certificate path.
 /// priv_key_file - private key for the public certificiate path.
-/// ocsp_key_file - ocsp certificate for public certificate path.
 ///
-/// Returns: the server configuration in an Arc
+/// Returns: ```io::Result``` wrapping ```Arc<ServerConfig>```.
 ///
 /// Example:
 /// ```rust
-///      let config = gen_tls_server_config("tests.crt", "priv.key", None);
+///      let config = gen_tls_server_config("tests.crt", "priv.key")?;
 /// ```
 pub fn gen_tls_server_config(
     certs_file: &Path,
