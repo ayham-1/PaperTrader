@@ -23,15 +23,16 @@ use tokio_rustls::client::TlsStream;
 /// Gets three server salts, generates three new salts, cancatenates both salts, and use the
 /// concatenated salt to hash the username, email, and password. Generates a message containing the
 /// hashes and sends it to the server. Waits for a response and returns.
+/// Should be used in contexts that return ```io:;Result```.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
-/// tls_client - The TLS client to use.
-/// poll - The mio::Poll to get the events from.
+/// socket - The TLS socket to use.
 /// username - The username to send to the server.
 /// email - The email to send to the server.
 /// password - The password to send to the server.
 ///
-/// Returns: nothing on success, ReturnFlag on error containing the reason of failure.
+/// Returns: ```io::Result``` indicating success or failure.
 ///
 /// Example:
 /// ```rust
