@@ -41,15 +41,13 @@ tokio::task_local! {
 /// platfrom dependent.
 /// On unix systems: /var/log/papertrader/
 /// On windows/unknown systems: $(pwd)/log/
+/// Should be used in contexts that return ```io::Result```.
 ///
-/// Returns: nothing on success, on error contains the reason of failure.
+/// Returns: ```io::Result```.
 ///
 /// Example:
 /// ```rust
-///     match libtrader_init_log() {
-///         Ok(()) => {},
-///         Err(err) => panic!("failed initializing log, reason: {}", err)
-///     };
+///     libtrader_init_log()?;
 /// ```
 ///
 fn libtrader_init_log() -> std::io::Result<()> {
@@ -110,11 +108,28 @@ fn libtrader_init_log() -> std::io::Result<()> {
 /// Server Initialization of the library.
 ///
 /// Public function that initializes the library, and starts the libtrader server.
-/// This function should not return.
 ///
 /// Example:
 /// ```rust
 ///     libtrader_init_server()?;
+///     // Create tokio runtime
+///     let rt = tokio::runtime::Builder::new_multi_thread()
+///         .worker_threads(8)
+///         .thread_name("libtrader_server_thread")
+///         .enable_all()
+///         .build()
+///         .expect("failed creating server runtime");
+///
+///     // Spawn server
+///     rt.block_on(async move {
+///         IP.scope("0.0.0.0:0000".parse().unwrap(), async move {
+///             // for main task logging
+///             libtrader_init_server()
+///                 .await
+///                 .expect("failed running server");
+///         })
+///         .await;
+///     });
 /// ```
 pub async fn libtrader_init_server() -> std::io::Result<()> {
     // Initialize log.
