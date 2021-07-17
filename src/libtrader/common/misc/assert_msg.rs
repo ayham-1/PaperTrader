@@ -4,13 +4,20 @@ use crate::common::message::message_type::MessageType;
 /// Asserts a recieved message meta information.
 ///
 /// Takes in a message and meta information to check the message against.
+/// Can be used to check some attributes.
+/// For example, you can check for message to have an X amount of arguments, and
+/// not check how many arguments are passed.
 ///
 /// Arguments:
 /// message - The mesage to assert against.
 /// msg_type - MessageType expected.
+/// check_arg_cnt - Whether to check for the argument account.
 /// arg_cnt - The argument count expected.
+/// check_dnum - Whether to check for the number data message.
 /// msg_dnum - The number of the data message.
+/// check_dmax - Whether to check for the max data message.
 /// msg_dmax - The number of the max data message.
+/// check_len - Whether to check for the data payload length.
 /// data_len - The length of the data payload.
 ///
 /// Returns: a boolean.

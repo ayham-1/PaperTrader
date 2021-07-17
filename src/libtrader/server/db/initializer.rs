@@ -7,7 +7,7 @@
 /// user - The name of the user to connect to the database with.
 /// pass - The password of the user to connect to the database with.
 ///
-/// Returns: ```Result``` wrapping  ```tokio_postgres::Client``` on success, 
+/// Returns: ```Result``` wrapping  ```tokio_postgres::Client``` on success,
 /// and ```tokio_postgres::Error``` on error.
 ///
 /// Example:
