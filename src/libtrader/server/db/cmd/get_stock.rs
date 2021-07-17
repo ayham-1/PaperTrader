@@ -4,8 +4,10 @@ use crate::common::misc::return_flags::ReturnFlags;
 /// Returns the whole stock data from the postgres SQL database.
 ///
 /// Takes in a stock symbol and returns the whole data entries of the searched stock.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// searched_symbol - The name of the stock table.
 ///
 /// Returns: a Vec<StockVal> on success, and a string containing the reason of failure on error.
@@ -56,8 +58,10 @@ pub async fn get_stock_from_db(
 /// Returns stock data since an unix epoch from the postgres SQL database.
 ///
 /// Takes in a stock symbol and returns the data entries after a specified epoch of the searched stock.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// searched_symbol - The name of the stock table.
 /// time_epoch - The time from which the stock data retrieved.
 ///
@@ -115,8 +119,10 @@ pub async fn get_stock_from_db_since_epoch(
 ///
 /// Takes in a stock symbol and returns the data entries between two specified unix epochs of the searched
 /// stock.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// searched_symbol - The name of the stock table.
 /// first_time_epoch - The time from which the stock data is first retrieved.
 /// second_time_epoch - The time from which the stock data ends.
