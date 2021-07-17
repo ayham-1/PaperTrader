@@ -4,8 +4,10 @@ use crate::common::misc::return_flags::ReturnFlags;
 /// Returns a company from the postgres SQL database.
 ///
 /// Takes in a company symbol and returns a company.
+/// Shuold be used in Async contexts
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// search_symbol - The specific company symbol to find.
 ///
 /// Returns: a reference to the found company on success, and a string containing the reason of
