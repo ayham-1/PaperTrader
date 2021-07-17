@@ -3,8 +3,10 @@ use crate::common::misc::return_flags::ReturnFlags;
 /// Creates a stock on the postgres SQL database.
 ///
 /// Takes in a stock name and creates a table in the ```asset_schema``` schema
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// stock_name - The name of the stock to create.
 ///
 /// Returns: nothing on success, a string containing the reason of failure on error.
