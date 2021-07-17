@@ -4,8 +4,10 @@ use crate::common::misc::return_flags::ReturnFlags;
 /// Creates a transaction on the postgre SQL database
 ///
 /// Takes in the transaction and a userId to insert to the database.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// user_id - ID to use for the new transaction.
 /// transaction - The transaction to use.
 ///
