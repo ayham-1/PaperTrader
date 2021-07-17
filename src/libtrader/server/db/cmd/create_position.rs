@@ -4,8 +4,10 @@ use crate::common::misc::return_flags::ReturnFlags;
 /// Creates a position on the postgre SQL database
 ///
 /// Takes in the position to insert to the database.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// user_id - ID to create position for.
 /// position - The position to use.
 ///
