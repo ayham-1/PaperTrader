@@ -4,8 +4,10 @@ use crate::common::misc::return_flags::ReturnFlags;
 /// Creates a company on the postgres SQL database.
 ///
 /// Takes in a company and writes an entry in public.companies.
+/// Should be used in Async contexts.
 ///
 /// Arguments:
+/// sql_conn - The SQL connection to use.
 /// company - The company to create.
 ///
 /// Returns: the company, a string containing reason of failure on error.
