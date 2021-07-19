@@ -15,3 +15,10 @@ Cargo.lock
 
 # Logs generated
 log/
+
+# Latex garbage
+*.aux
+*.log
+*.toc
+*.fls
+*.fdb_latexmk
